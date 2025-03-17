@@ -12,7 +12,9 @@ Instead we're going to focus on practical techniques for making the most out of 
 ## About the author
 You could say that there are two kinds of programmers, academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical applications, about making a change in the real world.
 
-I have been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles and companies since 1998. I started out with Basic on the Commodore, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time I was absolutely convinced that C++ was the future, and didn't care much about C at all. It wasn't until I started designing and implementing my own programming languages some time around Y2K that I started to properly learn and appreciate C.
+I have been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles and companies since 1998.
+
+I started out with Basic on the Commodore, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time I was absolutely convinced that C++ was the future, and didn't care much about C at all. It wasn't until I started designing and implementing my own programming languages some time around Y2K that I started to properly learn and appreciate C.
 
 Since then I've written many kinds of software in the language, more code than I wish to remember; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of C and appreciate it for its strengths.
 
