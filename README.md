@@ -1,4 +1,5 @@
 # Hacktical C
+A pracitcal hackers guide to the C programming language.
 
 *In memory of Dennis Ritchie,
 one of the greatest hackers this world has known.*
