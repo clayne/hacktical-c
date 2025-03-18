@@ -10,9 +10,9 @@ This book assumes basic programming knowledge. We're not going to spend a lot of
 ## About the author
 You could say that there are two kinds of programmers, academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical applications, about making a change in the real world.
 
-I have been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles and companies since 1998.
+I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
-I started out with Basic on the Commodore, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time, I didn't care much about C at all, it looked very primitive compared to C++. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously. Since then I've written a lot of code in C, more code than I wish to remember; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
+I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time, I didn't care much about C at all, it looked very primitive compared to other languages. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously. Since then I've written a lot of C and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
 
 ## Why (not) C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language. C doesn't try to save you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.

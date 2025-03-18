@@ -3,11 +3,11 @@ Linked lists have a somewhat sketchy reputation these days. Which is a shame, be
 
 Singly linked lists are tricky to rearrange and remove items from since you always need access to the previous item, which can only be obtained by starting from the head. Doubly linked lists solve this problem, since you have direct access to both the previous and next item. 
 
-The other common objection is memory locality. Since list nodes are separate from the actual values, iterating means chasing pointers at every step. Since modern computer architectures derive a lot of their speed from caching large blocks of data, as opposed to accessing main memory repeatedly; this makes ordinary linked lists slow compared to arrays.
+The other common objection is memory locality. Since list nodes are separate from the actual values, iterating means chasing pointers at every step. Modern computer architectures derive a lot of their speed from caching large blocks of data, as opposed to repeatedly accessing main memory; which makes ordinary linked lists slow compared to arrays.
 
-Intrusive means that the list's infrastructure is instead stored inside the values. This means no extra allocations for list nodes and potentially no pointer chasing if values are allocated as a single block of memory.
+Intrusive means that the list's infrastructure is stored inside the values. This means no extra allocations for list nodes and potentially no pointer chasing if values are allocated as a single block of memory.
 
-At this point you might wonder what is the point of a list of values stored in a single block of memory. The point is that the allocation strategy has little to do with what sequences we choose to put the values in. One common strategy in C is to allocate a bunch of values as a single block of memory, as opposed to asking the memory allocator for one value at a time; which reduces memory fragmentation.
+At this point you might wonder what is the point of a list of values stored in a single block of memory. The point is that the allocation strategy has little to do with what sequences we choose to put values in. One common strategy in C is to allocate a bunch of values as a single block of memory, as opposed to asking the memory allocator for one value at a time; which reduces memory fragmentation.
 
 This is what a list node looks like; as promised there is no trace of the value, just the links.
 
