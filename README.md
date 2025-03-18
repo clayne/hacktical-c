@@ -26,6 +26,7 @@ The truth is that any reasonably complicated software system created by humans w
 Programmers like to say that you should pick 'the right tool for the job'; what many fail to grasp is that the only people who have the capability to decide which tools are right, are the people creating the software. Much effort has been wasted on arguing and bullying programmers into picking tools other people prefer.
 
 ## Building
+The makefile requires `gcc`, `ccache` and `valgrind` to do it's thing.
 
 ```
 git clone https://github.com/codr7/hacktical-c.git
