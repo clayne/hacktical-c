@@ -26,7 +26,28 @@ struct hc_task_list {
 };
 ```
 
-We now have all the pieces needed to define our tasks. For this example, we'll use a simple counter to represent the data being produced/consumed, but you could pass any kind of data.
+To keep it simple, we'll simply keep running tasks until all are `done`.
+
+```
+void hc_task_list_run(struct hc_task_list *tl) {
+  bool all_done = false;
+  
+  while (!all_done) {
+    all_done = true;
+    
+    hc_list_do(&tl->tasks, i) {
+      struct hc_task *t = hc_baseof(i, struct hc_task, list);
+
+      if (!t->done) {
+	t->body(t);
+	all_done = false;
+      }
+    }
+  }
+}
+```
+
+We now have all the pieces needed to define our tasks. For this example, we'll use a counter to represent the data being produced/consumed.
 
 ```C
 struct my_task {
@@ -87,7 +108,7 @@ static void consumer(struct hc_task *task) {
 }
 ```
 
-`hc_task_yield()` is implemented as a macro that updates the task state and adds a `case`.
+`hc_task_yield()` is implemented as a macro that updates the task state and adds a matching `case`.
 
 ```C
 #define hc_task_yield(task)			
@@ -101,4 +122,4 @@ static void consumer(struct hc_task *task) {
 The reason this works is because C allows `case` to appear at any nesting level within a `switch`. The discovery of this fact is often credited to a guy named [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
 
 ### Limitations
-Since we're skipping around inside the function, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
+Since we're skipping around inside the function body, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
