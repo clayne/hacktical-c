@@ -17,13 +17,13 @@ I started out with Basic on the Commodore 64, went on to learn Assembler on an A
 ## Why C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language. C doesn't try to save you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
 
-These days many programmers will recommend choosing a stricter language, regardless of the problem is being solved. Most of those programmers wouldn't even trust themselves with the kind of freedom C offers, many of them haven't even bothered to learn the language properly.
+These days many programmers will recommend choosing a stricter language, regardless of the problem being solved. Most of those programmers wouldn't even trust themselves with the kind of freedom C offers, many haven't even bothered to learn the language properly.
 
 Since most of the foundation of the digital revolution, including the Internet was built using C; it gets the blame for many problems that are more due to our inability and immaturity in designing and building complicated software systems than about programming languages.
 
 The truth is that any reasonably complicated software system created by humans will have bugs, regardless of what technology was used to create it. Using a stricter language helps with reducing some classes of bugs, at the cost of reduced flexibility in expressing a solution and increased effort creating the software.
 
-Programmers like to say that you should pick 'the right tool for the job'; what many fail to grasp is that the only people who have the right and capability to decide which tools are the right ones, are the people creating the software. Much effort has been wasted on arguing and bullying programmers into picking the tools other people prefer.
+Programmers like to say that you should pick 'the right tool for the job'; what many fail to grasp is that the only people who have the right and capability to decide which tools are right, are the people creating the software. Much effort has been wasted on arguing and bullying programmers into picking the tools other people prefer.
 
 ## Building the code
 
