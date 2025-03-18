@@ -1,3 +1,0 @@
-* add makefile
-* add list
-* add fix
