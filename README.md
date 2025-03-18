@@ -14,7 +14,7 @@ I've been writing code for fun on a mostly daily basis since I got a Commodore 6
 
 I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time, I didn't care much about C at all, it looked very primitive compared to other languages. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously. Since then I've written a ton of C; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
 
-## Why (not) C?
+## Why C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language. C doesn't try to save you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
 
 These days many programmers will recommend choosing a stricter language, regardless of the problem is being solved. Most of those programmers wouldn't even trust themselves with the kind of freedom C offers, many of them haven't even bothered to learn the language properly.
