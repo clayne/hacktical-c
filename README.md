@@ -32,7 +32,7 @@ git clone https://github.com/codr7/hacktical-c.git
 cd hacktical-c
 mkdir build
 make
-build/test
+valgrind build/test
 ```
 
 ## Chapters
