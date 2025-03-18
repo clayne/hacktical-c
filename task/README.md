@@ -26,7 +26,7 @@ struct hc_task_list {
 };
 ```
 
-To keep it simple, we'll simply keep running tasks until all are `done`.
+To keep it simple, we'll simply keep running tasks until all are `done`. One obvious improvement would be to keep running tasks on a separate list.
 
 ```
 void hc_task_list_run(struct hc_task_list *tl) {
@@ -119,7 +119,7 @@ static void consumer(struct hc_task *task) {
   } while (0)				      
 ```
 
-The reason this works is because C allows `case` to appear at any nesting level within a `switch`. The discovery of this fact is often credited to a guy named [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
+The reason this works is because C allows `case` to appear at any nesting level within a `switch`. The discovery of this feature is often credited to a guy named [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
 
 ### Limitations
 Since we're skipping around inside the function body, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
