@@ -9,10 +9,6 @@
   return;								\
   case __LINE__:;							
 
-struct hc_task_list {
-  struct hc_list tasks;
-};
-
 struct hc_task;
 
 typedef void (*hc_task_body)(struct hc_task *);
@@ -24,11 +20,15 @@ struct hc_task {
   bool done;
 };
 
-struct hc_task_list *hc_task_list_init(struct hc_task_list *tl);
-void hc_task_list_run(struct hc_task_list *tl);
+struct hc_task_list {
+  struct hc_list tasks;
+};
 
 struct hc_task *hc_task_init(struct hc_task *t,
 			     struct hc_task_list *tl,
 			     hc_task_body body);
+
+struct hc_task_list *hc_task_list_init(struct hc_task_list *tl);
+void hc_task_list_run(struct hc_task_list *tl);
 
 #endif
