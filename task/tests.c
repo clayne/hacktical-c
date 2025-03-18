@@ -9,7 +9,7 @@ static void producer(struct hc_task *task) {
   case 0:
     assert(cc == 0);
     pc++;
-    hc_task_yield();
+    hc_task_yield(task);
     assert(cc == 1);
     pc++;
   }
@@ -22,7 +22,7 @@ static void consumer(struct hc_task *task) {
   case 0:
     assert(pc == 1);
     cc++;
-    hc_task_yield();
+    hc_task_yield(task);
     assert(pc == 2);
     cc++;
   }

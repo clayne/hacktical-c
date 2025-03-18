@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include "list/list.h"
 
-#define hc_task_yield()							\
+#define hc_task_yield(task)						\
   task->state = __LINE__;						\
   return;								\
   case __LINE__:;							
