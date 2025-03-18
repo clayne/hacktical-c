@@ -1,5 +1,5 @@
 # Hacktical C
-A pracitcal hacker's guide to the C programming language.
+A practical hacker's guide to the C programming language.
 
 *In memory of Dennis Ritchie,
 one of the greatest hackers this world has known.*
@@ -14,9 +14,7 @@ You could say that there are two kinds of programmers, academics and hackers. I'
 
 I have been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles and companies since 1998.
 
-I started out with Basic on the Commodore, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time I was absolutely convinced that C++ was the future, and didn't care much about C at all. It wasn't until I started designing and implementing my own programming languages some time around Y2K that I started to properly learn and appreciate C.
-
-Since then I've written many kinds of software in the language, more code than I wish to remember; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of C and appreciate it for its strengths.
+I started out with Basic on the Commodore, went on to learn Assembler on an Amiga 500, Pascal on PC, followed by C++. For a long time, I didn't care much about C at all, it looked very primitive compared to C++. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously. Since then I've written a lot of code in C, more code than I wish to remember; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
 
 ## Why (not) C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language. C doesn't try to save you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
