@@ -5,7 +5,7 @@ void hc_list_init(struct hc_list *l) {
   l->prev = l->next = l;
 }
 
-bool hc_list_empty(struct hc_list *l) {
+bool hc_list_nil(struct hc_list *l) {
   return l->prev == l && l->next == l;
 }
 

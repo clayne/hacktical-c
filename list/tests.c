@@ -1,7 +1,7 @@
 #include <assert.h>
 #include "list.h"
 
-struct list_item {
+struct my_item {
   struct hc_list ls;
   int value;
 };
@@ -11,7 +11,7 @@ void list_tests() {
   hc_list_init(&head);
 
   const int n = 10;
-  struct list_item items[n];
+  struct my_item items[n];
   
   for (int i = 0; i < n; i++) {
     items[i].value = i;
@@ -21,6 +21,6 @@ void list_tests() {
   int i = 0;
   
   hc_list_do(&head, il) {
-    assert(hc_baseof(il, struct list_item, ls)->value == i++);
+    assert(hc_baseof(il, struct my_item, ls)->value == i++);
   }
 }

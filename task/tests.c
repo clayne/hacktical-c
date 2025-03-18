@@ -2,43 +2,53 @@
 #include <stdio.h>
 #include "task.h"
 
-int pc = 0, cc = 0;
+struct my_task {
+  struct hc_task task;
+  int *value;
+};
 
 static void producer(struct hc_task *task) {
+  int *value = hc_baseof(task, struct my_task, task)->value;
+  
   switch (task->state) {
   case 0:
-    assert(cc == 0);
-    pc++;
+    assert(*value == 0);
+    (*value)++;
     hc_task_yield(task);
-    assert(cc == 1);
-    pc++;
+    assert(*value == 2);
+    (*value)++;
   }
   
   task->done = true;
 }
 
 static void consumer(struct hc_task *task) {
+  int *value = hc_baseof(task, struct my_task, task)->value;
+
   switch (task->state) {
   case 0:
-    assert(pc == 1);
-    cc++;
+    assert(*value == 1);
+    (*value)++;
     hc_task_yield(task);
-    assert(pc == 2);
-    cc++;
+    assert(*value == 3);
+    (*value)++;
   }
   
   task->done = true;
 }
-
+  
 void task_tests() {
   struct hc_task_list tl;
   hc_task_list_init(&tl);
   
-  struct hc_task pt, ct;
-  hc_task_init(&pt, &tl, &producer);
-  hc_task_init(&ct, &tl, &consumer);
+  int value = 0;  
 
-  hc_task_list_run(&tl); 
-  assert(pc == 2);
-  assert(cc == 2);
+  struct my_task pt = {.value = &value};
+  hc_task_init(&pt.task, &tl, &producer);
+
+  struct my_task ct = {.value = &value};
+  hc_task_init(&ct.task, &tl, &consumer);
+
+  hc_task_list_run(&tl);
+  assert(value == 4);
 }

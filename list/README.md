@@ -20,7 +20,7 @@ struct hc_list {
 And this is a value which is set up to be part of two lists.
 
 ```C
-struct list_item {
+struct my_item {
   struct hc_list one_list;
   struct hc_list another_list;
   int value;
@@ -35,7 +35,7 @@ We can now allocate as many items as we need in one block, and add them to a max
   hc_list_init(&another_list);
 
   const int n = 10;
-  struct list_item items[n];
+  struct my_item items[n];
   
   for (int i = 0; i < n; i++) {
     items[i].value = i;
@@ -56,7 +56,7 @@ Iterating a list means starting from the head and stepping through the links unt
   _hc_list_do(l, i, hc_unique(next))
 ```
 
-We use the following macro to go out from `struct hc_list` to `struct list_item`.
+We use the following macro to go out from `struct hc_list` to `struct my_item`.
 
 ```C
 #define hc_baseof(p, t, m) ({			
@@ -69,7 +69,7 @@ Like so.
 
 ```C
   hc_list_do(&one_list, i) {
-    struct list_item it = hc_baseof(i, struct list_item, one_list);
+    struct my_item it = hc_baseof(i, struct my_item, one_list);
     ...
   }
 ```

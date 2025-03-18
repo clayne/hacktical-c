@@ -4,10 +4,12 @@
 #include <stdbool.h>
 #include "list/list.h"
 
-#define hc_task_yield(task)						\
-  task->state = __LINE__;						\
-  return;								\
-  case __LINE__:;							
+#define hc_task_yield(task)			\
+  do {						\
+    task->state = __LINE__;			\
+    return;					\
+    case __LINE__:;			        \
+  } while (0)				      
 
 struct hc_task;
 
