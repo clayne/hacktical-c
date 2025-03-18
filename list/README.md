@@ -1,4 +1,4 @@
-## Intrusive doubly linked lists
+## Intrusive Doubly Linked Lists
 Linked lists have a somewhat sketchy reputation these days. Which is a shame, because it's a very flexible and cheap technique for keeping track of a sequence of values.
 
 Singly linked lists are tricky to rearrange and remove items from since you always need access to the previous item, which can only be obtained by starting from the head. Doubly linked lists solve this problem, since you have direct access to both the previous and next item. 

@@ -25,7 +25,7 @@ The truth is that any reasonably complicated software system created by humans w
 
 Programmers like to say that you should pick 'the right tool for the job'; what many fail to grasp is that the only people who have the right and capability to decide which tools are the right ones, are the people creating the software. Much effort has been wasted on arguing and bullying programmers into picking the tools other people prefer.
 
-## Building and testing the code
+## Building the code
 
 ```
 git clone https://github.com/codr7/hacktical-c.git
@@ -37,4 +37,4 @@ build/test
 
 ## Chapters
 
-- [Intrusive doubly linked lists](https://github.com/codr7/hacktical-c/tree/main/list)
+- [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
