@@ -1,6 +1,7 @@
 #ifndef HACKTICAL_LIST_H
 #define HACKTICAL_LIST_H
 
+#include <stdbool.h>
 #include "../util/macros.h"
 
 #define _hc_list_do(l, i, _next)				\
@@ -16,6 +17,7 @@ struct hc_list {
 };
 
 void hc_list_init(struct hc_list *l);
+bool hc_list_empty(struct hc_list *l);
 struct hc_list *hc_list_delete(struct hc_list *l);
 
 void hc_list_push_front(struct hc_list *l, struct hc_list *it);

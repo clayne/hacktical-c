@@ -5,6 +5,10 @@ void hc_list_init(struct hc_list *l) {
   l->prev = l->next = l;
 }
 
+bool hc_list_empty(struct hc_list *l) {
+  return l->prev == l && l->next == l;
+}
+
 struct hc_list *hc_list_delete(struct hc_list *l) {
   l->prev->next = l->next;
   l->next->prev = l->prev;
