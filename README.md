@@ -1,14 +1,14 @@
 # Hacktical C
 A practical hacker's guide to the C programming language.
 
-*In memory of Dennis Ritchie,
+*In memory of [Dennis Ritchie](https://en.wikipedia.org/wiki/Dennis_Ritchie),
 one of the greatest hackers this world has known.*
 
 ## About the book
 This book assumes basic programming knowledge. We're not going to spend a lot of time and space on basic features, except where they behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility that C offers.
 
 ## About the author
-You could say that there are two kinds of programmers, academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a change in the real world.
+You could say that there are two kinds of programmers, with very different motivations; academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a change in the real world.
 
 I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
