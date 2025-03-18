@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "list.h"
 
 struct list_item {
   struct hc_list ls;

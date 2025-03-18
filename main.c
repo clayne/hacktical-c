@@ -1,4 +1,4 @@
-void list_tests();
+#include "list/tests.c"
 
 int main() {
   list_tests();

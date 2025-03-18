@@ -6,3 +6,6 @@ build/test: main.c build/list.o
 
 build/list.o:
 	$(MAKE) -C list
+
+clean:
+	rm build/*

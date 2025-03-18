@@ -41,5 +41,3 @@ struct hc_list *hc_list_peek_back(struct hc_list *l) {
   struct hc_list *it = l->prev;
   return (it == l) ? NULL : it;
 }
-
-#include "tests.c"
