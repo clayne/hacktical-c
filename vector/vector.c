@@ -65,9 +65,10 @@ void *hc_vector_insert(struct hc_vector *v, int i, int n) {
 }
 
 bool hc_vector_delete(struct hc_vector *v, int i, int n) {
-  if (v->length < i+n) { return false; }
+  const in m = i+n;
+  if (v->length < m) { return false; }
 
-  if (i+n < v->length) {
+  if (m < v->length) {
     uint8_t *const p = hc_vector_get(v, i);
     memmove(p, p + n*v->item_size, i + (v->length-n)*v->item_size);
   }
