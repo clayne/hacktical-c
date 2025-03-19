@@ -1,5 +1,5 @@
-#ifndef HACKTICAL_MACROS_H
-#define HACKTICAL_MACROS_H
+#ifndef HACKTICAL_MACRO_H
+#define HACKTICAL_MACRO_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -14,6 +14,13 @@
       uint8_t *_p = (uint8_t *)p;		\
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\
     })
+
+#define _hc_defer(_d, _v, ...)			\
+  void _d(int *) { __VA_ARGS__; }		\
+  int _v __attribute__ ((__cleanup__(_d)))
+
+#define hc_defer(...)							\
+  _hc_defer(hc_unique(defer_d), hc_unique(defer_v), __VA_ARGS__)
 
 #define _hc_id(x, y)				\
   x##y

@@ -1,10 +1,13 @@
 export CC=ccache gcc
 export CFLAGS=-g -Wall -I.
-PARTS=build/list.o build/task.o build/vector.o
+PARTS=build/fix.o build/list.o build/task.o build/vector.o
 
-build/test: clean main.c $(PARTS) 
-	$(CC) $(CFLAGS) main.c $(PARTS) -o build/test
+build/test: clean tests.c $(PARTS) 
+	$(CC) $(CFLAGS) tests.c $(PARTS) -o build/test
 	valgrind build/test
+
+build/fix.o:
+	$(MAKE) -C fix
 
 build/list.o:
 	$(MAKE) -C list

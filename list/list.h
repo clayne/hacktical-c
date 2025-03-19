@@ -2,7 +2,7 @@
 #define HACKTICAL_LIST_H
 
 #include <stdbool.h>
-#include "../util/macros.h"
+#include "../macro/macro.h"
 
 #define _hc_list_do(l, i, _next)				\
   for (struct hc_list *i = (l)->next, *_next = i->next;		\

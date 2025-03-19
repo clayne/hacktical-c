@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "util/macros.h"
+#include "macro/macro.h"
 
 #define hc_vector_do(v, var)			\
   for (void *var = (v)->start;			\
