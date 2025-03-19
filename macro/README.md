@@ -1,5 +1,5 @@
 ## Macros
-Before we go further, macros deserve a closer look. Many developers never get past the initial stage of utilizing their most basic features; which is a shame, because macros enable many powerful techniques.
+Before we move on, macros deserve a closer look. Many developers never get past the initial stage of utilizing their most basic features; which is a shame, because macros enable many powerful techniques.
 
 It's often useful pass macro parameters through an additional layer of macros to force expansion. `hc_id()` is used to concatenate identifiers and utilizes this technique to expand arguments before concatenating using `##`.
 
