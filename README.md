@@ -5,7 +5,7 @@ A practical hacker's guide to the C programming language.
 one of the greatest hackers this world has known.*
 
 ## About the book
-This book assumes basic programming knowledge. We're not going to spend a lot of time and space on basic features, except where they behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility that C offers.
+This book assumes basic programming knowledge. We're not going to spend a lot of time and space on explaining basic features, except where they behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility C offers.
 
 ## About the author
 You could say that there are two kinds of programmers, with very different motivations; academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a change in the real world.
@@ -25,7 +25,7 @@ C doesn't try to save you from making mistakes. It has very few opinions about y
 
 These days; many programmers will recommend choosing a stricter language, regardless of the problem being solved. Most of those programmers wouldn't trust themselves with the kind of freedom C offers, many haven't even bothered to learn the language properly.
 
-Since most of the foundation of the digital revolution, including the Internet was built using C; it gets the blame for many problems that are more due to our inability and immaturity in designing and building complicated software systems than about programming languages.
+Since most of the foundation of the digital revolution, including the Internet was built using C; it gets the blame for many problems that are more due to our immaturity in designing and building complicated software than about programming languages.
 
 The truth is that any reasonably complicated software system created by humans will have bugs, regardless of what technology was used to create it. Using a stricter language helps with reducing some classes of bugs, at the cost of reduced flexibility in expressing a solution and increased effort creating the software.
 
