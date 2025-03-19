@@ -39,3 +39,4 @@ make
 
 - [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
+- [Vectors](https://github.com/codr7/hacktical-c/tree/main/vector)
