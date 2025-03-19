@@ -2,6 +2,10 @@
 #include <string.h>
 #include "vector.h"
 
+static void grow(struct hc_vector *v) {
+  hc_vector_grow(v, v->capacity ? v->capacity*2 : 2);
+}
+
 struct hc_vector *hc_vector_init(struct hc_vector *v, int item_size) {
   v->item_size = item_size;
   v->capacity = v->length = 0;
@@ -14,17 +18,13 @@ void hc_vector_deinit(struct hc_vector *v) {
 }
 
 void hc_vector_grow(struct hc_vector *v, int capacity) {
-  v->capacity = capacity ? capacity : 2;
+  v->capacity = capacity;
 
   v->items = realloc(v->items,
 		     hc_align(v->item_size*(v->capacity+1), v->item_size));
 
   v->start = hc_align(v->items, v->item_size);
   v->end = v->start + v->item_size*v->length;
-}
-
-static void grow(struct hc_vector *v) {
-  hc_vector_grow(v, v->capacity*2);
 }
 
 void hc_vector_clear(struct hc_vector *v) {

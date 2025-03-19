@@ -19,7 +19,7 @@ The `hc_vector_grow()` call in the preceding example is not strictly needed, but
 
 ```C
 void hc_vector_grow(struct hc_vector *v, int capacity) {
-  v->capacity = capacity ? capacity : 2;
+  v->capacity = capacity;
 
   v->items = realloc(v->items,
 		     hc_align(v->item_size*(v->capacity+1), v->item_size));
