@@ -38,11 +38,47 @@ hc_vector_do(&v, it) {
 }
 ```
 
-Alternatively you could use `hc_vector_get()` with a manual loop, which is slightly slower (since it needs to calculate the pointer for every iteration).
+Alternatively you could use `hc_vector_get()` with a manual loop, which is slightly slower since it needs to call a function and calculate the pointer for every iteration.
 
 ```C
 for (int i = 0; i < n; i++) {
   int v = *(int *)hc_vector_get(&v, i);
   ...
 }  
+```
+
+While not the primary use case for vectors, it's sometimes useful to be able to insert/delete blocks of items. `hc_vector_insert()` returns a pointer to the start of the inserted block.
+
+```C
+void *hc_vector_insert(struct hc_vector *v, int i, int n) {
+  const int m = v->length+n;
+  if (m > v->capacity) { hc_vector_grow(v, m); } 
+  uint8_t *const p = hc_vector_get(v, i);
+
+  if (i < v->length) {
+    memmove(p + v->item_size*n, p, (v->length - i) * v->item_size);
+  }
+  
+  v->length += n;
+  v->end += n*v->item_size;
+  return p;
+}
+```
+
+While `hc_vector_delete()` simply returns a boolean signalling if the deletion was successful or not.
+
+```
+bool hc_vector_delete(struct hc_vector *v, int i, int n) {
+  const int m = i+n;
+  if (v->length < m) { return false; }
+
+  if (m < v->length) {
+    uint8_t *const p = hc_vector_get(v, i);
+    memmove(p, p + n*v->item_size, i + (v->length-n) * v->item_size);
+  }
+
+  v->length -= n;
+  v->end -= n*v->item_size;
+  return true;
+}
 ```
