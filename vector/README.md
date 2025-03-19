@@ -3,8 +3,6 @@ A vector can be thought of as a dynamically allocated array that automagically c
 
 Rather than storing pointers to values, we'll expose the memory directly to allow copying values in place. This means that the vector needs to know the size of its items.
 
-The `hc_vector_grow()` call is not strictly needed, but helps reduce allocations; without it the vector in the following example would need to duble the size of its memory block 3 times (allocating 2, 4, 8 and finally 16*32 bytes) to store 10 integers.
-
 ```C
 struct hc_vector v;
 hc_vector_init(&v, sizeof(int));
@@ -14,6 +12,20 @@ const int n = 10;
     
 for (int i = 0; i < n; i++) {
   *(int *)hc_vector_push(&v) = i;
+}
+```
+
+The `hc_vector_grow()` call in the preceding example is not strictly needed, but helps reduce allocations; without it the vector would need to duble the size of its memory block 3 times (allocating 2, 4, 8 and finally 16*32 bytes) to store 10 integers.
+
+```C
+void hc_vector_grow(struct hc_vector *v, int capacity) {
+  v->capacity = capacity ? capacity : 2;
+
+  v->items = realloc(v->items,
+		     hc_align(v->item_size*(v->capacity+1), v->item_size));
+
+  v->start = hc_align(v->items, v->item_size);
+  v->end = v->start + v->item_size*v->length;
 }
 ```
 
