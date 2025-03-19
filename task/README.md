@@ -122,4 +122,4 @@ static void consumer(struct hc_task *task) {
 The reason this works is because C allows `case` to appear at any nesting level within a `switch`. The discovery of this feature is often credited to a guy named [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
 
 ### Limitations
-Since we're skipping around inside the function body, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
+Since we're skipping around inside the task's function body, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
