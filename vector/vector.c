@@ -56,21 +56,26 @@ void *hc_vector_pop(struct hc_vector *v) {
 }
 
 void *hc_vector_insert(struct hc_vector *v, int i, int n) {
-  while (v->length+n > v->capacity) { grow(v); } 
+  const int m = v->length+n;
+  if (m > v->capacity) { hc_vector_grow(v, m); } 
   uint8_t *const p = hc_vector_get(v, i);
-  memmove(p+v->item_size*n, p, (v->length-i)*v->item_size);
+
+  if (i < v->length) {
+    memmove(p + v->item_size*n, p, (v->length - i) * v->item_size);
+  }
+  
   v->length += n;
-  v->end += n;
+  v->end += n*v->item_size;
   return p;
 }
 
 bool hc_vector_delete(struct hc_vector *v, int i, int n) {
-  const in m = i+n;
+  const int m = i+n;
   if (v->length < m) { return false; }
 
   if (m < v->length) {
     uint8_t *const p = hc_vector_get(v, i);
-    memmove(p, p + n*v->item_size, i + (v->length-n)*v->item_size);
+    memmove(p, p + n*v->item_size, i + (v->length-n) * v->item_size);
   }
 
   v->length -= n;
