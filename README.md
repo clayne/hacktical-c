@@ -42,7 +42,7 @@ make
 ```
 
 ## Donations
-If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via GitHub and I have launched a [gofundme campaign](https://gofund.me/46f9b954).
+If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via GitHub and I've launched a [gofundme campaign](https://gofund.me/46f9b954).
 
 ## Chapters
 The structure of this book is designed to form a natural progression, where later chapters build upon concepts that have already been introduced.

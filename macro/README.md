@@ -1,7 +1,7 @@
 ## Macros
 Before we move on, macros deserve a closer look. Many developers never get past the initial stage of utilizing their most basic features; which is a shame, because macros enable many powerful techniques.
 
-It's often useful pass macro parameters through an additional layer of macros to force expansion. `hc_id()` is used to concatenate identifiers and utilizes this technique to expand arguments before concatenating using `##`.
+It's often useful to pass macro arguments through an additional layer of macros to force expansion. `hc_id()` is used to concatenate identifiers and utilizes this technique to expand arguments before concatenating using `##`.
 
 ```C
 #define _hc_id(x, y)
