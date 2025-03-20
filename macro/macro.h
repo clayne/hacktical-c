@@ -31,7 +31,7 @@
   _hc_defer(hc_unique(defer_d), hc_unique(defer_v), __VA_ARGS__)
 
 #define _hc_id(x, y)				\
-  x##y
+  x ## y
 
 #define hc_id(x, y)				\
   _hc_id(x, y)
