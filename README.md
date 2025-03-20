@@ -48,6 +48,7 @@ If you would like to help make this book happen, all contributions are welcome. 
 The structure of this book is designed to form a natural progression, where later chapters build upon concepts that have already been introduced.
 
 - [Macros](https://github.com/codr7/hacktical-c/tree/main/macro)
+- [Fixed-Point Arithmetic](https://github.com/codr7/hacktical-c/tree/main/fix)
 - [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
 - [Vectors](https://github.com/codr7/hacktical-c/tree/main/vector)
