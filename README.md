@@ -42,7 +42,7 @@ make
 ```
 
 ## Benchmarks
-Some features come with benchmarks, `make build/benchmark` builds and runs all of them.
+Some chapters come with benchmarks, `make build/benchmark` builds and runs all of them.
 
 ## Extensions
 The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically.
