@@ -1,3 +1,4 @@
+#include "error/tests.c"
 #include "fix/tests.c"
 #include "list/tests.c"
 #include "macro/tests.c"
@@ -6,6 +7,7 @@
 #include "vector/tests.c"
 
 int main() {
+  error_tests();
   fix_tests();
   list_tests();
   macro_tests();

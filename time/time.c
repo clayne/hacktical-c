@@ -1,11 +1,11 @@
 #include <errno.h>
 #include <inttypes.h>
+#include "error/error.h"
 #include "time.h"
-#include "macro/fail.h"
 
 void hc_utc(struct timespec *out) {
   if (!timespec_get(out, TIME_UTC)) {
-    hc_fail("Failed getting time: %d", errno);
+    hc_throw(0, "Failed getting time: %d", errno);
   }
 }
 
@@ -19,7 +19,7 @@ uint64_t hc_sleep(uint64_t ns) {
   case EINTR:
     return t.tv_nsec;
   default:
-    hc_fail("Failed sleeping: %d", errno);
+    hc_throw(0, "Failed sleeping: %d", errno);
   }
 
   return 0;
