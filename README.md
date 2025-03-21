@@ -45,7 +45,7 @@ make
 Some chapters come with benchmarks, `make build/benchmark` builds and runs all of them.
 
 ## Platforms
-Since Unix is all about C, and Linux is currently the best supported Unix out there; Linux is the platofrm I would recommend for writing C. Just having access to `valgrind` is priceless. Windows does however offer a way of running Linix as a subsystem in the form of WSL2, which works very well.
+Since Unix is all about C, and Linux is currently the best supported Unix out there; Linux is the platofrm I would recommend for writing C. Just having access to `valgrind` is priceless. Microsoft has unfortunately chosen to neglect C for a log time, it's compilers dragging far behind the rest of the pack. Windows does however offer a way of running Linux as a subsystem in the form of WSL2, which works very well.
 
 ## Extensions
 The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically.
