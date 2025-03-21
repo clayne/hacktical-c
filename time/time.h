@@ -13,5 +13,6 @@ uint64_t hc_sleep(uint64_t ns);
 
 void hc_timer_init(struct hc_timer *t);
 uint64_t hc_timer_ns(const struct hc_timer *t);
+uint64_t hc_timer_print(const struct hc_timer *t, const char *m);
 
 #endif

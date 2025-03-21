@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <inttypes.h>
 #include "time.h"
 #include "macro/fail.h"
 
@@ -35,4 +36,8 @@ uint64_t hc_timer_ns(const struct hc_timer *t) {
   return
     (end.tv_sec - t->start.tv_sec) * 1000000000 +
     (end.tv_nsec - t->start.tv_nsec);
+}
+
+uint64_t hc_timer_print(const struct hc_timer *t, const char *m) {
+  printf("%s%" PRIu64 "ns\n", m, hc_timer_ns(t));
 }

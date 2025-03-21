@@ -6,6 +6,8 @@
 #define HC_FIX_EXP 3
 #define HC_FIX_HDR (HC_FIX_EXP+1)
 
+#define HC_FIX_MAX_EXP 7
+
 typedef uint64_t hc_fix;
 
 uint32_t hc_scale(uint8_t exp);
