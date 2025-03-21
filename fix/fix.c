@@ -2,18 +2,18 @@
 #include "fix.h"
 #include "macro/macro.h"
 
-uint32_t scale[8] = {
-  1,
-  10,
-  100,
-  1000,
-  10000,
-  100000,
-  1000000,
-  10000000};
-
 uint32_t hc_scale(uint8_t exp) {
-  assert(exp < 8);
+  static const uint32_t scale[HC_FIX_MAX_EXP+1] = {
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000};
+
+  assert(exp <= HC_FIX_MAX_EXP);
   return scale[exp];
 }
 
