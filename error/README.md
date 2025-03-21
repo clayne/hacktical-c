@@ -3,6 +3,8 @@ How to best deal with errors is something we're still very much learning in soft
 
 C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
 
+We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
+
 ```C
 #define _hc_catch(_e, _f, h)					
   jmp_buf _e;							
