@@ -46,15 +46,29 @@ void hc_errors_deinit() {
 }
 ```
 
-`hc_throw()` takes a code and a `printf`-compatable format and argument list.
+`hc_throw()` takes a code and a `printf`-compatable format and argument list. We're taking advantage of the fact that adjecent string literals are automagically concatenated by the compiler to add context to the message.
 
 ```C
-#define hc_throw(c, m, ...) {					\
-      struct hc_error *e =					\
-	hc_error_new((c), "Failure %d in '%s', line %d:\n" m,	\
-		     (c), __FILE__, __LINE__, ##__VA_ARGS__);	\
-      _hc_throw(e);						\
+#define hc_throw(c, m, ...) {						
+      struct hc_error *e =					
+	hc_error_new((c), "Failure %d in '%s', line %d:\n" m "\n",
+		     (c), __FILE__, __LINE__, ##__VA_ARGS__);	
+      _hc_throw(e);						
   } do while(0)
+
+void _hc_throw(struct hc_error *e) {
+  struct hc_vector *hs = handlers();
+
+  if (!hs->length) {
+    fputs(e->message, stderr);
+    abort();
+  }
+  
+  jmp_buf t;
+  memcpy(t, *(jmp_buf *)hc_vector_peek(hs), sizeof(jmp_buf));
+  hc_error = e;
+  longjmp(t, 1);
+}
 ```
 
 Example:
@@ -75,11 +89,33 @@ Failure 12345 in 'error/tests.c', line 14:
 here 42
 ```
 
-Errors are defined as dynamically sized structs.
+Errors are defined as dynamically sized structs, it's up to the handler to free the memory.
 
 ```C
 struct hc_error {
   int code;
   char message[];
 };
+
+struct hc_error *hc_error_new(int code, const char *message, ...) {
+  va_list args;
+  va_start(args, message);
+  
+  va_list tmp_args;
+  va_copy(tmp_args, args);
+  int len = vsnprintf(NULL, 0, message, tmp_args);
+  va_end(tmp_args);
+
+  if (len < 0) {
+    vfprintf(stderr, message, args);
+    abort();
+  }
+  
+  len++;
+  struct hc_error *e = malloc(sizeof(struct hc_error) + len);
+  e->code = code;
+  vsnprintf(e->message, len, message, args);
+  va_end(args);
+  return e;
+}
 ```
