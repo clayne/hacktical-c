@@ -2,13 +2,13 @@
 #include "time.h"
 #include "macro/fail.h"
 
-void get_utc(struct timespec *out) {
+void hc_utc(struct timespec *out) {
   if (!timespec_get(out, TIME_UTC)) {
     hc_fail("Failed getting time: %d", errno);
   }
 }
 
-uint64_t sleep(uint64_t ns) {
+uint64_t hc_sleep(uint64_t ns) {
   struct timespec t = {0};
   t.tv_nsec = ns;
 
@@ -25,12 +25,12 @@ uint64_t sleep(uint64_t ns) {
 }
 
 void hc_timer_init(struct hc_timer *t) {
-  get_utc(&t->start);
+  hc_utc(&t->start);
 }
 
 uint64_t hc_timer_nsecs(const struct hc_timer *t) {
   struct timespec end;
-  get_utc(&end);
+  hc_utc(&end);
   
   return
     (end.tv_sec - t->start.tv_sec) * 1000000000 +
