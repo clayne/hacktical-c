@@ -1,7 +1,7 @@
 ## Exceptions
 How to best deal with errors is something we're still very much learning in software development. It is however very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions are a much better solution.
 
-C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `struct jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second (non-`0`) return from `setjmp`.
+C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
 
 ```C
 #define _hc_catch(_e, _f, h)					
