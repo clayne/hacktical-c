@@ -42,7 +42,11 @@ make
 ```
 
 ## Extensions
-The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically. Some developers avoid extensions like the plague, some are happy to use them for everything and anything. I fall somewhere in the middle of the spectrum; comfortable with using extensions when there are no good standard alternatives, especially if they're supported by both `gcc` and `clang`. All of the extensions used in this book except nested functions (which is only supported by `gcc` so far) fall in that category.
+The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically.
+
+Some developers avoid extensions like the plague, some are happy to use them for everything and anything. I fall somewhere in the middle of the spectrum; comfortable with using extensions when there are no good standard alternatives, especially if they're supported by both `gcc` and `clang`. All of the extensions used in this book except nested functions (which is currently only supported by `gcc`) fall in that category.
+
+I can think of one feature, `hc_defer()`, which would currently be absolutely impossible to do without extensions. In other cases, alternative solutions are simply less convenient.
 
 ## Donations
 If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via GitHub and I've launched a [gofundme campaign](https://gofund.me/46f9b954).
