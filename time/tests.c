@@ -6,5 +6,5 @@ void time_tests() {
   hc_timer_init(&t);
   const int ns = 1000;
   assert(hc_sleep(ns) == 0);
-  assert(hc_timer_nsecs(&t) >= ns);
+  assert(hc_timer_ns(&t) >= ns);
 }
