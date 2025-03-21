@@ -3,6 +3,24 @@ How to best deal with errors is something we're still very much learning in soft
 
 C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
 
+Example:
+```C
+void on_catch(struct hc_error *e) {
+  printf(e->message);
+  free(e);
+}
+  
+hc_catch(on_catch) {
+  hc_throw(12345, "here %d", 42);
+}
+```
+
+Output:
+```
+Failure 12345 in 'error/tests.c', line 14:
+here 42
+```
+
 We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
 
 ```C
@@ -69,24 +87,6 @@ void _hc_throw(struct hc_error *e) {
   hc_error = e;
   longjmp(t, 1);
 }
-```
-
-Example:
-```C
-void on_catch(struct hc_error *e) {
-  printf(e->message);
-  free(e);
-}
-  
-hc_catch(on_catch) {
-  hc_throw(12345, "here %d", 42);
-}
-```
-
-Output:
-```
-Failure 12345 in 'error/tests.c', line 14:
-here 42
 ```
 
 Errors are defined as dynamically sized structs, it's up to the handler to free the memory.
