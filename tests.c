@@ -1,3 +1,5 @@
+#include "error/error.h"
+
 #include "error/tests.c"
 #include "fix/tests.c"
 #include "list/tests.c"
@@ -14,5 +16,7 @@ int main() {
   task_tests();
   time_tests();
   vector_tests();
+
+  hc_errors_deinit();
   return 0;
 }

@@ -27,12 +27,15 @@ void hc_catch_pop() {
   hc_vector_pop(handlers());
 }
 
+void hc_errors_deinit() {
+  hc_vector_deinit(handlers());
+}
+
 void _hc_throw(struct hc_error *e) {
   struct hc_vector *hs = handlers();
 
   if (!hs->length) {
     fputs(e->message, stderr);
-    fputc('\n', stderr);
     abort();
   }
   
@@ -53,7 +56,6 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
 
   if (len < 0) {
     vfprintf(stderr, message, args);
-    fputc('\n', stderr);
     abort();
   }
   

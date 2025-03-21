@@ -5,12 +5,12 @@
 #include <setjmp.h>
 #include "macro/macro.h"
 
-#define hc_throw(c, m, ...) ({					\
-      struct hc_error *e =					\
-	hc_error_new((c), "Failure %d in '%s', line %d:\n" m,	\
-		     (c), __FILE__, __LINE__, ##__VA_ARGS__);	\
-      _hc_throw(e);						\
-    })
+#define hc_throw(c, m, ...) do {					\
+    struct hc_error *e =						\
+      hc_error_new((c), "Failure %d in '%s', line %d:\n" m "\n",	\
+		   (c), __FILE__, __LINE__, ##__VA_ARGS__);		\
+    _hc_throw(e);							\
+  } while(0)
 
 #define _hc_catch(_e, _f, h)					\
   jmp_buf _e;							\
@@ -25,6 +25,7 @@
 
 void hc_catch_push(jmp_buf h);
 void hc_catch_pop();
+void hc_errors_deinit();
 
 struct hc_error {
   int code;

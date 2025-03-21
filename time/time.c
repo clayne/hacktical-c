@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 #include "error/error.h"
 #include "time.h"
 
