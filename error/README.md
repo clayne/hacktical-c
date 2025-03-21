@@ -29,8 +29,7 @@ We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick 
   bool _f = true;						
   if (setjmp(_e)) {						
     h(hc_error);						
-  } else							
-    for (hc_catch_push(_e); _f; _f = false, hc_catch_pop())	
+  } else for (hc_catch_push(_e); _f; _f = false, hc_catch_pop())	
 
 #define hc_catch(h)				
   _hc_catch(hc_unique(env), hc_unique(flag), h)
