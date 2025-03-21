@@ -15,7 +15,7 @@ void fix_benchmark() {
   hc_timer_print(&t, "double: "); 
 
   hc_timer_init(&t);
-  hc_fix fv = hc_fix_new(HC_FIX_MAX_EXP, 0);
+  hc_fix fv = hc_fix_new(3, 0);
   hc_fix fd = hc_fix_new(3, 1);
   
   for (int i = 0; i < n; i++) {
