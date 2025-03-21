@@ -44,6 +44,9 @@ make
 ## Benchmarks
 Some chapters come with benchmarks, `make build/benchmark` builds and runs all of them.
 
+## Platforms
+Since Unix is all about C, and Linux is currently the best supported Unix out there; Linux is the platofrm I would recommend for writing C. Just having access to `valgrind` is priceless. Windows does however offer a way of running Linix as a subsystem in the form of WSL2, which works very well.
+
 ## Extensions
 The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically.
 
@@ -59,6 +62,6 @@ The structure of this book is designed to form a natural progression, where late
 
 - [Macros](https://github.com/codr7/hacktical-c/tree/main/macro)
 - [Fixed-Point Arithmetic](https://github.com/codr7/hacktical-c/tree/main/fix)
-- [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
+- [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/ma-in/list)
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
 - [Vectors](https://github.com/codr7/hacktical-c/tree/main/vector)
