@@ -72,3 +72,12 @@ Output:
 Failure 12345 in 'error/tests.c', line 14:
 here 42
 ```
+
+Errors are defined as dynamically sized structs.
+
+```C
+struct hc_error {
+  int code;
+  char message[];
+};
+```
