@@ -1,4 +1,4 @@
-export CC=ccache clang
+export CC=ccache gcc
 export CFLAGS=-g -Wall -I.
 PARTS=build/fix.o build/list.o build/task.o build/vector.o
 
