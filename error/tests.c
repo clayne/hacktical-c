@@ -10,6 +10,6 @@ void error_tests() {
   }
   
   hc_catch(on_catch) {
-    hc_throw(12345, "here %d", 42);
+    hc_throw(12345, "%d", 42);
   }
 }

@@ -11,14 +11,14 @@ void on_catch(struct hc_error *e) {
 }
   
 hc_catch(on_catch) {
-  hc_throw(12345, "here %d", 42);
+  hc_throw(12345, "Going %s", "Down!");
 }
 ```
 
 Output:
 ```
 Failure 12345 in 'error/tests.c', line 14:
-here 42
+Going Down!
 ```
 
 We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
