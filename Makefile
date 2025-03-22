@@ -1,6 +1,6 @@
 export CC=ccache gcc
 export CFLAGS=-g -O0 -Wall -I.
-CHAPTERS=build/error.o build/fix.o build/list.o build/task.o build/time.o build/vector.o
+CHAPTERS=build/error.o build/fix.o build/list.o build/malloc.o build/task.o build/time.o build/vector.o
 
 build/test: clean tests.c $(CHAPTERS) 
 	$(CC) $(CFLAGS) tests.c $(CHAPTERS) -o build/test
@@ -18,6 +18,9 @@ build/fix.o:
 
 build/list.o:
 	$(MAKE) -C list
+
+build/malloc.o:
+	$(MAKE) -C malloc
 
 build/task.o:
 	$(MAKE) -C task
