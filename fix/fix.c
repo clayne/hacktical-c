@@ -18,13 +18,13 @@ uint32_t hc_scale(uint8_t exp) {
 }
 
 hc_fix hc_fix_new(uint8_t exp, int64_t val) {
-  return (hc_fix)hc_bitm(exp, HC_FIX_EXP) +
+  return (hc_fix)hc_bitmask(exp, HC_FIX_EXP) +
     (hc_fix)(((val < 0) ? 1 : 0) << HC_FIX_EXP) +
     (hc_fix)(hc_abs(val) << HC_FIX_HDR);
 }
 
 uint8_t hc_fix_exp(hc_fix x) {
-  return hc_bitm(x, HC_FIX_EXP);
+  return hc_bitmask(x, HC_FIX_EXP);
 }
 
 int64_t hc_fix_val(hc_fix x) {

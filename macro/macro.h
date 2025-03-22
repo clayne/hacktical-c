@@ -20,7 +20,7 @@
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\
     })
 
-#define hc_bitm(v, bc)				\
+#define hc_bitmask(v, bc)			\
   (v & ((1 << bc) - 1))
 
 #define _hc_defer(_d, _v, ...)			\

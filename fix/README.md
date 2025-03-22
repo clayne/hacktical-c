@@ -16,7 +16,7 @@ The constructor takes an exponent and a scaled, signed value.
 
 ```C
 hc_fix hc_fix_new(uint8_t exp, int64_t val) {
-  return (hc_fix)hc_bitm(exp, HC_FIX_EXP) +
+  return (hc_fix)hc_bitmask(exp, HC_FIX_EXP) +
     (hc_fix)(((val < 0) ? 1 : 0) << HC_FIX_EXP) +
     (hc_fix)(hc_abs(val) << HC_FIX_HDR);
 }
