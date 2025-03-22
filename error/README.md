@@ -35,7 +35,7 @@ We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick 
   _hc_catch(hc_unique(env), hc_unique(flag), h)
 ```
 
-We'll use a thread local `struct hc_vector` to store handlers. Note that the only way to deallocate it is by manually calling `hc_errors_deinit()` at the end of  every thread.
+We'll use a static thread local `struct hc_vector` to store handlers. Note that the only way to deinitialize it is by manually calling `hc_errors_deinit()` at the end of every thread.
 
 ```C
 static struct hc_vector *handlers() {
@@ -88,7 +88,7 @@ void _hc_throw(struct hc_error *e) {
 }
 ```
 
-Errors are defined as dynamically sized structs, it's up to the handler to free the memory.
+Errors are defined as dynamically sized structs, it's up to the handler to free memory. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be comsumed once.
 
 ```C
 struct hc_error {
