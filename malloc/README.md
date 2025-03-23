@@ -1,5 +1,5 @@
 ## Composable Memory Allocators
-Writing your own memory allocator has become a rite of passage for C programmers. Here we're going to explore a composable design that allows convenient definition of pipelines of allocators with different behaviors.
+Writing your own memory allocator is a rite of passage for C programmers. Which makes sense, since THE defining feature of C is raw memory access. Here we're going to explore a composable design that allows convenient definition of pipelines of allocators with different behaviors.
 
 Allocators are required to support the following API:
 
@@ -74,7 +74,7 @@ static void bump_release(struct hc_malloc *m, void *p) {
 }
 ```
 
-Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be conveniently added to a pipeline. A multi set ordered by allocation size is used to recycle pointers.
+Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be conveniently added to a pipeline. A multi set ordered by allocation size is used to recycle allocations.
 
 ```C
 struct hc_memo_alloc {
