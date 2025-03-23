@@ -12,8 +12,14 @@ static void default_release(struct hc_malloc *m, void *p) {
   free(p);
 }
 
-struct hc_malloc hc_malloc = {.acquire = default_acquire,
-			      .release = default_release};
+__thread struct hc_malloc default_malloc = {.acquire = default_acquire,
+					    .release = default_release};
+
+__thread struct hc_malloc *hc_malloc = NULL;
+
+void hc_malloc_init() {
+  hc_malloc = &default_malloc;
+}
 
 /* Bump */
 

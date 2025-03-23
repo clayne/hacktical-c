@@ -11,6 +11,8 @@
 #include "vector/tests.c"
 
 int main() {
+  hc_malloc_init();
+
   error_tests();
   fix_tests();
   list_tests();

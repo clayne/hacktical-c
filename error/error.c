@@ -36,6 +36,7 @@ void _hc_throw(struct hc_error *e) {
 
   if (!hs->length) {
     fputs(e->message, stderr);
+    hc_error_free(e);
     abort();
   }
   
@@ -67,3 +68,6 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
   return e;
 }
 
+void hc_error_free(struct hc_error *e) {
+  free(e);
+}

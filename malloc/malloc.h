@@ -7,6 +7,16 @@
 
 //TODO add benchmark (add/free vs memo)
 
+#define __hc_malloc_do(m, _pm)				\
+  struct hc_malloc *_pm = hc_malloc;		\
+  for (hc_malloc = (m); _pm; hc_malloc = _pm, _pm = NULL)
+
+#define _hc_malloc_do(m)				\
+  __hc_malloc_do(m, hc_unique(prev_malloc))
+
+#define hc_malloc_do(m)				\
+  _hc_malloc_do(&(m)->malloc)
+
 #define __hc_acquire(m, _m, s) ({		\
       struct hc_malloc *_m = m;			\
       _m->acquire(_m, s);			\
@@ -15,27 +25,28 @@
 #define _hc_acquire(m, s)			\
   __hc_acquire(m, hc_unique(malloc), s)
 
-#define hc_acquire(m, s)			\
-  _hc_acquire(&(m)->malloc, s)
+#define hc_acquire(s)				\
+  _hc_acquire(hc_malloc, s)
 
 #define __hc_release(m, _m, p)			\
-  do {						\
-    struct hc_malloc *_m = m;			\
-    _m->release(_m, p);				\
-  } while (0)
+  struct hc_malloc *_m = m;			\
+  _m->release(_m, p)
 
 #define _hc_release(m, p)			\
   __hc_release(m, hc_unique(malloc), p)
 
-#define hc_release(m, p)			\
-  _hc_release(&(m)->malloc, p)
+#define hc_release(p)				\
+  _hc_release(hc_malloc, p)
+
 
 struct hc_malloc {
   void *(*acquire)(struct hc_malloc *, size_t);
   void (*release)(struct hc_malloc *, void *);
 };
 
-extern struct hc_malloc hc_malloc;
+extern __thread struct hc_malloc *hc_malloc;
+
+void hc_malloc_init();
 
 /* Bump */
 

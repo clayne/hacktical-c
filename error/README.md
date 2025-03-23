@@ -92,7 +92,7 @@ void _hc_throw(struct hc_error *e) {
 }
 ```
 
-Errors are defined as dynamically sized structs, it's up to the handler to free memory. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be comsumed once.
+Errors are defined as dynamically sized structs, which are allocated/freed automagically. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be comsumed once.
 
 ```C
 struct hc_error {
