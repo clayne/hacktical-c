@@ -21,5 +21,6 @@ size_t hc_set_index(struct hc_set *s, void *key, bool *ok);
 size_t hc_set_length(struct hc_set *s);
 void *hc_set_find(struct hc_set *s, void *key);
 void *hc_set_add(struct hc_set *s, void *key, bool force);
+void hc_set_clear(struct hc_set *s);
 
 #endif

@@ -64,3 +64,6 @@ void *hc_set_add(struct hc_set *s, void *key, bool force) {
   return hc_vector_insert(&s->items, i, 1);
 }
 
+void hc_set_clear(struct hc_set *s) {
+  hc_vector_clear(&s->items);
+}
