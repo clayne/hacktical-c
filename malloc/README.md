@@ -154,7 +154,7 @@ static void memo_release(struct hc_malloc *a, void *p) {
 }
 ```
 
-A set of macros are provided to simplify usage. The `_x()` variants are meant for internal use with bare `struct hc_malloc`-pointers, while the outer layer adds `&(m)->malloc` to avoid having to type it out at every use.
+A set of macros are provided to simplify usage. `_x()`-variants are meant mostly for internal use with bare `struct hc_malloc`-pointers, while the outer layer adds `&(m)->malloc` to avoid having to type it out at every use.
 
 ```C
 #define __hc_acquire(m, _m, s) ({		
