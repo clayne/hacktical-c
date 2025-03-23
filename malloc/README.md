@@ -15,11 +15,11 @@ struct hc_malloc {
 The default/root allocator delegates to `malloc`/`free`.
 
 ```C
-static void *default_acquire(struct hc_malloc *m, size_t size) {
+void *default_acquire(struct hc_malloc *m, size_t size) {
   return malloc(size);
 }
 
-static void default_release(struct hc_malloc *m, void *p) {
+void default_release(struct hc_malloc *m, void *p) {
   free(p);
 }
 
@@ -57,7 +57,7 @@ void hc_bump_alloc_free(struct hc_bump_alloc *a) {
 `acquire()` bumps the offset, while `release()` is a no op.
 
 ```C
-static void *bump_acquire(struct hc_malloc *m, size_t size) {
+void *bump_acquire(struct hc_malloc *m, size_t size) {
   struct hc_bump_alloc *ba = hc_baseof(m, struct hc_bump_alloc, malloc);
   uint8_t *p = ba->memory + ba->offset;
   uint8_t *pa = hc_align(p, size);
@@ -71,7 +71,7 @@ static void *bump_acquire(struct hc_malloc *m, size_t size) {
   return pa;
 }
 
-static void bump_release(struct hc_malloc *m, void *p) {
+void bump_release(struct hc_malloc *m, void *p) {
   // Do nothing
 }
 ```
@@ -112,11 +112,11 @@ struct memo {
   uint8_t data[];
 };
 
-static enum hc_order memo_cmp(const void *l, const void *r) {
+enum hc_order memo_cmp(const void *l, const void *r) {
   return hc_cmp(*(size_t *)l, *(size_t *)r);
 }
 
-static const void *memo_key(const void *p) {
+const void *memo_key(const void *p) {
   struct memo *m = *(struct memo **)p;
   return &m->size;
 }
@@ -125,7 +125,7 @@ static const void *memo_key(const void *p) {
 `acquire` first checks for recycled allocations of the correct size, and delegates to the source allocator if none was found.
 
 ```C
-static void *memo_acquire(struct hc_malloc *a, size_t size) {
+void *memo_acquire(struct hc_malloc *a, size_t size) {
   struct hc_memo_alloc *ma = hc_baseof(a, struct hc_memo_alloc, malloc);
 
   if (hc_set_length(&ma->memo)) {
@@ -149,7 +149,7 @@ static void *memo_acquire(struct hc_malloc *a, size_t size) {
 While `release` registers the allocation for recycling.
 
 ```C
-static void memo_release(struct hc_malloc *a, void *p) {
+void memo_release(struct hc_malloc *a, void *p) {
   struct hc_memo_alloc *ma = hc_baseof(a, struct hc_memo_alloc, malloc);
   struct memo *m = hc_baseof(p, struct memo, data);
   *(struct memo **)hc_set_add(&ma->memo, &m->size, true) = m;
