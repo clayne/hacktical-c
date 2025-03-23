@@ -32,13 +32,25 @@ void hc_vector_grow(struct hc_vector *v, int capacity) {
 A macro is provided to simplify looping.
 
 ```C
+#define _hc_vector_do(v, _v, var)			\
+  struct hc_vector *_v = v;				\
+  for (uint8_t *var = _v->start;			\
+       var < _v->end;					\
+       var += _v->item_size)
+
+#define hc_vector_do(v, var)				\
+  _hc_vector_do(v, hc_unique(vector), var)
+```
+
+Example:
+```C
 hc_vector_do(&v, it) {
   int v = *(int *)it;
   ...
 }
 ```
 
-Alternatively you could use `hc_vector_get()` with a manual loop, which is slightly slower since it needs to call a function and calculate the pointer for every iteration.
+Alternatively you can use `hc_vector_get()` with a manual loop, which is slightly slower since it needs to call a function and calculate the pointer for every iteration.
 
 ```C
 for (int i = 0; i < n; i++) {
