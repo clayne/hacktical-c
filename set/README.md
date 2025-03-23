@@ -33,7 +33,7 @@ assert(hc_set_length(&s) == 0);
 hc_set_deinit(&s);
 ```
 
-A custom enum and convenience macro for comparisons is provided.
+A custom enum and convenience macro for comparisons are provided.
 
 ```C
 #define hc_cmp(x, y) ({					\
