@@ -76,7 +76,7 @@ static void bump_release(struct hc_malloc *m, void *p) {
 }
 ```
 
-Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be conveniently added to a pipeline. A multi set ordered by allocation size is used to recycle allocations.
+Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be conveniently added at any point in a pipeline. A multi set ordered by allocation size is used to recycle allocations.
 
 ```C
 struct hc_memo_alloc {
