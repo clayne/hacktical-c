@@ -66,3 +66,5 @@ The structure of this book is designed to form a natural progression, where late
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
 - [Vectors](https://github.com/codr7/hacktical-c/tree/main/vector)
 - [Exceptions](https://github.com/codr7/hacktical-c/tree/main/error)
+- [Ordered Sets and Maps](https://github.com/codr7/hacktical-c/tree/main/set)
+- [Composable Memory Allocators](https://github.com/codr7/hacktical-c/tree/main/malloc)

@@ -5,6 +5,7 @@
 #include "list/tests.c"
 #include "macro/tests.c"
 #include "malloc/tests.c"
+#include "set/tests.c"
 #include "task/tests.c"
 #include "time/tests.c"
 #include "vector/tests.c"
@@ -15,6 +16,7 @@ int main() {
   list_tests();
   macro_tests();
   malloc_tests();
+  set_tests();
   task_tests();
   time_tests();
   vector_tests();
