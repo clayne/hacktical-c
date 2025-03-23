@@ -1,5 +1,5 @@
 ## Composable Memory Allocators
-Writing your own memory allocator is a rite of passage for C programmers. Which makes sense, since THE defining feature of C is raw memory access. Here we're going to explore a composable design that allows convenient definition of pipelines of allocators with different behaviors.
+Writing your own memory allocator is a common rite of passage for novice C programmers. Which makes sense, since one of the defining features of C is raw memory access. Here we're going to explore a composable design that allows convenient definition of pipelines of allocators with different behaviors.
 
 Allocators are required to support the following API:
 
