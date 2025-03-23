@@ -4,16 +4,33 @@
 #include <stddef.h>
 #include <stdint.h>
 
-//TODO Add bump test/benchmark
-//TODO Figure out how to insert source in chain
+//TODO add slab alloc
+//TODO add ordered sets
+//TODO add memo_alloc
+//TODO add bump benchmark
+
+#define _hc_acquire(_m, s) ({			\
+      struct hc_malloc *m = _m;			\
+      m->acquire(m, s);				\
+    })
+
+#define hc_acquire(m, s)			\
+  _hc_acquire(&(m)->malloc, s)
+
+#define _hc_release(_m, p)			\
+  do {						\
+    struct hc_malloc *m = _m;			\
+    m->release(m, p);				\
+  } while (0)
+
+#define hc_release(m, p)			\
+  _hc_release(&(m)->malloc, p)
+
 
 struct hc_malloc {
   void *(*acquire)(struct hc_malloc *, size_t);
   void (*release)(struct hc_malloc *, void *);
 };
-
-void *hc_acquire(struct hc_malloc *m, size_t size);
-void hc_release(struct hc_malloc *m, void *v);
 
 extern struct hc_malloc hc_malloc;
 
