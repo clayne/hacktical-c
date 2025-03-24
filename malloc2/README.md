@@ -1,8 +1,8 @@
 ## Composable Memory Allocators - Part 2
-Welcome back to memory allocator land. We now have enough features in place to design more interesting allocators. Before we're done, my goal is to share enough examples of what's possible for you to start dreaming up your own designes.
+Welcome back to memory allocator land. We now have enough features in place to design more interesting allocators. Before we're done, the goal is to share enough examples of what's possible for you to start dreaming up your own designs.
 
 ### Recycling
-Recycling memory is a common requirement for allocators, we'll design the feature as a separate allocator that can be conveniently added at any point in a pipeline. A multi-`struct hc_set` ordered by allocation size is used to recycle allocations.
+Recycling memory is a common requirement for allocators, we'll design the feature as a separate allocator that can be conveniently added at any point in a pipeline. A multi-`struct hc_set` ordered by allocation size is used to track allocations.
 
 ```C
 struct hc_memo_alloc {
