@@ -15,9 +15,12 @@
 #define hc_vector_do(v, var)				\
   _hc_vector_do(v, hc_unique(vector), var)
 
+struct hc_malloc;
+
 struct hc_vector {
   size_t item_size, capacity, length;
   uint8_t *items, *start, *end;
+  struct hc_malloc *malloc;
 };
 
 struct hc_vector *hc_vector_init(struct hc_vector *v, size_t item_size);

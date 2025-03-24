@@ -65,6 +65,7 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/ma-in/list)
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
 - [Composable Memory Allocators - Part 1](https://github.com/codr7/hacktical-c/tree/main/malloc1)
+- [Vectors](https://github.com/codr7/hacktical-c/tree/ma-in/vector)
 - [Exceptions](https://github.com/codr7/hacktical-c/tree/main/error)
 - [Ordered Sets and Maps](https://github.com/codr7/hacktical-c/tree/main/set)
 - [Composable Memory Allocators - Part 2](https://github.com/codr7/hacktical-c/tree/main/malloc2)

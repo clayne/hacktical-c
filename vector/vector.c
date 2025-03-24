@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "vector.h"
+#include "malloc1/malloc1.h"
 
 static void grow(struct hc_vector *v) {
   hc_vector_grow(v, v->capacity ? v->capacity*2 : 2);
@@ -9,6 +11,7 @@ static void grow(struct hc_vector *v) {
 struct hc_vector *hc_vector_init(struct hc_vector *v, size_t item_size) {
   v->item_size = item_size;
   v->capacity = v->length = 0;
+  v->malloc = hc_malloc;
   v->items = v->start = v->end = NULL;
   return v;
 }
@@ -18,12 +21,18 @@ void hc_vector_deinit(struct hc_vector *v) {
 }
 
 void hc_vector_grow(struct hc_vector *v, size_t capacity) {
-  v->capacity = capacity;
+  v->capacity = capacity; 
+  size_t size = v->item_size * (v->capacity+1);
+  uint8_t *new_items = _hc_acquire(v->malloc, size);
+  uint8_t *new_start = hc_align(new_items, v->item_size);
 
-  v->items = realloc(v->items,
-		     hc_align(v->item_size*(v->capacity+1), v->item_size));
-
-  v->start = hc_align(v->items, v->item_size);
+  if (v->items) {
+    memmove(new_start, v->start, v->length * v->item_size);
+    _hc_release(v->malloc, v->items); 
+  }
+  
+  v->items = new_items;
+  v->start = new_start;
   v->end = v->start + v->item_size*v->length;
 }
 
@@ -71,7 +80,7 @@ void *hc_vector_insert(struct hc_vector *v, size_t i, size_t n) {
 
 bool hc_vector_delete(struct hc_vector *v, size_t i, size_t n) {
   const size_t m = i+n;
-  if (v->length < m) { return false; }
+  assert(m <= v->length);
 
   if (m < v->length) {
     uint8_t *const p = hc_vector_get(v, i);

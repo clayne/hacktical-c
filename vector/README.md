@@ -4,6 +4,15 @@ A vector can be thought of as a dynamically allocated array that automagically c
 Rather than storing pointers to values, we'll expose the memory directly to allow copying values in place. This means that the vector needs to know the size of its items.
 
 ```C
+struct hc_vector {
+  size_t item_size, capacity, length;
+  uint8_t *items, *start, *end;
+  struct hc_malloc *malloc;
+};
+```
+
+Example:
+```C
 struct hc_vector v;
 hc_vector_init(&v, sizeof(int));
 hc_vector_grow(&v, 10);
@@ -19,12 +28,18 @@ The `hc_vector_grow()` call in the preceding example is not strictly needed, but
 
 ```C
 void hc_vector_grow(struct hc_vector *v, int capacity) {
-  v->capacity = capacity;
+  v->capacity = capacity; 
+  size_t size = v->item_size * (v->capacity+1);
+  uint8_t *new_items = _hc_acquire(v->malloc, size);
+  uint8_t *new_start = hc_align(new_items, v->item_size);
 
-  v->items = realloc(v->items,
-		     hc_align(v->item_size*(v->capacity+1), v->item_size));
-
-  v->start = hc_align(v->items, v->item_size);
+  if (v->items) {
+    memmove(new_start, v->start, v->length * v->item_size);
+    _hc_release(v->malloc, v->items); 
+  }
+  
+  v->items = new_items;
+  v->start = new_start;
   v->end = v->start + v->item_size*v->length;
 }
 ```
@@ -77,13 +92,13 @@ void *hc_vector_insert(struct hc_vector *v, int i, int n) {
 }
 ```
 
-While `hc_vector_delete()` simply returns a boolean signalling if the deletion was successful or not.
+`hc_vector_delete()` simply removes the specified items.
 
 ```
-bool hc_vector_delete(struct hc_vector *v, int i, int n) {
+void hc_vector_delete(struct hc_vector *v, int i, int n) {
   const int m = i+n;
-  if (v->length < m) { return false; }
-
+  assert(v->length <= m);
+  
   if (m < v->length) {
     uint8_t *const p = hc_vector_get(v, i);
     memmove(p, p + n*v->item_size, i + (v->length-n) * v->item_size);
