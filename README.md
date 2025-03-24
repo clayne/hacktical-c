@@ -55,7 +55,7 @@ Some developers avoid extensions like the plague, some are happy to use them for
 I can think of one feature, `hc_defer()`, which would currently be absolutely impossible to do without extensions. In other cases, alternative solutions are simply less convenient.
 
 ## Donations
-If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via GitHub and I've launched a [gofundme-campaign](https://gofund.me/46f9b954).
+If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via Stripe and Liberapay and I've launched a [gofundme-campaign](https://gofund.me/46f9b954).
 
 ## Chapters
 The content is arranged to form a natural progression, where later chapters build on concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
