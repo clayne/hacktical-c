@@ -1,5 +1,8 @@
 * add dynload support to dynamic
-** load generated so and check dcgen() result
+** add hc_dload/hc_dsym
+*** load generated so and check dcgen() result
+** add dcompile
+*** pick out automagically
 * add calculator/codegen
 ** fix calculator with stack
 * add trace allocator to malloc2
