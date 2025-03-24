@@ -1,6 +1,6 @@
 ## Dynamic Compilation
 
-Never put off till run-time what you can do at compile-time.
+*Never put off till run-time what you can do at compile-time.*
 
 ~ D. Gries
 
