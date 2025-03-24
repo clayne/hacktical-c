@@ -5,3 +5,6 @@
 * add trace allocator to malloc2
 ** add slog
 * add slab allocator to malloc2
+* add term
+** ansi
+** sharpl

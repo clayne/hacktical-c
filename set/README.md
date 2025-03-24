@@ -11,9 +11,8 @@ enum hc_order cmp(const void *x, const void *y) {
   return hc_cmp(*(const int *)x, *(const int *)y);
 }
 
-void *key(const void *x, const void *y) {
-  const struct map_item *xi = x;
-  return &xi->k;
+const void *key(const void *x) {
+  return &((const struct map_item *)x)->k;
 }
 
 const int n = 10;

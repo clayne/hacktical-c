@@ -7,14 +7,11 @@ struct map_item {
 };
 
 static enum hc_order cmp(const void *x, const void *y) {
-  const int *xi = x;
-  const int *yi = y;
-  return hc_cmp(*xi, *yi);
+  return hc_cmp(*(const int *)x, *(const int *)y);
 }
 
 static const void *key(const void *x) {
-  const struct map_item *xi = x;
-  return &xi->k;
+  return &((const struct map_item *)x)->k;
 }
 
 void set_tests() {
