@@ -1,4 +1,4 @@
-## Dynamic Code Geneation
+## Dynamic Compilation
 
 Never put off till run-time what you can do at compile-time.
 ~ D. Gries
