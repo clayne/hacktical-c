@@ -8,3 +8,14 @@
 * add term
 ** ansi
 ** sharpl
+* ecs using vectors
+
+* channels using fd pairs
+** files/sockets/pipes
+** uring
+
+https://unix.stackexchange.com/questions/11946/how-big-is-the-pipe-buffer
+https://sumofbytes.com/blog/understanding-asynchronous-in-linux-io-uring
+
+* mud reload
+** links
