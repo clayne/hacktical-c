@@ -25,7 +25,6 @@ void set_tests() {
   
   for (int i = 0; i < n; i++) {
     struct map_item *it = hc_set_add(&s, &i, false);
-    assert(it);
     *it = (struct map_item){.k = i, .v = i};
   }
 

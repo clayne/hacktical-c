@@ -3,9 +3,9 @@ Besides lists and vectors, some kind of mapping/lookup functionality is often ne
 
 Example:
 ```C
-struct my_item {
+struct map_item {
   int k, v;
-}
+};
 
 enum hc_order cmp(const void *x, const void *y) {
   return hc_cmp(*(const int *)x, *(const int *)y);
@@ -18,22 +18,24 @@ void *key(const void *x, const void *y) {
 
 const int n = 10;
 struct hc_set s;
-hc_set_init(&s, sizeof(int), cmp);
+hc_set_init(&s, sizeof(struct map_item), cmp);
   
-for (int i = n-1; i >= 0; i--) {
-  *(int *)hc_set_add(&s, &i, false) = i;
+for (int i = 0; i < n; i++) {
+  struct map_item *it = hc_set_add(&s, &i, false);
+  *it = (struct map_item){.k = i, .v = i};
 }
 
 for (int i = 0; i < n; i++) {
-  assert(*(int *)hc_set_find(&s, &i) == i);
+  struct map_item *it = hc_set_find(&s, &i);
+  assert(it);
+  assert(it->k == i);
+  assert(it->v == i);
 }
 
-hc_set_clear(&s);
-assert(hc_set_length(&s) == 0);
 hc_set_deinit(&s);
 ```
 
-A custom enum and convenience macro for comparisons are provided.
+A custom enum and convenience macro for comparisons is provided.
 
 ```C
 #define hc_cmp(x, y) ({					\
