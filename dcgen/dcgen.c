@@ -1,7 +1,9 @@
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "dcgen.h"
 #include "error/error.h"
 #include "malloc/malloc.h"
@@ -20,20 +22,81 @@ char *hc_vsprintf(const char *format, va_list args) {
   char *out = hc_acquire(len);
   vsnprintf(out, len, format, args);
   return out;
+} 
+
+static struct hc_vector hc_split_string(const char *in, char c) {
+  struct hc_vector out;
+  hc_vector_init(&out, sizeof(char *));
+  const char *p, *i;
+  
+  for (p = in; p;) {
+    i = strchr(p, ' ');
+    if (!i) { break; }
+    *(char **)hc_vector_push(&out) = strndup(p, i - p);
+    p = i+1;
+  }
+
+  if (i == NULL && *p) {
+    *(char **)hc_vector_push(&out) = strdup(p);
+  }
+
+  return out;
 }
 
-void hc_exec(const char *cmd, ...) {
+struct hc_proc hc_exec(const char *cmd, ...) {
   va_list args;
   va_start(args, cmd);
+  struct hc_malloc *ma = hc_malloc;
   char *c = hc_vsprintf(cmd, args);
   va_end(args);
-  const int ec = system(c);
-  
-  if (ec != 0) {
-    hc_throw(0, "Command '%s' failed with exit code %d", ec);
+
+  char *i = strchr(c, ' ');
+  char *cp = strndup(c, i - c);
+  struct hc_vector cas = hc_split_string(i+1, ' ');
+  int fds[2];
+  pipe(fds);
+  pid_t child_pid = fork();
+
+  switch (child_pid) {
+  case 0: {
+    close(fds[1]);
+    dup2(fds[0], 0);
+    char **as = calloc(cas.length+2, sizeof(char *));
+    as[0] = cp;
+    
+    for (int i = 0; i < cas.length; i++) {
+      as[i+1] = *(char **)hc_vector_get(&cas, i);
+    }
+
+    as[cas.length+1] = NULL;
+    
+    if (execve(cp, as, NULL) == -1) {
+      hc_throw(0, "Failed to exec '%s': %d", c, errno);
+    }
+    
+    break;
+  }
+  case -1:
+    hc_throw(0, "Failed to fork process: %d", errno);
+  default:
+    close(fds[0]);
+
+    hc_vector_do(&cas, ca) {
+      free(*(char **)ca);
+    }
+    
+    hc_vector_deinit(&cas);
+    _hc_malloc_do(ma) { hc_release(c); }
+    return (struct hc_proc){.pid = child_pid, .stdin = fds[1]};
   }
 }
 
 void hc_compile(const char *code, const char *out) {
-  hc_exec("gcc -shared %s -o -xc - | %s", out, code);  
+  struct hc_proc child = hc_exec("/usr/bin/gcc -shared -o %s -E -", out);
+  FILE *stdin = fdopen(child.stdin, "w");
+  fputs(code, stdin);
+  fclose(stdin);
+  close(child.stdin);
+  int status;
+  waitpid(child.pid, &status, 0);
 }

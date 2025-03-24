@@ -2,8 +2,16 @@
 #define HACKTICAL_DCGEN_H
 
 #include <stdarg.h>
+#include <stdio.h>
 
 char *hc_vsprintf(const char *format, va_list args);
-void hc_exec(const char *path, ...);
+
+struct hc_proc {
+  int pid;
+  FILE *stdin;
+};
+
+struct hc_proc hc_exec(const char *path, ...);
+void hc_compile(const char *code, const char *out);
 
 #endif

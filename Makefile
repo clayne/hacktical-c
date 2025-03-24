@@ -1,5 +1,7 @@
 export CC=ccache gcc
-export CFLAGS=-g -O0 -Wall -I.
+export CFLAGS=-g -O0 -Wall -I. -lexplain
+export LDFLAGS=-lexplain
+
 CHAPTERS=build/dcgen.o build/error.o build/fix.o build/list.o build/malloc.o build/set.o build/task.o build/time.o build/vector.o
 
 build/test: clean tests.c $(CHAPTERS) 

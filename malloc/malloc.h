@@ -7,12 +7,13 @@
 
 //TODO add benchmark (add/free vs memo)
 
-#define __hc_malloc_do(m, _pm)				\
-  struct hc_malloc *_pm = hc_malloc;		\
-  for (hc_malloc = (m); _pm; hc_malloc = _pm, _pm = NULL)
+#define __hc_malloc_do(m, _pm)						\
+  for (struct hc_malloc *_pm = hc_malloc;				\
+       _pm && (hc_malloc = (m));					\
+       hc_malloc = _pm, _pm = NULL)
 
-#define _hc_malloc_do(m)				\
-  __hc_malloc_do(m, hc_unique(prev_malloc))
+#define _hc_malloc_do(m)			\
+  __hc_malloc_do(m, hc_unique(malloc_p))
 
 #define hc_malloc_do(m)				\
   _hc_malloc_do(&(m)->malloc)
@@ -23,7 +24,7 @@
     })
 
 #define _hc_acquire(m, s)			\
-  __hc_acquire(m, hc_unique(malloc), s)
+  __hc_acquire(m, hc_unique(malloc_m), s)
 
 #define hc_acquire(s)				\
   _hc_acquire(hc_malloc, s)
@@ -33,7 +34,7 @@
   _m->release(_m, p)
 
 #define _hc_release(m, p)			\
-  __hc_release(m, hc_unique(malloc), p)
+  __hc_release(m, hc_unique(malloc_m), p)
 
 #define hc_release(p)				\
   _hc_release(hc_malloc, p)

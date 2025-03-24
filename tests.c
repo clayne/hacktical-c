@@ -1,5 +1,6 @@
 #include "error/error.h"
 
+#include "dcgen/tests.c"
 #include "error/tests.c"
 #include "fix/tests.c"
 #include "list/tests.c"
@@ -13,6 +14,7 @@
 int main() {
   hc_malloc_init();
 
+  dcgen_tests();
   error_tests();
   fix_tests();
   list_tests();
