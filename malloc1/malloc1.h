@@ -1,11 +1,8 @@
-#ifndef HACKTICAL_MALLOC_H
-#define HACKTICAL_MALLOC_H
+#ifndef HACKTICAL_MALLOC1_H
+#define HACKTICAL_MALLOC1_H
 
 #include <stddef.h>
 #include <stdint.h>
-#include <set/set.h>
-
-//TODO add benchmark (add/free vs memo)
 
 #define __hc_malloc_do(m, _pm)						\
   for (struct hc_malloc *_pm = hc_malloc;				\
@@ -62,19 +59,5 @@ struct hc_bump_alloc *hc_bump_alloc_new(struct hc_malloc *source,
 					size_t size);
 
 void hc_bump_alloc_free(struct hc_bump_alloc *a);
-
-/* Memo */
-
-struct hc_memo_alloc {
-  struct hc_malloc malloc;
-  struct hc_malloc *source;
-  struct hc_set memo;
-};
-
-struct hc_memo_alloc *hc_memo_alloc_init(struct hc_memo_alloc *a,
-					 struct hc_malloc *source);
-
-void hc_memo_alloc_deinit(struct hc_memo_alloc *a);
-
 
 #endif

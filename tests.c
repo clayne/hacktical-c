@@ -1,11 +1,12 @@
 #include "error/error.h"
 
-#include "dcgen/tests.c"
+#include "dynamic/tests.c"
 #include "error/tests.c"
 #include "fix/tests.c"
 #include "list/tests.c"
 #include "macro/tests.c"
-#include "malloc/tests.c"
+#include "malloc1/tests.c"
+#include "malloc2/tests.c"
 #include "set/tests.c"
 #include "task/tests.c"
 #include "time/tests.c"
@@ -14,12 +15,13 @@
 int main() {
   hc_malloc_init();
 
-  dcgen_tests();
+  dynamic_tests();
   error_tests();
   fix_tests();
   list_tests();
   macro_tests();
-  malloc_tests();
+  malloc1_tests();
+  malloc2_tests();
   set_tests();
   task_tests();
   time_tests();

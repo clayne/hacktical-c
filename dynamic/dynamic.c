@@ -4,9 +4,11 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "dcgen.h"
+
+#include "dynamic.h"
 #include "error/error.h"
-#include "malloc/malloc.h"
+#include "malloc1/malloc1.h"
+#include "vector/vector.h"
 
 char *hc_vsprintf(const char *format, va_list args) {
   va_list tmp_args;

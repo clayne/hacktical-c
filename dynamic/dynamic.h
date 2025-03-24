@@ -1,5 +1,5 @@
-#ifndef HACKTICAL_DCGEN_H
-#define HACKTICAL_DCGEN_H
+#ifndef HACKTICAL_DYNAMIC_H
+#define HACKTICAL_DYNAMIC_H
 
 #include <stdarg.h>
 #include <stdio.h>

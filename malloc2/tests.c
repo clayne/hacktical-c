@@ -1,23 +1,5 @@
 #include <assert.h>
-#include "malloc.h"
-
-static void bump_tests() {
-  const int s = 1024;
-  struct hc_bump_alloc *a = hc_bump_alloc_new(hc_malloc, s);
-  assert(a->size == s);
-  assert(a->offset == 0);
-
-  hc_malloc_do(a) {
-    int *ip = hc_acquire(sizeof(int));
-    *ip = 42;
-    
-    long *lp = hc_acquire(sizeof(long));
-    *lp = 42L;
-  }
-  
-  assert(a->offset >= sizeof(int) + sizeof(long));
-  hc_bump_alloc_free(a);
-}
+#include "malloc2.h"
 
 static void memo_tests() {
   struct hc_memo_alloc a;
@@ -47,7 +29,6 @@ static void memo_tests() {
   hc_memo_alloc_deinit(&a);
 }
 
-void malloc_tests() {
-  bump_tests();
+void malloc2_tests() {
   memo_tests();
 }

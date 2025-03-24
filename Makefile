@@ -2,7 +2,7 @@ export CC=ccache gcc
 export CFLAGS=-g -O0 -Wall -I. -lexplain
 export LDFLAGS=-lexplain
 
-CHAPTERS=build/dcgen.o build/error.o build/fix.o build/list.o build/malloc.o build/set.o build/task.o build/time.o build/vector.o
+CHAPTERS=build/dynamic.o build/error.o build/fix.o build/list.o build/malloc1.o build/malloc2.o build/set.o build/task.o build/time.o build/vector.o
 
 build/test: clean tests.c $(CHAPTERS) 
 	$(CC) $(CFLAGS) tests.c $(CHAPTERS) -o build/test
@@ -12,8 +12,8 @@ build/benchmark: clean benchmarks.c $(CHAPTERS)
 	$(CC) $(CFLAGS) benchmarks.c $(CHAPTERS) -o build/benchmark
 	build/benchmark
 
-build/dcgen.o:
-	$(MAKE) -C dcgen
+build/dynamic.o:
+	$(MAKE) -C dynamic
 
 build/error.o:
 	$(MAKE) -C error
@@ -24,8 +24,11 @@ build/fix.o:
 build/list.o:
 	$(MAKE) -C list
 
-build/malloc.o:
-	$(MAKE) -C malloc
+build/malloc1.o:
+	$(MAKE) -C malloc1
+
+build/malloc2.o:
+	$(MAKE) -C malloc2
 
 build/set.o:
 	$(MAKE) -C set
