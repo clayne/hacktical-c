@@ -58,7 +58,7 @@ I can think of one feature, `hc_defer()`, which would currently be absolutely im
 If you would like to help make this book happen, all contributions are welcome. The repository is set up for sponsoring via GitHub and I've launched a [gofundme campaign](https://gofund.me/46f9b954).
 
 ## Chapters
-The structure of this book is designed to form a natural progression, where later chapters build upon concepts that have already been introduced.
+The content is arranged to form a natural progression, where later chapters build upon concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
 
 - [Macros](https://github.com/codr7/hacktical-c/tree/main/macro)
 - [Fixed-Point Arithmetic](https://github.com/codr7/hacktical-c/tree/main/fix)
