@@ -99,13 +99,13 @@ void *bump_acquire(struct hc_malloc *m, size_t size) {
   struct hc_bump_alloc *ba = hc_baseof(m, struct hc_bump_alloc, malloc);
   uint8_t *p = ba->memory + ba->offset;
   uint8_t *pa = hc_align(p, size);
-  const size_t no = ba->offset + pa - p + size;
+  const size_t new_offset = ba->offset + pa - p + size;
   
-  if (no >= ba->size) {
+  if (new_offset >= ba->size) {
     hc_throw(0, "Out of memory");
   }   
 
-  ba->offset = no;
+  ba->offset = new_offset;
   return pa;
 }
 
