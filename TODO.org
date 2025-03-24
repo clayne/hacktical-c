@@ -1,6 +1,7 @@
 * add dynload support to dynamic
 ** load generated so and check dcgen() result
-* add code generation
+* add calculator/codegen
 ** fix calculator with stack
-* add malloc1 benchmark
-* add malloc2 benchmark
+* add trace allocator to malloc2
+** add slog
+* add slab allocator to malloc2
