@@ -1,11 +1,9 @@
 ## Exceptions
-How to best deal with errors is something we're still very much learning in software development. It is however very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions make a much better solution.
+How to best deal with errors is something we're still very much figuring out in software development. But it is very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions make a much better solution.
 
-C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`.
+C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
 
-`setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
-
-One important limitation that might not be obvious at first glance is that you can only restore a context as long as the original stack frame exists.
+One important limitation that might not be obvious at first glance is that you can only restore a context as long as the original stack frame exists, luckily that's exactly the behavior we're looking for.
 
 Example:
 ```C
@@ -25,7 +23,7 @@ Failure 12345 in 'error/tests.c', line 14:
 Going Down!
 ```
 
-We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
+We use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
 
 ```C
 #define _hc_catch(_e, _f, h)					
@@ -39,7 +37,7 @@ We'll use a `for`-loop to push/pop handlers around the catch body, a neat trick 
   _hc_catch(hc_unique(env), hc_unique(flag), h)
 ```
 
-We'll use a static thread local `struct hc_vector` to store handlers. Note that the only way to deinitialize it is by manually calling `hc_errors_deinit()` at the end of every thread.
+We use a static thread-local `struct hc_vector` to store handlers. Note that the only way to deinitialize it is by manually calling `hc_errors_deinit()` at the end of every thread.
 
 ```C
 static struct hc_vector *handlers() {
@@ -67,7 +65,7 @@ void hc_errors_deinit() {
 }
 ```
 
-`hc_throw()` takes a code and a `printf`-compatable format and argument list. We're taking advantage of the fact that adjecent string literals are automagically concatenated by the compiler to add context to the message.
+`hc_throw()` takes a code and a `printf`-compatable format and argument list. We're taking advantage of the fact that adjacent string literals are automagically concatenated by the compiler to add context.
 
 ```C
 #define hc_throw(c, m, ...) {						

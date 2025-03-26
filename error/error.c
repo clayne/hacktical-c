@@ -46,7 +46,7 @@ void _hc_throw(struct hc_error *e) {
   longjmp(t, 1);
 }
 
-struct hc_error *hc_error_new(int code, const char *message, ...) {
+struct hc_error *hc_error_new(const int code, const char *message, ...) {
   va_list args;
   va_start(args, message);
   
