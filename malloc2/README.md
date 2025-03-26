@@ -2,7 +2,7 @@
 Welcome back to memory allocator land. We now have enough features in place to design more interesting allocators. Before we're done, the goal is to share enough examples of what's possible for you to start dreaming up your own designs.
 
 ### Recycling
-Recycling memory is a common requirement for allocators, we'll design the feature as a separate allocator that can be conveniently added at any point in a pipeline. A multi-`struct hc_set` ordered by allocation size is used to track allocations.
+Recycling memory is a common requirement for allocators, we'll design the feature as a separate allocator that can be added at any point in a pipeline. A multi-`struct hc_set` ordered by allocation size is used to track allocations.
 
 ```C
 struct hc_memo_alloc {
@@ -72,7 +72,7 @@ void *memo_acquire(struct hc_malloc *a, size_t size) {
 }
 ```
 
-While `release` registers the allocation for recycling.
+`release` registers the allocation for recycling.
 
 ```C
 void memo_release(struct hc_malloc *a, void *p) {

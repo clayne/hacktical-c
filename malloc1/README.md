@@ -1,7 +1,7 @@
 ## Composable Memory Allocators - Part 1
 Writing your own memory allocator is a common rite of passage for novice C programmers. Which makes sense, since one of the defining features of C is raw memory access.
 
-Here we're going to explore a composable design that allows convenient definition of pipelines of allocators with different behaviors. Individual allocators follow the Unix-principle of doing one thing well.
+Here we're going to explore a composable design that allows defining pipelines of allocators to conveniently custom tailor the allocation strategy. Individual allocators follow the Unix-principle of doing one thing well.
 
 Allocators are required to support the following API:
 
@@ -27,7 +27,7 @@ struct hc_malloc hc_malloc = {.acquire = default_acquire,
 			      .release = default_release};
 ```
 
-A set of macros are provided to simplify use. `_x()`-variants are provided mainly for internal use with bare `struct hc_malloc`-pointers, while the outer layer adds `->malloc` to avoid having to type it out at every use.
+A set of macros are provided to simplify use. `_x()`-variants are intended for use with bare `struct hc_malloc`-pointers, while the outer layer adds `->malloc` to avoid having to type it out at every use.
 
 ```C
 #define __hc_malloc_do(m, _pm)						

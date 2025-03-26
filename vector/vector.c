@@ -8,7 +8,8 @@ static void grow(struct hc_vector *v) {
   hc_vector_grow(v, v->capacity ? v->capacity*2 : 2);
 }
 
-struct hc_vector *hc_vector_init(struct hc_vector *v, size_t item_size) {
+struct hc_vector *hc_vector_init(struct hc_vector *v,
+				 const size_t item_size) {
   v->item_size = item_size;
   v->capacity = v->length = 0;
   v->malloc = hc_malloc;
@@ -20,7 +21,7 @@ void hc_vector_deinit(struct hc_vector *v) {
   if (v->items) { free(v->items); }
 }
 
-void hc_vector_grow(struct hc_vector *v, size_t capacity) {
+void hc_vector_grow(struct hc_vector *v, const size_t capacity) {
   v->capacity = capacity; 
   size_t size = v->item_size * (v->capacity+1);
   uint8_t *new_items = _hc_acquire(v->malloc, size);
@@ -64,7 +65,7 @@ void *hc_vector_pop(struct hc_vector *v) {
   return v->end;
 }
 
-void *hc_vector_insert(struct hc_vector *v, size_t i, size_t n) {
+void *hc_vector_insert(struct hc_vector *v, const size_t i, const size_t n) {
   const size_t m = v->length+n;
   if (m > v->capacity) { hc_vector_grow(v, m); } 
   uint8_t *const p = hc_vector_get(v, i);
@@ -78,7 +79,7 @@ void *hc_vector_insert(struct hc_vector *v, size_t i, size_t n) {
   return p;
 }
 
-bool hc_vector_delete(struct hc_vector *v, size_t i, size_t n) {
+bool hc_vector_delete(struct hc_vector *v, const size_t i, const size_t n) {
   const size_t m = i+n;
   assert(m <= v->length);
 
