@@ -82,7 +82,8 @@ struct hc_proc hc_exec(const char *cmd, ...) {
     hc_throw(0, "Failed to fork process: %d", errno);
   default:
     close(fds[0]);
-
+    free(cp);
+    
     hc_vector_do(&cas, ca) {
       free(*(char **)ca);
     }
