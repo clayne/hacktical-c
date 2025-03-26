@@ -42,7 +42,11 @@ void hc_vector_clear(struct hc_vector *v) {
   v->end = v->start;
 }
 
-void *hc_vector_get(struct hc_vector *v, size_t i) {
+void *hc_vector_get(struct hc_vector *v, const size_t i) {
+  return v->items ? v->start + v->item_size*i : NULL;
+}
+
+const void *hc_vector_get_const(const struct hc_vector *v, const size_t i) {
   return v->items ? v->start + v->item_size*i : NULL;
 }
 

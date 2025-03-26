@@ -1,5 +1,5 @@
 ## Ordered Sets and Maps
-Besides lists and vectors, some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched, ordered vectors. What we're actually going to build is an ordered set; but since it's value based, maps are easy to implement on top with low overhead.
+Besides lists and vectors, some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched vectors. What we're actually going to build is an ordered set; but since it's value based, maps are easily implemented on top with low overhead.
 
 Example:
 ```C
@@ -50,7 +50,7 @@ typedef enum hc_order (*hc_cmp_t)(const void *, const void *);
 
 Besides a comparator for items, sets also feature an optional accessor for item keys.
 
-```
+```C
 struct hc_set {
   struct hc_vector items;
   hc_cmp_t cmp;
@@ -71,7 +71,7 @@ void hc_set_deinit(struct hc_set *s) {
 
 Most of the weight is pulled by `hc_set_index()`; which returns an index for a key, and optionally sets a flag if the key is in the set.
 
-```
+```C
 size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
   size_t min = 0, max = s->items.length;
 
@@ -98,13 +98,11 @@ size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
 
   return min;
 }
+```
 
-void *hc_set_find(struct hc_set *s, void *key) {
-  bool ok = false;
-  const size_t i = hc_set_index(s, key, &ok);
-  return ok ? hc_vector_get(&s->items, i) : NULL;
-}
+`hc_set_add()` adds an item with the specified key, provided it's not already in the set or the `force`-flag is `true`. A pointer to the item is returned for copying data.
 
+```C
 void *hc_set_add(struct hc_set *s, void *key, bool force) {
   bool ok = false;
   const size_t i = hc_set_index(s, key, &ok);
@@ -115,5 +113,15 @@ void *hc_set_add(struct hc_set *s, void *key, bool force) {
   
   return hc_vector_insert(&s->items, i, 1);
 
+}
+```
+
+`hc_set_find()` returns the item with the specified key if it's in the set, otherwise `NULL`.
+
+```C
+void *hc_set_find(struct hc_set *s, void *key) {
+  bool ok = false;
+  const size_t i = hc_set_index(s, key, &ok);
+  return ok ? hc_vector_get(&s->items, i) : NULL;
 }
 ```

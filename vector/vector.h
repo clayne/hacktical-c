@@ -28,6 +28,7 @@ void hc_vector_deinit(struct hc_vector *v);
 void hc_vector_grow(struct hc_vector *v, size_t capacity);
 void hc_vector_clear(struct hc_vector *v);
 void *hc_vector_get(struct hc_vector *v, size_t i);
+const void *hc_vector_get_const(const struct hc_vector *v, size_t i);
 void *hc_vector_push(struct hc_vector *v);
 void *hc_vector_peek(struct hc_vector *v);
 void *hc_vector_pop(struct hc_vector *v);

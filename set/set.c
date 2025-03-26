@@ -16,12 +16,12 @@ void hc_set_deinit(struct hc_set *s) {
   hc_vector_deinit(&s->items);
 }
 
-size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
+size_t hc_set_index(const struct hc_set *s, const void *key, bool *ok) {
   size_t min = 0, max = s->items.length;
 
   while (min < max) {
     const size_t i = (min+max)/2;
-    const void *v = hc_vector_get(&s->items, i);
+    const void *v = hc_vector_get_const(&s->items, i);
     const void *k = s->key ? s->key(v) : v;
 
     switch (s->cmp(key, k)) {
@@ -43,17 +43,17 @@ size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
   return min;
 }
 
-size_t hc_set_length(struct hc_set *s) {
+size_t hc_set_length(const struct hc_set *s) {
   return s->items.length;
 }
 
-void *hc_set_find(struct hc_set *s, void *key) {
+void *hc_set_find(struct hc_set *s, const void *key) {
   bool ok = false;
   const size_t i = hc_set_index(s, key, &ok);
-  return ok ? hc_vector_get(&s->items, i) : NULL;
+  return ok ? hc_vector_get_const(&s->items, i) : NULL;
 }
 
-void *hc_set_add(struct hc_set *s, void *key, bool force) {
+void *hc_set_add(struct hc_set *s, const void *key, const bool force) {
   bool ok = false;
   const size_t i = hc_set_index(s, key, &ok);
 
