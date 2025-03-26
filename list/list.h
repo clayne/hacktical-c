@@ -17,7 +17,7 @@ struct hc_list {
 };
 
 void hc_list_init(struct hc_list *l);
-bool hc_list_nil(struct hc_list *l);
+bool hc_list_nil(const struct hc_list *l);
 struct hc_list *hc_list_delete(struct hc_list *l);
 
 void hc_list_push_front(struct hc_list *l, struct hc_list *it);

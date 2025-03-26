@@ -27,7 +27,7 @@ struct my_item {
 };
 ```
 
-We can now allocate as many items as we need in one block, and add them to a maximum of two lists at a time. Lists are simply nodes that are not part of any values.
+We can now allocate as many items as we need in one block, and add them to a maximum of two lists at a time. List roots are simply nodes that are not part of any values.
 
 ```C
   struct hc_list one_list, another_list;
@@ -56,7 +56,15 @@ Iterating a list means starting from the head and stepping through the links unt
   _hc_list_do(l, i, hc_unique(next))
 ```
 
-We use the following macro to go out from `struct hc_list` to `struct my_item`.
+Example:
+```C
+  hc_list_do(&one_list, i) {
+    struct my_item it = hc_baseof(i, struct my_item, one_list);
+    ...
+  }
+```
+
+We use the following macro to reach out from `struct hc_list` to its `struct my_item`-container.
 
 ```C
 #define hc_baseof(p, t, m) ({			
@@ -65,17 +73,17 @@ We use the following macro to go out from `struct hc_list` to `struct my_item`.
     })
 ```
 
-Like so.
+To remove an item from a list; we don't even need access to the list root, just the item is enough.
 
 ```C
-  hc_list_do(&one_list, i) {
-    struct my_item it = hc_baseof(i, struct my_item, one_list);
-    ...
-  }
+struct hc_list *hc_list_delete(struct hc_list *l) {
+  l->prev->next = l->next;
+  l->next->prev = l->prev;
+  return l;
+}
 ```
 
-To remove an item from a list; we don't even need access to the actual list, just the item is enough.
-
+Example:
 ```C
 hc_list_delete(&items[0].one_list);
 ```
