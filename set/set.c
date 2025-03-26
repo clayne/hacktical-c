@@ -5,7 +5,9 @@ struct hc_set *hc_set_new(size_t item_size, hc_cmp_t cmp) {
   return hc_set_init(malloc(sizeof(struct hc_set)), item_size, cmp);
 }
 
-struct hc_set *hc_set_init(struct hc_set *s, size_t item_size, hc_cmp_t cmp) {
+struct hc_set *hc_set_init(struct hc_set *s,
+			   const size_t item_size,
+			   hc_cmp_t cmp) {
   hc_vector_init(&s->items, item_size);
   s->cmp = cmp;
   s->key = NULL;
