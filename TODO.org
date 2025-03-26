@@ -1,8 +1,7 @@
-* add dynload support to dynamic
-** add hc_dload/hc_dsym
-*** load generated so and check dcgen() result
-** add dcompile
-*** pick out automagically
+* finish dynload support to dynamic
+
+- [Dynamic Compilation](https://github.com/codr7/hacktical-c/tree/main/dynamic)
+
 * bytes/u8string
 
 https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp

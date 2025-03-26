@@ -8,10 +8,16 @@ char *hc_vsprintf(const char *format, va_list args);
 
 struct hc_proc {
   int pid;
-  FILE *stdin;
+  int stdin;
 };
 
 struct hc_proc hc_exec(const char *path, ...);
 void hc_compile(const char *code, const char *out);
+
+struct hc_dlib {
+  void *handle;
+};
+
+struct hc_dlib hc_dlopen(const char *path);
 
 #endif

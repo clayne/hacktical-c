@@ -1,3 +1,4 @@
+#include <dlfcn.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,11 +96,22 @@ struct hc_proc hc_exec(const char *cmd, ...) {
 }
 
 void hc_compile(const char *code, const char *out) {
-  struct hc_proc child = hc_exec("/usr/bin/gcc -shared -o %s -E -", out);
+  const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -E -";
+  struct hc_proc child = hc_exec(cmd, out, out);
   FILE *stdin = fdopen(child.stdin, "w");
   fputs(code, stdin);
   fclose(stdin);
   close(child.stdin);
   int status;
   waitpid(child.pid, &status, 0);
+}
+
+struct hc_dlib hc_dlopen(const char *path) {
+  void *p = dlopen(path, RTLD_NOW);
+
+  if (p == NULL) {
+    hc_throw(0, "Error opening dynamic library '%s': %s", path, dlerror());
+  }
+
+  return (struct hc_dlib){.handle = p};
 }

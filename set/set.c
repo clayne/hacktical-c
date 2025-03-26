@@ -52,7 +52,7 @@ size_t hc_set_length(const struct hc_set *s) {
 void *hc_set_find(struct hc_set *s, const void *key) {
   bool ok = false;
   const size_t i = hc_set_index(s, key, &ok);
-  return ok ? hc_vector_get_const(&s->items, i) : NULL;
+  return ok ? hc_vector_get(&s->items, i) : NULL;
 }
 
 void *hc_set_add(struct hc_set *s, const void *key, const bool force) {
