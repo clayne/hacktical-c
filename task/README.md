@@ -1,7 +1,7 @@
 ## Lightweight Concurrent Tasks
-Concurrent tasks allows keeping the flow of control intact where it would otherwise easily get lost in the noise of a solution based on discrete events. Note that concurrent only means interleaved, not parallel; which means that system threads would add a lot of complexity and overhead for no gain. C lacks built in support for coroutines, but if you're willing to live with a few limitations, the same effect can be achieved without breaking any rules.
+Concurrent tasks allows keeping the flow of control intact where it would otherwise get lost in the noise of a solution based on discrete events. Note that concurrent means interleaved, not parallel; which means that system threads would add a lot of complexity and overhead. C lacks built in support for coroutines, but the same effect can be achieved without breaking any rules.
 
-We'll start by defining an abstraction to represent a task.
+We start by defining an abstraction to represent a task.
 
 ```C
 struct hc_task {
@@ -18,7 +18,7 @@ The task body is simply a regular pointer to a function taking a `struct hc_task
 typedef void (*hc_task_body)(struct hc_task *);
 ```
 
-We'll also need a way to track of a list of tasks, a scheduler.
+We also need a way to track of a list of tasks, a scheduler.
 
 ```
 struct hc_task_list {
@@ -47,7 +47,7 @@ void hc_task_list_run(struct hc_task_list *tl) {
 }
 ```
 
-We now have all the pieces needed to define our tasks. For this example, we'll use a counter to represent the data being produced/consumed.
+We now have all the pieces needed to define our tasks. For this example, we'll use a simple counter to represent the data being produced/consumed.
 
 ```C
 struct my_task {
@@ -74,7 +74,7 @@ int main() {
 }
 ```
 
-The producer increases the counter and then yields control to the consumer, execution resumes on the next line following `hc_task_yield()` on the next call.
+The producer increases the counter and then yields control to the consumer, execution resumes on the next line following `hc_task_yield()` on next call.
 
 ```C
 void producer(struct hc_task *task) {
@@ -91,7 +91,7 @@ void producer(struct hc_task *task) {
 }
 ```
 
-While the consumer decreases the counter in a similar fashion.
+The consumer decreases the counter in a similar fashion.
 
 ```C
 static void consumer(struct hc_task *task) {

@@ -15,7 +15,7 @@ struct hc_task_list *hc_task_list_init(struct hc_task_list *tl) {
   hc_list_init(&tl->tasks);
 }
 
-void hc_task_list_run(struct hc_task_list *tl) {
+void hc_task_list_run(const struct hc_task_list *tl) {
   bool all_done = false;
   
   while (!all_done) {
