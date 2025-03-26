@@ -62,7 +62,7 @@ The content is arranged to form a natural progression, where later chapters buil
 
 - [Macros](https://github.com/codr7/hacktical-c/tree/main/macro)
 - [Fixed-Point Arithmetic](https://github.com/codr7/hacktical-c/tree/main/fix)
-- [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/ma-in/list)
+- [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
 - [Lightweight Concurrent Tasks](https://github.com/codr7/hacktical-c/tree/main/task)
 - [Composable Memory Allocators - Part 1](https://github.com/codr7/hacktical-c/tree/main/malloc1)
 - [Vectors](https://github.com/codr7/hacktical-c/tree/ma-in/vector)
