@@ -3,7 +3,7 @@ Fixed-point is a method of representing fractional values by storing a fixed num
 
 The reasons one might wish to do so are mainly performance and correctness. Floating point values are more complicated to implement and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
 
-We'll use unsigned 64 bit integers to store our fixed-point values, using 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
+We'll use unsigned 64-bit integers to store fixed-point values; using 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
 
 ```C
 #define HC_FIX_EXP 3
@@ -12,7 +12,7 @@ We'll use unsigned 64 bit integers to store our fixed-point values, using 3 bits
 typedef uint64_t hc_fix;
 ```
 
-The constructor takes an exponent and a scaled, signed value.
+The constructor takes an exponent and a pre-scaled, signed value.
 
 ```C
 hc_fix hc_fix_new(uint8_t exp, int64_t val) {

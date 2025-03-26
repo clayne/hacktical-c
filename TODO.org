@@ -3,6 +3,10 @@
 *** load generated so and check dcgen() result
 ** add dcompile
 *** pick out automagically
+* bytes/u8string
+
+https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
+
 * add calculator/codegen
 ** fix calculator with stack
 * add trace allocator to malloc2

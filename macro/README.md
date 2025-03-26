@@ -26,7 +26,7 @@ assert(foobar == 42);
 
 Since it doesn't make much sense to generate unique identifiers that are never used, this macro is mostly used to generate arguments for macros where the generated id can be reused.
 
-`hc_defer()` is used to register scoped destructors, it uses `hc_unique()` to generate a name for the temporary variable to which the `__cleanup__` attribute is applied, as well as for the destructor trampoline. Registered destructors are executed in reverse order.
+`hc_defer()` is used to register scoped destructors, it uses `hc_unique()` to generate a name for the temporary variable to which the `__cleanup__` attribute is applied, as well as for the destructor trampoline. Registered destructors are executed in reverse order. `__VA__ARGS__` represents the argument list in macros that take a variable number of arguments. It is sometimes used as `##__VA_ARGS__`, which removes the preceding `,` when the argument list is empty.
 
 ```C
 #define _hc_defer(_d, _v, ...)			
@@ -36,9 +36,6 @@ Since it doesn't make much sense to generate unique identifiers that are never u
 #define hc_defer(...)
   _hc_defer(hc_unique(defer_d), hc_unique(defer_v), __VA_ARGS__)
 ```
-
-`__VA__ARGS__` represents the argument list in macros that take a variable number of arguments. It is sometimes used as `##__VA_ARGS__`, which removes the preceding `,` when the argument list is empty.
-
 Example:
 ```C
 int foo = 0;
@@ -51,7 +48,7 @@ int foo = 0;
 assert(foo == 2);
 ```
 
-`__auto_type` allows inferring types from macro arguments, this may be used to define generic macros such as `hc_min()`. Multi-line macros may be turned into expressions by wrapping their body in `({`/`})`.
+`__auto_type` allows inferring types from macro arguments, this may be used to define generic macros such as `hc_min()`. Enclosing the macro body in `({`/`})` enables multi-line expressions.
 
 ```C
 #define hc_min(x, y) ({				
