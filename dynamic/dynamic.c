@@ -11,23 +11,7 @@
 #include "malloc1/malloc1.h"
 #include "vector/vector.h"
 
-char *hc_vsprintf(const char *format, va_list args) {
-  va_list tmp_args;
-  va_copy(tmp_args, args);
-  int len = vsnprintf(NULL, 0, format, tmp_args);
-  va_end(tmp_args);
-
-  if (len < 0) {
-    hc_throw(0, "Formatting '%s' failed: %d", format, errno);
-  }
-
-  len++;
-  char *out = hc_acquire(len);
-  vsnprintf(out, len, format, args);
-  return out;
-} 
-
-static struct hc_vector hc_split_string(const char *in, char c) {
+static struct hc_vector parse_args(const char *in) {
   struct hc_vector out;
   hc_vector_init(&out, sizeof(char *));
   const char *p, *i;
@@ -54,8 +38,9 @@ struct hc_proc hc_exec(const char *cmd, ...) {
   va_end(args);
 
   char *i = strchr(c, ' ');
+  if (!i) { i = c + strlen(c); }
   char *cp = strndup(c, i - c);
-  struct hc_vector cas = hc_split_string(i+1, ' ');
+  struct hc_vector cas = parse_args(i+1);
   int fds[2];
   pipe(fds);
   pid_t child_pid = fork();
@@ -72,8 +57,9 @@ struct hc_proc hc_exec(const char *cmd, ...) {
     }
 
     as[cas.length+1] = NULL;
-    
-    if (execve(cp, as, NULL) == -1) {
+    char *const env[] = {"PATH=/bin:/sbin", NULL};
+      
+    if (execve(cp, as, env) == -1) {
       hc_throw(0, "Failed to exec '%s': %d", c, errno);
     }
     
@@ -96,7 +82,7 @@ struct hc_proc hc_exec(const char *cmd, ...) {
 }
 
 void hc_compile(const char *code, const char *out) {
-  const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -E -";
+  const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -xc -";
   struct hc_proc child = hc_exec(cmd, out, out);
   FILE *stdin = fdopen(child.stdin, "w");
   fputs(code, stdin);
@@ -106,12 +92,48 @@ void hc_compile(const char *code, const char *out) {
   waitpid(child.pid, &status, 0);
 }
 
-struct hc_dlib hc_dlopen(const char *path) {
-  void *p = dlopen(path, RTLD_NOW);
+char *hc_vsprintf(const char *format, va_list args) {
+  va_list tmp_args;
+  va_copy(tmp_args, args);
+  int len = vsnprintf(NULL, 0, format, tmp_args);
+  va_end(tmp_args);
 
-  if (p == NULL) {
-    hc_throw(0, "Error opening dynamic library '%s': %s", path, dlerror());
+  if (len < 0) {
+    hc_throw(0, "Formatting '%s' failed: %d", format, errno);
   }
 
-  return (struct hc_dlib){.handle = p};
+  len++;
+  char *out = hc_acquire(len);
+  vsnprintf(out, len, format, args);
+  return out;
+} 
+
+struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
+  lib->handle = dlopen(path, RTLD_NOW);
+
+  if (lib->handle == NULL) {
+    hc_throw(0, "Error opening dynamic library '%s': %s", path, dlerror());
+  }
+  
+  return lib;
+}
+
+struct hc_dlib *hc_dlib_deinit(struct hc_dlib *lib) {
+  if (dlclose(lib->handle) != 0) {
+    hc_throw(0, "Failed closing dynamic library: ", dlerror());
+  }
+
+  return lib;
+}
+
+void *hc_dlib_find(const struct hc_dlib *lib, const char *s) {
+  dlerror();
+  void *v = dlsym(lib->handle, s);
+  char *e = dlerror();
+
+  if (e != NULL) {
+    hc_throw(0, "Symbol '%s' not found: %s", e);
+  }
+
+  return v;
 }

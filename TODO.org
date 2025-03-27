@@ -1,4 +1,5 @@
 * finish dynload support to dynamic
+** figure out why generated library contains source code
 
 - [Dynamic Compilation](https://github.com/codr7/hacktical-c/tree/main/dynamic)
 

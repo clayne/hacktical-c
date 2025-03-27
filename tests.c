@@ -15,7 +15,7 @@
 int main() {
   hc_malloc_init();
 
-  //dynamic_tests();
+  dynamic_tests();
   error_tests();
   fix_tests();
   list_tests();
