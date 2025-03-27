@@ -4,8 +4,6 @@
 
 ~ D. Gries
 
-I'd go one step further: don't evaluate what you can compile. In languages like Lisp this is a lot easier due to built-in support for code generation and dynamic compilation.
-
 To implement dynamic compilation in C, we'll have to cast a few non-trivial Unix spells and sacrifice some portability in the process. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
 
 Example:
@@ -39,7 +37,7 @@ void hc_compile(const char *code, const char *out) {
 
 Starting an external process with a pipe attached to `stdin` gets a tiny bit involved, and non-trivial to refactor into smaller pieces; but goes someting like this.
 
-First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to its `stdin` using `dup2()` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
+First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to `stdin` using `dup2()` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
 
 ```C
 struct hc_proc {
