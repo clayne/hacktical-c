@@ -42,6 +42,11 @@ Starting an external process with a pipe attached to `stdin` gets a tiny bit inv
 First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to its `stdin` using `dup2()` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
 
 ```C
+struct hc_proc {
+  int pid;
+  int stdin;
+};
+
 struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
   va_list args;
   va_start(args, cmd);
