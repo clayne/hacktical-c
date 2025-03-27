@@ -118,7 +118,7 @@ char *hc_vsprintf(const char *format, va_list args) {
 struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
   lib->handle = dlopen(path, RTLD_NOW);
 
-  if (lib->handle == NULL) {
+  if (!lib->handle) {
     hc_throw(0, "Error opening dynamic library '%s': %s", path, dlerror());
   }
   
@@ -138,7 +138,7 @@ void *hc_dlib_find(const struct hc_dlib *lib, const char *s) {
   void *v = dlsym(lib->handle, s);
   char *e = dlerror();
 
-  if (e != NULL) {
+  if (e) {
     hc_throw(0, "Symbol '%s' not found: %s", e);
   }
 
