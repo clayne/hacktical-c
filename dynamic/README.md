@@ -96,7 +96,7 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
 }
 ```
 
-`struct hc_dlib` handles loading dynamic libraries and looking up symbols.
+`struct hc_dlib` handles loading shared libraries and looking up symbols.
 
 ```C
 struct hc_dlib {
