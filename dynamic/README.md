@@ -25,7 +25,7 @@ Example:
 
 The star of the show is `hc_compile()` which allows dynamically creating shared libraries from source code.
 
-```
+```C
 void hc_compile(const char *code, const char *out) {
   const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -xc -";
   struct hc_proc child;
@@ -39,9 +39,9 @@ void hc_compile(const char *code, const char *out) {
 
 Starting an external process with a pipe attached to `stdin` gets a tiny bit involved, and non-trivial to refactor into smaller pieces; but goes someting like this.
 
-First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to its `stdin` using `dup2()`` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
+First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to its `stdin` using `dup2()` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
 
-```
+```C
 struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
   va_list args;
   va_start(args, cmd);
@@ -95,7 +95,7 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
 
 `struct hc_dlib` handles loading dynamic libraries and looking up symbols.
 
-``
+```C
 struct hc_dlib {
   void *handle;
 };
