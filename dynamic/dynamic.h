@@ -9,8 +9,11 @@ struct hc_proc {
   int stdin;
 };
 
-struct hc_proc hc_exec(const char *path, ...);
+struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...);
+struct hc_proc *hc_proc_deinit(struct hc_proc *proc);
+
 void hc_compile(const char *code, const char *out);
+
 char *hc_vsprintf(const char *format, va_list args);
 
 struct hc_dlib {

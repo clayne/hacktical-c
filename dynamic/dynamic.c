@@ -30,10 +30,9 @@ static struct hc_vector parse_args(const char *in) {
   return out;
 }
 
-struct hc_proc hc_exec(const char *cmd, ...) {
+struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
   va_list args;
   va_start(args, cmd);
-  struct hc_malloc *ma = hc_malloc;
   char *c = hc_vsprintf(cmd, args);
   va_end(args);
 
@@ -66,7 +65,7 @@ struct hc_proc hc_exec(const char *cmd, ...) {
     break;
   }
   case -1:
-    hc_throw(0, "Failed to fork process: %d", errno);
+    hc_throw(0, "Failed forking process: %d", errno);
   default:
     close(fds[0]);
     free(cp);
@@ -76,20 +75,28 @@ struct hc_proc hc_exec(const char *cmd, ...) {
     }
     
     hc_vector_deinit(&cas);
-    _hc_malloc_do(ma) { hc_release(c); }
-    return (struct hc_proc){.pid = child_pid, .stdin = fds[1]};
+    hc_release(c);
+    proc->pid = child_pid;
+    proc->stdin = fds[1];
+    return proc;
   }
+}
+
+struct hc_proc *hc_proc_deinit(struct hc_proc *proc) {
+  close(proc->stdin);
+  int status;
+  waitpid(proc->pid, &status, 0);
+  return proc;
 }
 
 void hc_compile(const char *code, const char *out) {
   const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -xc -";
-  struct hc_proc child = hc_exec(cmd, out, out);
+  struct hc_proc child;
+  hc_proc_init(&child, cmd, out);
+  hc_defer(hc_proc_deinit(&child));
   FILE *stdin = fdopen(child.stdin, "w");
   fputs(code, stdin);
   fclose(stdin);
-  close(child.stdin);
-  int status;
-  waitpid(child.pid, &status, 0);
 }
 
 char *hc_vsprintf(const char *format, va_list args) {

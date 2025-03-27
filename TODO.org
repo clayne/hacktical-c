@@ -1,7 +1,3 @@
-* dynamic readme
-
-- [Dynamic Compilation](https://github.com/codr7/hacktical-c/tree/main/dynamic)
-
 * bytes/u8string
 
 https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
