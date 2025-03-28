@@ -5,17 +5,14 @@
 * add slog
 ** use streams
 
+* add slab allocator to malloc2
+
 * add calculator/codegen
 ** fix calculator with stack
-
-* add trace allocator to malloc2
 
 * bytes/u8string
 
 https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
-
-
-* add slab allocator to malloc2
 
 * add term
 ** ansi
