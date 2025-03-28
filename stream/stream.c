@@ -37,7 +37,7 @@ size_t hc_stream_vprintf(struct hc_stream *s,
 
   char *data = hc_vsprintf(spec, args);
   hc_defer(hc_release(data));
-  hc_stream_put(s, data, strlen(data));
+  return hc_stream_put(s, data, strlen(data));
 }
 
 size_t hc_stream_put(struct hc_stream *s, uint8_t *data, size_t n) {

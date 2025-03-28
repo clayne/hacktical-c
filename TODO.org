@@ -1,5 +1,5 @@
 * stream
-** add memory stream
+** add memory stream backed by vector
 ** add tests
 
 * add slog
