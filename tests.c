@@ -8,6 +8,7 @@
 #include "malloc1/tests.c"
 #include "malloc2/tests.c"
 #include "set/tests.c"
+#include "stream/tests.c"
 #include "task/tests.c"
 #include "time/tests.c"
 #include "vector/tests.c"
@@ -23,6 +24,7 @@ int main() {
   malloc1_tests();
   malloc2_tests();
   set_tests();
+  stream_tests();
   task_tests();
   time_tests();
   vector_tests();

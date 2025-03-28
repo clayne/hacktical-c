@@ -1,22 +1,19 @@
-* bytes/u8string
-
-https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
-
 * stream
-** add hc_stream interface
-*** put(const uint8 *, n) method
-*** get(uint8 *, n) method
-*** printf method
-**** default create tmp buffer/vsnprintf
-** add FILE constructor
-*** override printf to use fprintf
+** add memory stream
+** add tests
+
+* add slog
+** use streams
 
 * add calculator/codegen
 ** fix calculator with stack
 
 * add trace allocator to malloc2
 
-* add slog
+* bytes/u8string
+
+https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
+
 
 * add slab allocator to malloc2
 
