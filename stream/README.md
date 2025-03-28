@@ -15,7 +15,7 @@ struct hc_stream {
 
 `vprintf` defaults to using a temporary buffer, but is special cased for `FILE *`s to simply delegate to `vfprintf()`.
 
-```
+```C
 size_t hc_stream_vprintf(struct hc_stream *s,
 			 const char *spec,
 			 va_list args) {
@@ -29,9 +29,9 @@ size_t hc_stream_vprintf(struct hc_stream *s,
 }
 ```
 
-The first implementation is file streams.
+The first implementation is file streams, which simply delegate to `stdio`.
 
-```
+```C
 struct hc_file_stream {
   struct hc_stream stream;
   FILE *file;
@@ -51,10 +51,42 @@ int file_vprintf(struct hc_stream *s, const char *spec, va_list args) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   return vfprintf(fs->file, spec, args);
 }
+```
 
-const struct hc_stream hc_file_stream = {
-  .get = file_get,
-  .put = file_put,
-  .vprintf = file_vprintf
+The next most obvious variant is memory streams. We'll use a `struct hc_vector` to manage the data. `vprintf` defaults to using a temporary buffer.
+
+```C
+struct hc_memory_stream {
+  struct hc_stream stream;
+  struct hc_vector data;
+  size_t rpos;
 };
+```
+
+`put()` inserts a block of `n` bytes at the end of the vector and uses `memcpy()` to copy data.
+
+```C
+size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
+  const size_t offset = ms->data.length;
+  hc_vector_insert(&ms->data, ms->data.length, n);
+  memcpy(ms->data.start + offset, data, n);
+  return n;
+}
+```
+
+`get()` clamps the number of read bytes to the length of `s->data` minus `s->rpos` and uses `memcpy()` to copy data. It also updates `rpos`. 
+
+```C
+size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
+  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
+
+  if (ms->rpos + n > ms->data.length) {
+    n = ms->data.length - ms->rpos;
+  }
+  
+  memcpy(data, ms->data.start + ms->rpos, n);
+  ms->rpos += n;
+  return n;
+}
 ```

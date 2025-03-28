@@ -1,6 +1,7 @@
 * stream
-** add memory stream backed by vector
 ** add tests
+** document memory streams
+** check const args
 
 * add slog
 ** use streams
