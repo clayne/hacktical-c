@@ -9,10 +9,12 @@ struct hc_task *hc_task_init(struct hc_task *t,
   t->state = 0;
   t->done = false;
   hc_list_push_back(&tl->tasks, &t->list);
+  return t;
 }
 
 struct hc_task_list *hc_task_list_init(struct hc_task_list *tl) {
   hc_list_init(&tl->tasks);
+  return tl;
 }
 
 void hc_task_list_run(const struct hc_task_list *tl) {

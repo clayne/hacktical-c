@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "vector.h"
@@ -11,7 +12,8 @@ static void grow(struct hc_vector *v) {
 struct hc_vector *hc_vector_init(struct hc_vector *v,
 				 const size_t item_size) {
   v->item_size = item_size;
-  v->capacity = v->length = 0;
+  v->capacity = 0;
+  v->length = 0;
   v->malloc = hc_malloc;
   v->items = v->start = v->end = NULL;
   return v;

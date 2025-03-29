@@ -61,8 +61,6 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
     if (execve(cp, as, env) == -1) {
       hc_throw(0, "Failed to exec '%s': %d", c, errno);
     }
-    
-    break;
   }
   case -1:
     hc_throw(0, "Failed forking process: %d", errno);
@@ -78,8 +76,10 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
     hc_release(c);
     proc->pid = child_pid;
     proc->stdin = fds[1];
-    return proc;
+    break;
   }
+
+  return proc;
 }
 
 struct hc_proc *hc_proc_deinit(struct hc_proc *proc) {

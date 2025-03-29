@@ -3,42 +3,91 @@
 #include <string.h>
 
 #include "dynamic/dynamic.h"
+#include "error/error.h"
 #include "malloc1/malloc1.h"
 #include "macro/macro.h"
 #include "stream.h"
 
-size_t file_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+void _hc_stream_deinit(struct hc_stream *s) {
+  assert(s->deinit);
+  s->deinit(s);
+}
+
+size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n) {
+  assert(s->get);
+  return s->get(s, data, n);
+}
+
+size_t _hc_stream_put(struct hc_stream *s, uint8_t *data, size_t n) {
+  assert(s->put);
+  return s->put(s, data, n);
+}
+
+size_t _hc_stream_vprintf(struct hc_stream *s,
+			 const char *spec,
+			 va_list args) {
+  if (s->vprintf) {
+    return s->vprintf(s, spec, args);
+  }
+
+  char *data = hc_vsprintf(spec, args);
+  hc_defer(hc_release(data));
+  return _hc_stream_put(s, (uint8_t *)data, strlen(data));
+}
+
+size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...) {
+  va_list args;
+  va_start(args, spec);
+  hc_defer(va_end(args));
+  return _hc_stream_vprintf(s, spec, args);
+}
+
+void file_deinit(struct hc_stream *s) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
-  return fwrite(data, n, 1, fs->file);
+  assert(fs->file);
+  
+  if (fclose(fs->file) == EOF) {
+    hc_throw(0, "Failed closing file");
+  }
+
+  fs->file = NULL;
 }
 
 size_t file_get(struct hc_stream *s, uint8_t *data, size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+  assert(fs->file);
   return fread(data, n, 1, fs->file);
+}
+
+size_t file_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+  assert(fs->file);
+  return fwrite(data, n, 1, fs->file);
 }
 
 int file_vprintf(struct hc_stream *s, const char *spec, va_list args) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+  assert(fs->file);
   return vfprintf(fs->file, spec, args);
 }
 
-const struct hc_stream hc_file_stream = {
-  .get = file_get,
-  .put = file_put,
+struct hc_stream hc_file_stream = {
+  .deinit  = file_deinit,
+  .get     = file_get,
+  .put     = file_put,
   .vprintf = file_vprintf
 };
 
-struct hc_stream *hc_file_stream_init(struct hc_file_stream *s, FILE *file) {
+struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
+					   FILE *file) {
+  s->stream = hc_file_stream;
   s->file = file;
-  return &s->stream;
+  return s;
 };
 
-size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+void memory_deinit(struct hc_stream *s) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
-  const size_t offset = ms->data.length;
-  hc_vector_insert(&ms->data, ms->data.length, n);
-  memcpy(ms->data.start + offset, data, n);
-  return n;
+  hc_vector_deinit(&ms->data);
 }
 
 size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
@@ -53,36 +102,31 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
   return n;
 }
 
-const struct hc_stream hc_memory_stream = {
-  .get = memory_get,
-  .put = memory_put,
+size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
+  uint8_t *dst = hc_vector_insert(&ms->data, ms->data.length, n);
+  memcpy(dst, data, n);
+  return n;
+}
+
+struct hc_stream hc_memory_stream = {
+  .deinit  = memory_deinit,
+  .get     = memory_get,
+  .put     = memory_put,
   .vprintf = NULL
 };
 
-struct hc_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
+struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
+  s->stream = hc_memory_stream;
   hc_vector_init(&s->data, 1);
   s->rpos = 0;
-  return &s->stream;
+  return s;
 }
 
-size_t hc_stream_vprintf(struct hc_stream *s,
-			 const char *spec,
-			 va_list args) {
-  if (s->vprintf) {
-    return s->vprintf(s, spec, args);
+const char *hc_memory_stream_string(struct hc_memory_stream *s) {
+  if (*(s->data.end-1) || !s->data.length) {
+    *(uint8_t *)hc_vector_push(&s->data) = 0;
   }
 
-  char *data = hc_vsprintf(spec, args);
-  hc_defer(hc_release(data));
-  return hc_stream_put(s, data, strlen(data));
-}
-
-size_t hc_stream_put(struct hc_stream *s, uint8_t *data, size_t n) {
-  assert(s->put);
-  return s->put(s, data, n);
-}
-
-size_t hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n) {
-  assert(s->get);
-  return s->get(s, data, n);
+  return (const char *)s->data.start;
 }

@@ -53,6 +53,7 @@ struct hc_memo_alloc *hc_memo_alloc_init(struct hc_memo_alloc *a,
   a->source = source;
   hc_set_init(&a->memo, sizeof(struct memo *), memo_cmp);
   a->memo.key = memo_key;
+  return a;
 }
 
 void hc_memo_alloc_deinit(struct hc_memo_alloc *a) {

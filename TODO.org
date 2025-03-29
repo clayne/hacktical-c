@@ -1,7 +1,9 @@
 * stream
-** add tests
-** document memory streams
+** debug memory stream data capacity
 ** check const args
+
+* rename time.h
+** enable time cflags
 
 * add slog
 ** use streams
@@ -29,3 +31,5 @@ https://sumofbytes.com/blog/understanding-asynchronous-in-linux-io-uring
 
 * mud reload
 ** links
+
+https://github.com/fungos/cr
