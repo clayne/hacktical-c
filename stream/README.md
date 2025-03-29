@@ -1,5 +1,5 @@
 ## Extensible Streams
-C++'s stream implementation might have missed the target in many ways, but that doesn't mean that an extensible stream API is a bad idea.
+C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs are a bad idea.
 
 We'll start with defining the interface.
 
