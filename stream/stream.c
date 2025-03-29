@@ -106,7 +106,7 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
 
 size_t memory_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
-  uint8_t *dst = hc_vector_insert(&ms->data, ms->data.length, n);
+  uint8_t *const dst = hc_vector_insert(&ms->data, ms->data.length, n);
   memcpy(dst, data, n);
   return n;
 }
