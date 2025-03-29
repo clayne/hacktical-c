@@ -1,6 +1,15 @@
 ## Extensible Streams
 C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs in general are a bad idea. The problem we're trying to solve is providing a stream API where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for; there are extensions for custom `FILE *`-streams, but so far with very spotty support.
 
+Example:
+```
+  struct hc_memory_stream s;
+  hc_memory_stream_init(&s);
+  hc_defer(hc_stream_deinit(&s));
+  hc_stream_printf(&s, "%s%d", "foo", 42);
+  assert(strcmp("foo42", hc_memory_stream_string(&s)) == 0);
+```
+
 We'll start with defining the interface for a stream.
 
 ```C
@@ -77,7 +86,7 @@ struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
 };
 ```
 
-The next most obvious variation is memory streams. We'll use a `struct hc_vector` to manage the data. `vprintf` defaults to using a temporary buffer.
+The next most obvious variation is memory streams. We'll use a `struct hc_vector` to manage the data.
 
 ```C
 struct hc_memory_stream {
