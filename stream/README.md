@@ -1,5 +1,5 @@
 ## Extensible Streams
-C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs are a bad idea.
+C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs are a bad idea. The problem we're trying to solve is providing a stream API where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for, there exists extensions for memory and/or custom file streams, but so far with very spotty support.
 
 We'll start with defining the interface.
 
