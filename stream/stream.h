@@ -30,7 +30,7 @@ struct hc_stream {
 
 void _hc_stream_deinit(struct hc_stream *s);
 size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n);
-size_t _hc_stream_put(struct hc_stream *s, uint8_t *data, size_t n);
+size_t _hc_stream_put(struct hc_stream *s, const uint8_t *data, size_t n);
 
 size_t _hc_stream_vprintf(struct hc_stream *s,
 			  const char *spec,

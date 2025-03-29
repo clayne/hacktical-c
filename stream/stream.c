@@ -13,12 +13,14 @@ void _hc_stream_deinit(struct hc_stream *s) {
   s->deinit(s);
 }
 
-size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n) {
+size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, const size_t n) {
   assert(s->get);
   return s->get(s, data, n);
 }
 
-size_t _hc_stream_put(struct hc_stream *s, uint8_t *data, size_t n) {
+size_t _hc_stream_put(struct hc_stream *s,
+		      const uint8_t *data,
+		      const size_t n) {
   assert(s->put);
   return s->put(s, data, n);
 }
@@ -53,13 +55,13 @@ void file_deinit(struct hc_stream *s) {
   fs->file = NULL;
 }
 
-size_t file_get(struct hc_stream *s, uint8_t *data, size_t n) {
+size_t file_get(struct hc_stream *s, uint8_t *data, const size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   assert(fs->file);
   return fread(data, n, 1, fs->file);
 }
 
-size_t file_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+size_t file_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   assert(fs->file);
   return fwrite(data, n, 1, fs->file);
@@ -102,7 +104,7 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
   return n;
 }
 
-size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
+size_t memory_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
   uint8_t *dst = hc_vector_insert(&ms->data, ms->data.length, n);
   memcpy(dst, data, n);

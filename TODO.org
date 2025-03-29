@@ -1,5 +1,4 @@
 * stream
-** debug memory stream data capacity
 ** check const args
 
 * rename time.h
