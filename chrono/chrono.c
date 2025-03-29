@@ -1,8 +1,9 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
+
+#include "chrono.h"
 #include "error/error.h"
-#include "time.h"
 
 void hc_utc(struct timespec *out) {
   if (!timespec_get(out, TIME_UTC)) {
@@ -39,6 +40,6 @@ uint64_t hc_timer_ns(const struct hc_timer *t) {
     (end.tv_nsec - t->start.tv_nsec);
 }
 
-uint64_t hc_timer_print(const struct hc_timer *t, const char *m) {
+void hc_timer_print(const struct hc_timer *t, const char *m) {
   printf("%s%" PRIu64 "ns\n", m, hc_timer_ns(t));
 }

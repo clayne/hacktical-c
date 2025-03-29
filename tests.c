@@ -1,5 +1,6 @@
 #include "error/error.h"
 
+#include "chrono/tests.c"
 #include "dynamic/tests.c"
 #include "error/tests.c"
 #include "fix/tests.c"
@@ -10,12 +11,12 @@
 #include "set/tests.c"
 #include "stream/tests.c"
 #include "task/tests.c"
-#include "time/tests.c"
 #include "vector/tests.c"
 
 int main() {
   hc_malloc_init();
 
+  chrono_tests();
   dynamic_tests();
   error_tests();
   fix_tests();
@@ -26,7 +27,6 @@ int main() {
   set_tests();
   stream_tests();
   task_tests();
-  time_tests();
   vector_tests();
 
   hc_errors_deinit();

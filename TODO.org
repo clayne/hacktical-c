@@ -1,8 +1,4 @@
-* stream
-** check const args
-
-* rename time.h
-** enable time cflags
+* finish streams
 
 * add slog
 ** use streams

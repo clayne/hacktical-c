@@ -1,7 +1,7 @@
 #include <assert.h>
-#include "time.h"
+#include "chrono.h"
 
-void time_tests() {
+void chrono_tests() {
   struct hc_timer t;
   hc_timer_init(&t);
   const int ns = 1000;
