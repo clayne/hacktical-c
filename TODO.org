@@ -1,7 +1,5 @@
-* finish streams
-
 * add slog
-** use streams
+** stream
 
 * add slab allocator to malloc2
 
