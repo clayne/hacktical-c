@@ -37,7 +37,7 @@ size_t hc_stream_vprintf(struct hc_stream *s,
 }
 ```
 
-The first implementation is file streams, which simply delegate to `stdio`.
+The first implementation is file streams, which simply delegate to `stdio`. If `close` is `true`, the file is closed with the stream.
 
 ```C
 struct hc_file_stream {
@@ -48,6 +48,7 @@ struct hc_file_stream {
 
 void file_deinit(struct hc_stream *s) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+
   if (fs->close) {
     assert(fs->file);
   
@@ -146,4 +147,3 @@ struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
   return s;
 }
 ```
-
