@@ -46,13 +46,16 @@ size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...) {
 
 void file_deinit(struct hc_stream *s) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
-  assert(fs->file);
-  
-  if (fclose(fs->file) == EOF) {
-    hc_throw(0, "Failed closing file");
-  }
 
-  fs->file = NULL;
+  if (fs->close) {
+    assert(fs->file);
+    
+    if (fclose(fs->file) == EOF) {
+      hc_throw(0, "Failed closing file");
+    }
+    
+    fs->file = NULL;
+  }
 }
 
 size_t file_get(struct hc_stream *s, uint8_t *data, const size_t n) {
@@ -81,9 +84,11 @@ struct hc_stream hc_file_stream = {
 };
 
 struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file) {
+					   FILE *file,
+					   bool close) {
   s->stream = hc_file_stream;
   s->file = file;
+  s->close = close;
   return s;
 };
 

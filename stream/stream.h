@@ -42,11 +42,13 @@ size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...);
 struct hc_file_stream {
   struct hc_stream stream;
   FILE *file;
+  bool close;
 };
 
 extern struct hc_stream hc_file_stream;
 struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file);
+					   FILE *file,
+					   bool close);
 
 struct hc_memory_stream {
   struct hc_stream stream;
