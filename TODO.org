@@ -1,5 +1,8 @@
+* switch close flag to enum
+enum hc_file_stream_options
+
 * add slog
-** stream
+struct hc_stream *out
 
 * add slab allocator to malloc2
 
