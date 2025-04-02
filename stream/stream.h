@@ -22,6 +22,12 @@ struct hc_stream {
 #define hc_stream_put(s, d, n)			\
   _hc_stream_put(&(s)->stream, d, n)
 
+#define hc_stream_putc(s, d)			\
+  _hc_stream_putc(&(s)->stream, d)
+
+#define hc_stream_puts(s, d)			\
+  _hc_stream_puts(&(s)->stream, d)
+
 #define hc_stream_vprintf(s, spec, args)	\
   _hc_stream_vprintf(&(s)->stream, spec, args);
 
@@ -31,13 +37,14 @@ struct hc_stream {
 void _hc_stream_deinit(struct hc_stream *s);
 size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n);
 size_t _hc_stream_put(struct hc_stream *s, const uint8_t *data, size_t n);
+size_t _hc_stream_putc(struct hc_stream *s, char data);
+size_t _hc_stream_puts(struct hc_stream *s, const char *data);
 
 size_t _hc_stream_vprintf(struct hc_stream *s,
 			  const char *spec,
 			  va_list args);
 
 size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...);
-
 
 struct hc_file_stream {
   struct hc_stream stream;

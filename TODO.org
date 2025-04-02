@@ -1,15 +1,19 @@
-* switch close flag to enum
-enum hc_file_stream_options
+* finish slog
+** add slog_do macro
+*** rename with_malloc
+** struct add hc_slog_context
+*** add fields to all logs
 
-* add slog
-struct hc_stream *out
+* rename stream to stream1
+** cp to stream2
 
 * add slab allocator to malloc2
 
 * add calculator/codegen
 ** fix calculator with stack
 
-* bytes/u8string
+* string
+** u8
 
 https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
 

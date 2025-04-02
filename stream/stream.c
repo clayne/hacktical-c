@@ -25,6 +25,14 @@ size_t _hc_stream_put(struct hc_stream *s,
   return s->put(s, data, n);
 }
 
+size_t _hc_stream_putc(struct hc_stream *s, const char data) {
+  return _hc_stream_put(s, (const uint8_t *)&data, 1);
+}
+
+size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
+  return _hc_stream_put(s, (const uint8_t *)data, strlen(data));
+}
+
 size_t _hc_stream_vprintf(struct hc_stream *s,
 			 const char *spec,
 			 va_list args) {
