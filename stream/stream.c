@@ -26,7 +26,8 @@ size_t _hc_stream_put(struct hc_stream *s,
 }
 
 size_t _hc_stream_putc(struct hc_stream *s, const char data) {
-  return _hc_stream_put(s, (const uint8_t *)&data, 1);
+  const uint8_t d[2] = {data, 0};
+  return _hc_stream_put(s, d, 1);
 }
 
 size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
@@ -54,10 +55,9 @@ size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...) {
 
 void file_deinit(struct hc_stream *s) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+  assert(fs->file);
 
-  if (fs->close) {
-    assert(fs->file);
-    
+  if (fs->close_file) {  
     if (fclose(fs->file) == EOF) {
       hc_throw(0, "Failed closing file");
     }
@@ -91,12 +91,24 @@ struct hc_stream hc_file_stream = {
   .vprintf = file_vprintf
 };
 
+struct hc_stream *hc_stdout() {
+  static __thread bool init = true;
+  static __thread struct hc_file_stream s;
+
+  if (init) {
+    hc_file_stream_init(&s, stdout, false);
+    init = false;
+  }
+
+  return &s.stream;
+}
+
 struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
 					   FILE *file,
-					   bool close) {
+					   bool close_file) {
   s->stream = hc_file_stream;
   s->file = file;
-  s->close = close;
+  s->close_file = close_file;
   return s;
 };
 
@@ -139,7 +151,7 @@ struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
 }
 
 const char *hc_memory_stream_string(struct hc_memory_stream *s) {
-  if (*(s->data.end-1) || !s->data.length) {
+  if (!s->data.length || (*(s->data.end-1))) {
     *(uint8_t *)hc_vector_push(&s->data) = 0;
   }
 

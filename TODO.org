@@ -1,8 +1,12 @@
 * finish slog
-** add slog_do macro
-*** rename with_malloc
+** add BOOL field type
 ** struct add hc_slog_context
 *** add fields to all logs
+
+* add ref
+** struct hc_ref
+** hc_ref() hc/deref()
+** stream/slog
 
 * rename stream to stream1
 ** cp to stream2
