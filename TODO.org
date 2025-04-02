@@ -1,7 +1,17 @@
+* fix memory use
+
+* error
+** pop handler on use
+*** push with deref
+
 * finish slog
 ** add BOOL field type
 ** struct add hc_slog_context
-*** add fields to all logs
+*** add hc_slog_context_do(struct hc_slog *s){
+  hc_slog_write(hc_slog_string("foo", bar), hc_slog_int("bar", 42));
+}
+*** call function on all log writes
+'*** generate random name
 
 * add ref
 ** struct hc_ref
