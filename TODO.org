@@ -1,15 +1,9 @@
-* fix memory use
-
-* error
-** pop handler on use
-*** push with deref
-
 * finish slog
 ** add BOOL field type
 ** struct add hc_slog_context
-*** add hc_slog_context_do(struct hc_slog *s){
+*** add slog context
+hc_slog_context_do(struct hc_slog *s){
   hc_slog_write(hc_slog_string("foo", bar), hc_slog_int("bar", 42));
-}
 *** call function on all log writes
 '*** generate random name
 
@@ -18,6 +12,17 @@
 ** hc_ref() hc/deref()
 ** stream/slog
 
+* add hc_string
+** u8
+
+https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
+
+struct hc_string {
+  uint16_t length;
+  struct hc_malloc *malloc;
+  uint8_t data[];
+}
+
 * rename stream to stream1
 ** cp to stream2
 
@@ -25,11 +30,6 @@
 
 * add calculator/codegen
 ** fix calculator with stack
-
-* string
-** u8
-
-https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
 
 * network stream
 ** rename stream to stream1

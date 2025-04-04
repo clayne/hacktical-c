@@ -59,7 +59,7 @@ struct hc_slog_field {
 #define _hc_slog_write(s, ...) do {				\
     struct hc_slog_field fs[] = {__VA_ARGS__};			\
     size_t n = sizeof(fs) / sizeof(struct hc_slog_field);	\
-    __hc_slog_write((s), n, ##__VA_ARGS__);			\
+    __hc_slog_write((s), n, fs);			\
   } while (0)
 
 #define hc_slog_write(...)			\
@@ -71,6 +71,6 @@ struct hc_slog *_hc_slog_init(struct hc_slog *s,
 
 struct hc_slog *_hc_slog_deinit(struct hc_slog *s);
 
-void __hc_slog_write(struct hc_slog *s, size_t n, ...);
+void __hc_slog_write(struct hc_slog *s, size_t n, struct hc_slog_field fields[]);
 
 #endif

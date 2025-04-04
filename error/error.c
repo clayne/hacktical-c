@@ -41,7 +41,7 @@ void _hc_throw(struct hc_error *e) {
   }
   
   jmp_buf t;
-  memcpy(t, *(jmp_buf *)hc_vector_peek(hs), sizeof(jmp_buf));
+  memcpy(t, *(jmp_buf *)hc_vector_pop(hs), sizeof(jmp_buf));
   hc_error = e;
   longjmp(t, 1);
 }

@@ -34,15 +34,18 @@ static struct hc_slog_field *field_init(struct hc_slog_field *f,
 }
 
 static void field_deinit(struct hc_slog_field *f) {
+  free(f->name);
+  
   switch (f->type) {
   case HC_SLOG_STRING:
     free(f->as_string);
     break;
   default:
+    break;
   }
 }
 
-static void field_write(struct hc_slog *s, struct hc_slog_field *f) {
+static void field_write(struct hc_slog_field *f, struct hc_slog *s) {
   switch (f->type) {
   case HC_SLOG_INT:
     _hc_stream_printf(s->out, "%s=%d", f->name, f->as_int);
@@ -92,18 +95,16 @@ struct hc_slog *_hc_slog_deinit(struct hc_slog *s) {
   return s;
 }
 
-void __hc_slog_write(struct hc_slog *s, const size_t n, ...) {
-  va_list args;
-  va_start(args, n);
-
+void __hc_slog_write(struct hc_slog *s,
+		     const size_t n,
+		     struct hc_slog_field fields[]) {
   for(size_t i = 0; i < n; i++) {
-    struct hc_slog_field f = va_arg(args, struct hc_slog_field);
+    struct hc_slog_field f = fields[i];
     if (i) { _hc_stream_puts(s->out, ", "); }
-    field_write(s, &f);
+    field_write(&f, s);
     field_deinit(&f);
   }
 
-  va_end(args);
   _hc_stream_putc(s->out, '\n');
 }
 
