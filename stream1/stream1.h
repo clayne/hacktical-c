@@ -10,7 +10,6 @@ struct hc_stream {
   void   (*deinit)(struct hc_stream *s);
   size_t (*get)(struct hc_stream *s, uint8_t *data, size_t n);
   size_t (*put)(struct hc_stream *s, const uint8_t *data, size_t n);
-  int    (*vprintf)(struct hc_stream *s, const char *spec, va_list args);
 };
 
 #define hc_stream_deinit(s)			\

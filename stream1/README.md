@@ -17,7 +17,6 @@ struct hc_stream {
   void   (*deinit)(struct hc_stream *s);
   size_t (*get)(struct hc_stream *s, uint8_t *data, size_t n);
   size_t (*put)(struct hc_stream *s, const uint8_t *data, size_t n);
-  int    (*vprintf)(struct hc_stream *s, const char *spec, va_list args);
 };
 ```
 
@@ -77,16 +76,12 @@ size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
 }
 ```
 
-`vprintf` defaults to using a temporary buffer but may be overridden in subtypes.
+`vprintf` uses a temporary buffer to format the message.
 
 ```C
 size_t hc_stream_vprintf(struct hc_stream *s,
 			 const char *spec,
 			 va_list args) {
-  if (s->vprintf) {
-    return s->vprintf(s, spec, args);
-  }
-
   char *data = hc_vsprintf(spec, args);
   hc_defer(hc_release(data));
   return _hc_stream_put(s, data, strlen(data));
@@ -126,11 +121,6 @@ size_t file_put(struct hc_stream *s, const uint8_t *data, size_t n) {
   return fwrite(data, n, 1, fs->file);
 }
 
-int file_vprintf(struct hc_stream *s, const char *spec, va_list args) {
-  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
-  return vfprintf(fs->file, spec, args);
-}
-
 struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
 					   FILE *file,
 					   bool close) {
@@ -138,7 +128,6 @@ struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
     .deinit  = file_deinit,
     .get     = file_get,
     .put     = file_put,
-    .vprintf = file_vprintf
   };
 
   s->file = file;
@@ -193,7 +182,6 @@ struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
     .deinit  = memory_deinit,
     .get     = memory_get,
     .put     = memory_put,
-    .vprintf = NULL
   };
 
   hc_vector_init(&s->data, 1);
