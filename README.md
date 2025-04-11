@@ -48,9 +48,6 @@ mkdir build
 make
 ```
 
-## Benchmarks
-Some chapters come with benchmarks, `make build/benchmark` builds and runs all of them.
-
 ## Platforms
 Since Unix is all about C, and Linux is currently the best supported Unix out there; Linux is the platform I would recommend for writing C. Just having access to `valgrind` is priceless. Microsoft has unfortunately chosen to neglect C for a long time, its compilers dragging far behind the rest of the pack. Windows does however offer a way of running Linux in the form of WSL2, which works very well from my experience.
 
@@ -60,6 +57,9 @@ The code in this book uses several GNU extensions that are not yet in the C stan
 Some developers avoid extensions like the plague, some are happy to use them for everything and anything. I fall somewhere in the middle of the spectrum; comfortable with using extensions when there are no good standard alternatives, especially if they're supported by both `gcc` and `clang`. All of the extensions used in this book except nested functions (which is currently only supported by `gcc`) fall in that category.
 
 I can think of one feature, `hc_defer()`, which would currently be absolutely impossible to do without extensions. In other cases, alternative solutions are simply less convenient.
+
+## Benchmarks
+Some chapters come with benchmarks, `make build/benchmark` builds and runs all of them.
 
 ## Chapters
 The content is arranged to form a natural progression, where later chapters build on concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
