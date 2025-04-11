@@ -6,7 +6,6 @@
 #include "error/error.h"
 #include "macro/macro.h"
 #include "slog.h"
-#include "stream/stream.h"
 
 __thread struct hc_slog *_hc_slog = NULL;
 

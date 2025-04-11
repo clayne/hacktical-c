@@ -1,4 +1,4 @@
-## Extensible Streams
+## Extensible Streams - Part 1
 C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs in general are a bad idea. The problem we're trying to solve is providing a stream API where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for; there are extensions for custom `FILE *`-streams, but so far with very spotty support.
 
 Example:

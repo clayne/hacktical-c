@@ -1,5 +1,5 @@
-#ifndef HACKTICAL_STREAM_H
-#define HACKTICAL_STREAM_H
+#ifndef HACKTICAL_STREAM1_H
+#define HACKTICAL_STREAM1_H
 
 #include <stdarg.h>
 #include <stddef.h>

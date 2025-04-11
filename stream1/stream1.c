@@ -6,7 +6,7 @@
 #include "error/error.h"
 #include "malloc1/malloc1.h"
 #include "macro/macro.h"
-#include "stream.h"
+#include "stream1.h"
 
 void _hc_stream_deinit(struct hc_stream *s) {
   assert(s->deinit);

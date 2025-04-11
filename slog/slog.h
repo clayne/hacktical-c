@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "stream/stream.h"
+#include "stream1/stream1.h"
 
 #define __hc_slog_do(s, _ps)			\
   for (struct hc_slog *_ps = hc_slog();		\
@@ -86,18 +86,18 @@ void __hc_slog_write(struct hc_slog *s,
 		     size_t n,
 		     struct hc_slog_field fields[]);
 
-#define _hc_slog_context_do(_c, _n, _fs, ...)				\
-  struct hc_slog_context _c;						\
-  struct hc_slog_field _fs[] = {__VA_ARGS__};				\
-  size_t _n = sizeof(_fs) / sizeof(struct hc_slog_field);		\
-  hc_slog_context_init(&_c, _n, _fs);					\
-  hc_defer(hc_slog_deinit(&_c));					\
+#define _hc_slog_context_do(_c, _n, _fs, ...)			\
+  struct hc_slog_context _c;					\
+  struct hc_slog_field _fs[] = {__VA_ARGS__};			\
+  size_t _n = sizeof(_fs) / sizeof(struct hc_slog_field);	\
+  hc_slog_context_init(&_c, _n, _fs);				\
+  hc_defer(hc_slog_deinit(&_c));				\
   hc_slog_do(&_c)
 
-#define hc_slog_context_do(...)					\
-  _hc_slog_context_do(hc_unique(slog_c),			\
-		      hc_unique(slog_n),			\
-		      hc_unique(slog_fs),			\
+#define hc_slog_context_do(...)			\
+  _hc_slog_context_do(hc_unique(slog_c),	\
+		      hc_unique(slog_n),	\
+		      hc_unique(slog_fs),	\
 		      ##__VA_ARGS__)
 
 struct hc_slog_context {

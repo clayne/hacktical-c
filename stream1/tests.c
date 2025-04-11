@@ -1,8 +1,8 @@
 #include <assert.h>
 #include <string.h>
-#include "stream.h"
+#include "stream1.h"
 
-void stream_tests() {
+void stream1_tests() {
   struct hc_memory_stream s;
   hc_memory_stream_init(&s);
   hc_defer(hc_stream_deinit(&s));
