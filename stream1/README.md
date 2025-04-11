@@ -2,7 +2,7 @@
 C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs in general are a bad idea. The problem we're trying to solve is providing a stream API where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for; there are extensions for custom `FILE *`-streams, but so far with very spotty support.
 
 Example:
-```
+```C
   struct hc_memory_stream s;
   hc_memory_stream_init(&s);
   hc_defer(hc_stream_deinit(&s));
@@ -118,7 +118,7 @@ size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
 }
 ```
 
-`get()` clamps the number of read bytes to the length of `s->data` minus `s->rpos` and uses `memcpy()` to copy data. It also updates `rpos`. 
+`get()` clamps the number of read bytes to the length of `data` minus `rpos` and uses `memcpy()` to copy data, and finally updates `rpos`. 
 
 ```C
 size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
