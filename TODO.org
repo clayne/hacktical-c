@@ -1,24 +1,16 @@
 * finish slog
-** add hc_slog_context_do()
 ** add BOOL field type
 ** fix timestamp print
 *** libcbs
-
-struct hc_slog *_hc_slog_init(struct hc_slog *s,
-			      struct hc_stream *out,
-			      const bool close_out) {
-  s->write = __hc_slog_write;
-  s->out = out;
-  s->close_out = close_out;
-  return s;
-}
-
+** readme
 
 * add vm
 ** stack based fix calculator
-** variables
-** bytecode
-*** store ops as uint8_t[]
+** variable op size
+*** store uint8_t vector
+*** start each op with code uint8_t
+*** align op data
+** registers/variable support
 
 * add ref
 ** struct hc_ref
