@@ -18,6 +18,13 @@ For a long time, I didn't care much about C at all, it looked very primitive com
 
 Since then I've written a ton of C; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
 
+## Donations
+If you would like to see this project succeed, all contributions are welcome.
+
+I've decided to release the book under an open license to benefit as many as possible, because I believe knowledge should be shared freely. But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 
+
+The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
+
 ## Why C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language, offering similar levels of freedom.
 
@@ -53,13 +60,6 @@ The code in this book uses several GNU extensions that are not yet in the C stan
 Some developers avoid extensions like the plague, some are happy to use them for everything and anything. I fall somewhere in the middle of the spectrum; comfortable with using extensions when there are no good standard alternatives, especially if they're supported by both `gcc` and `clang`. All of the extensions used in this book except nested functions (which is currently only supported by `gcc`) fall in that category.
 
 I can think of one feature, `hc_defer()`, which would currently be absolutely impossible to do without extensions. In other cases, alternative solutions are simply less convenient.
-
-## Donations
-If you would like to see this project succeed, all contributions are welcome.
-
-I've decided to release the book under an open license to benefit as many as possible, because I believe knowledge should be shared freely. But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 
-
-The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
 
 ## Chapters
 The content is arranged to form a natural progression, where later chapters build on concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
