@@ -79,7 +79,7 @@ size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
 `vprintf` uses a temporary buffer to format the message.
 
 ```C
-size_t hc_stream_vprintf(struct hc_stream *s,
+size_t _hc_stream_vprintf(struct hc_stream *s,
 			 const char *spec,
 			 va_list args) {
   char *data = hc_vsprintf(spec, args);
@@ -162,7 +162,7 @@ size_t memory_put(struct hc_stream *s, const uint8_t *data, size_t n) {
 }
 ```
 
-`get()` clamps the number of read bytes to the length of `data` minus `rpos` and uses `memcpy()` to copy data, and finally updates `rpos`. 
+`get()` clamps the number of read bytes to the length of `data - rpos`, uses `memcpy()` to copy data, and finally updates `rpos`. 
 
 ```C
 size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
