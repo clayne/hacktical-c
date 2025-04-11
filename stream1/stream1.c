@@ -84,11 +84,19 @@ int file_vprintf(struct hc_stream *s, const char *spec, va_list args) {
   return vfprintf(fs->file, spec, args);
 }
 
-struct hc_stream hc_file_stream = {
-  .deinit  = file_deinit,
-  .get     = file_get,
-  .put     = file_put,
-  .vprintf = file_vprintf
+struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
+					   FILE *file,
+					   bool close_file) {
+  s->stream = (struct hc_stream){
+    .deinit  = file_deinit,
+    .get     = file_get,
+    .put     = file_put,
+    .vprintf = file_vprintf
+  };
+  
+  s->file = file;
+  s->close_file = close_file;
+  return s;
 };
 
 struct hc_stream *hc_stdout() {
@@ -102,15 +110,6 @@ struct hc_stream *hc_stdout() {
 
   return &s.stream;
 }
-
-struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file,
-					   bool close_file) {
-  s->stream = hc_file_stream;
-  s->file = file;
-  s->close_file = close_file;
-  return s;
-};
 
 void memory_deinit(struct hc_stream *s) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
@@ -136,15 +135,14 @@ size_t memory_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
   return n;
 }
 
-struct hc_stream hc_memory_stream = {
-  .deinit  = memory_deinit,
-  .get     = memory_get,
-  .put     = memory_put,
-  .vprintf = NULL
-};
-
 struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
-  s->stream = hc_memory_stream;
+  s->stream = (struct hc_stream){
+    .deinit  = memory_deinit,
+    .get     = memory_get,
+    .put     = memory_put,
+    .vprintf = NULL
+  };
+  
   hc_vector_init(&s->data, 1);
   s->rpos = 0;
   return s;

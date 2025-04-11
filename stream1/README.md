@@ -21,7 +21,63 @@ struct hc_stream {
 };
 ```
 
-`vprintf` defaults to using a temporary buffer.
+As well as a set of macros to simplify usage.
+
+```C
+#define hc_stream_deinit(s)			
+  _hc_stream_deinit(&(s)->stream)
+
+#define hc_stream_get(s, d, n)			
+  _hc_stream_get(&(s)->stream, d, n)
+
+#define hc_stream_put(s, d, n)			
+  _hc_stream_put(&(s)->stream, d, n)
+
+#define hc_stream_putc(s, d)			
+  _hc_stream_putc(&(s)->stream, d)
+
+#define hc_stream_puts(s, d)			
+  _hc_stream_puts(&(s)->stream, d)
+
+#define hc_stream_vprintf(s, spec, args)	
+  _hc_stream_vprintf(&(s)->stream, spec, args);
+```
+
+`deinit`, `get` & `put` delegate to respective stored function pointer.
+
+```C
+void _hc_stream_deinit(struct hc_stream *s) {
+  assert(s->deinit);
+  s->deinit(s);
+}
+
+size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, const size_t n) {
+  assert(s->get);
+  return s->get(s, data, n);
+}
+
+size_t _hc_stream_put(struct hc_stream *s,
+		      const uint8_t *data,
+		      const size_t n) {
+  assert(s->put);
+  return s->put(s, data, n);
+}
+```
+
+`putc` and `puts` are trivially implemented using `put`.
+
+```C
+size_t _hc_stream_putc(struct hc_stream *s, const char data) {
+  const uint8_t d[2] = {data, 0};
+  return _hc_stream_put(s, d, 1);
+}
+
+size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
+  return _hc_stream_put(s, (const uint8_t *)data, strlen(data));
+}
+```
+
+`vprintf` defaults to using a temporary buffer but may be overridden in subtypes.
 
 ```C
 size_t hc_stream_vprintf(struct hc_stream *s,
@@ -75,24 +131,23 @@ int file_vprintf(struct hc_stream *s, const char *spec, va_list args) {
   return vfprintf(fs->file, spec, args);
 }
 
-struct hc_stream hc_file_stream = {
-  .deinit  = file_deinit,
-  .get     = file_get,
-  .put     = file_put,
-  .vprintf = file_vprintf
-};
-
 struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
 					   FILE *file,
 					   bool close) {
-  s->stream = hc_file_stream;
+  s->stream = (struct hc_stream){
+    .deinit  = file_deinit,
+    .get     = file_get,
+    .put     = file_put,
+    .vprintf = file_vprintf
+  };
+
   s->file = file;
   s->close = close;
   return s;
 };
 ```
 
-The next most obvious variation is memory streams. We'll use a `struct hc_vector` to manage the data.
+Next up is implementing memory streams. We'll use a `struct hc_vector` to manage the stream data and track the current read position in `rpos`.
 
 ```C
 struct hc_memory_stream {
@@ -133,15 +188,14 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
   return n;
 }
 
-struct hc_stream hc_memory_stream = {
-  .deinit  = memory_deinit,
-  .get     = memory_get,
-  .put     = memory_put,
-  .vprintf = NULL
-};
-
 struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
-  s->stream = hc_memory_stream;
+  s->stream = (struct hc_stream){
+    .deinit  = memory_deinit,
+    .get     = memory_get,
+    .put     = memory_put,
+    .vprintf = NULL
+  };
+
   hc_vector_init(&s->data, 1);
   s->rpos = 0;
   return s;
