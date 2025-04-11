@@ -1,11 +1,24 @@
 * finish slog
+** add hc_slog_context_do()
 ** add BOOL field type
-** struct add hc_slog_context
-*** add slog context
-hc_slog_context_do(struct hc_slog *s){
-  hc_slog_write(hc_slog_string("foo", bar), hc_slog_int("bar", 42));
-*** call function on all log writes
-'*** generate random name
+** fix timestamp print
+*** libcbs
+
+struct hc_slog *_hc_slog_init(struct hc_slog *s,
+			      struct hc_stream *out,
+			      const bool close_out) {
+  s->write = __hc_slog_write;
+  s->out = out;
+  s->close_out = close_out;
+  return s;
+}
+
+
+* add vm
+** stack based fix calculator
+** variables
+** bytecode
+*** store ops as uint8_t[]
 
 * add ref
 ** struct hc_ref
@@ -13,6 +26,8 @@ hc_slog_context_do(struct hc_slog *s){
 ** stream/slog
 
 * add hc_string
+** add hc_string_dup() constructor
+** record malloc on construction
 ** u8
 
 https://github.com/jpakkane/pystd/blob/master/pystd2025.hpp
@@ -28,9 +43,6 @@ struct hc_string {
 
 * add slab allocator to malloc2
 
-* add calculator/codegen
-** fix calculator with stack
-
 * network stream
 ** rename stream to stream1
 ** add stream2
@@ -38,6 +50,7 @@ struct hc_string {
 * add term
 ** ansi
 ** sharpl
+
 * ecs using vectors
 
 * channels using fd pairs
@@ -51,3 +64,5 @@ https://sumofbytes.com/blog/understanding-asynchronous-in-linux-io-uring
 ** links
 
 https://github.com/fungos/cr
+
+DR.H10

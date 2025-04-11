@@ -71,3 +71,4 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Composable Memory Allocators - Part 2](https://github.com/codr7/hacktical-c/tree/main/malloc2)
 - [Dynamic Compilation](https://github.com/codr7/hacktical-c/tree/main/dynamic)
 - [Extensible Streams](https://github.com/codr7/hacktical-c/tree/main/stream)
+- [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
