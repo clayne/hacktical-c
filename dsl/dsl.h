@@ -1,5 +1,39 @@
 #ifndef HACKTICAL_DSL_H
 #define HACKTICAL_DSL_H
 
+#include "fix/fix.h"
+#include "vector/vector.h"
+
+struct hc_op;
+
+typedef size_t hc_pc;
+
+struct hc_dsl {
+  struct hc_vector code;
+  struct hc_vector ops;
+  struct hc_vector registers;
+  struct hc_vector stack;
+};
+
+void hc_dsl_init(struct hc_dsl *dsl);
+void hc_dsl_deinit(struct hc_dsl *dsl);
+
+hc_pc hc_dsl_emit(struct hc_dsl *dsl,
+		  const struct hc_op *op,
+		  const void *data);
+
+struct hc_op {
+  uint8_t code;
+  const char *name;
+  size_t size;
+
+  void (*eval)(struct hc_dsl *dsl, void *data);
+};
+
+extern const struct hc_op hc_push_op;
+
+struct hc_push_op {
+  hc_fix value;
+};
 
 #endif

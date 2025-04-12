@@ -4,13 +4,8 @@
 *** libcbs
 ** readme
 
-* add vm
-** stack based fix calculator
-** variable op size
-*** store uint8_t vector
-*** start each op with code uint8_t
-*** align op data
-** registers/variable support
+* finish dsl
+** add hc_dsl_eval()+test
 
 * add ref
 ** struct hc_ref
