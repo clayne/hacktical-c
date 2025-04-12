@@ -1,18 +1,9 @@
-* finish slog
-** add BOOL field type
-** fix timestamp print
-*** libcbs
-** readme
+* slog readme
 
 * finish dsl
 ** add fix reader
 ** add id reader
 1.2 3.4 +
-
-* add ref
-** struct hc_ref
-** hc_ref() hc/deref()
-** stream/slog
 
 * add hc_string
 ** add hc_string_dup() constructor

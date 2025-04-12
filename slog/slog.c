@@ -5,6 +5,7 @@
 
 #include "error/error.h"
 #include "macro/macro.h"
+#include "malloc1/malloc1.h"
 #include "slog.h"
 
 __thread struct hc_slog *_hc_slog = NULL;
@@ -70,17 +71,31 @@ static struct hc_slog_field *field_init(struct hc_slog_field *f,
 
 static void field_write(struct hc_slog_field *f, struct hc_stream *out) {
   switch (f->type) {
+  case HC_SLOG_BOOL:
+    _hc_stream_printf(out, "%s=%s", f->name, f->as_bool ? "true" : "false");
+    break;
   case HC_SLOG_INT:
     _hc_stream_printf(out, "%s=%d", f->name, f->as_int);
     break;
   case HC_SLOG_STRING:
     _hc_stream_printf(out, "%s=\"%s\"", f->name, f->as_string);
     break;
-  case HC_SLOG_TIME:
-    hc_throw(0, "Not implemented!");
+  case HC_SLOG_TIME: {
+    char *s = hc_time_printf(&f->as_time, "%Y-%m-%dT%H:%M:%S");
+    _hc_stream_printf(out, "%s=%s", f->name, s);
+    hc_release(s);
+    break;
+  }
   default:
     hc_throw(0, "Invalid slog field type: %d", f->type);
   }
+}
+
+struct hc_slog_field hc_slog_bool(const char *name, const bool value) {
+  struct hc_slog_field f;
+  field_init(&f, name, HC_SLOG_BOOL);
+  f.as_bool = value;
+  return f;
 }
 
 struct hc_slog_field hc_slog_int(const char *name, const int value) {
@@ -98,7 +113,7 @@ struct hc_slog_field hc_slog_string(const char *name, const char *value) {
 }
 
 struct hc_slog_field hc_slog_time(const char *name,
-				   const struct timespec value) {
+				  const struct hc_time value) {
   struct hc_slog_field f;  
   field_init(&f, name, HC_SLOG_TIME);
   f.as_time = value;

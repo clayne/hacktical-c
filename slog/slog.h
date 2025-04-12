@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 
+#include "chrono/chrono.h"
 #include "stream1/stream1.h"
 
 #define __hc_slog_do(s, _ps)			\
@@ -21,7 +22,7 @@
 struct hc_slog;
 
 enum hc_slog_field_t {
-  HC_SLOG_INT, HC_SLOG_STRING, HC_SLOG_TIME
+  HC_SLOG_BOOL, HC_SLOG_INT, HC_SLOG_STRING, HC_SLOG_TIME
 };
 
 struct hc_slog_field {
@@ -29,9 +30,10 @@ struct hc_slog_field {
   enum hc_slog_field_t type;
 
   union {
-    char *as_string;
+    bool as_bool;
     int as_int;
-    struct timespec as_time;
+    char *as_string;
+    struct hc_time as_time;
   };  
 };
 
@@ -57,12 +59,10 @@ struct hc_slog *hc_slog();
 
 struct hc_slog_field;
 
+struct hc_slog_field hc_slog_bool(const char *name, bool value);
 struct hc_slog_field hc_slog_int(const char *name, int value);
-
 struct hc_slog_field hc_slog_string(const char *name, const char *value);
-
-struct hc_slog_field hc_slog_timestamp(const char *name,
-				       struct timespec value);
+struct hc_slog_field hc_slog_time(const char *name, struct hc_time value);
 
 #define hc_slog_deinit(s)			\
   _hc_slog_deinit(&(s)->slog)

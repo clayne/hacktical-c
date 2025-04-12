@@ -32,7 +32,7 @@ struct hc_op {
   uint8_t code;
   const char *name;
   size_t size;
-
+  
   const uint8_t *(*eval)(struct hc_dsl *dsl, const uint8_t *data);
 };
 

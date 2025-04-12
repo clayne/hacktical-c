@@ -4,6 +4,8 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+
 #include "vector/vector.h"
 
 struct hc_stream {
