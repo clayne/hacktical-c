@@ -1,6 +1,7 @@
 #include "error/error.h"
 
 #include "chrono/tests.c"
+#include "dsl/tests.c"
 #include "dynamic/tests.c"
 #include "error/tests.c"
 #include "fix/tests.c"
@@ -18,6 +19,7 @@ int main() {
   hc_malloc_init();
 
   chrono_tests();
+  dsl_tests();
   dynamic_tests();
   error_tests();
   fix_tests();
