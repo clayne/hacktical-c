@@ -1,5 +1,5 @@
 export CC=ccache gcc
-export CFLAGS=-g -O0 -Wall -I. -ldl
+export CFLAGS=-g -O0 -Wall -fsanitize=undefined -I. -ldl
 export LDFLAGS=
 
 CHAPTERS=build/chrono.o build/dsl.o build/dynamic.o build/error.o build/fix.o build/list.o build/malloc1.o build/malloc2.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o
