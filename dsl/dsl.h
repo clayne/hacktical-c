@@ -22,12 +22,18 @@ hc_pc hc_dsl_emit(struct hc_dsl *dsl,
 		  const struct hc_op *op,
 		  const void *data);
 
+void hc_dsl_eval(struct hc_dsl *dsl, const hc_pc pc);
+
+void hc_dsl_push(struct hc_dsl *dsl, hc_fix v);
+hc_fix hc_dsl_peek(struct hc_dsl *dsl);
+hc_fix hc_dsl_pop(struct hc_dsl *dsl);
+
 struct hc_op {
   uint8_t code;
   const char *name;
   size_t size;
 
-  void (*eval)(struct hc_dsl *dsl, void *data);
+  const uint8_t *(*eval)(struct hc_dsl *dsl, const uint8_t *data);
 };
 
 extern const struct hc_op hc_push_op;

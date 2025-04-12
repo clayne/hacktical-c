@@ -5,7 +5,9 @@
 ** readme
 
 * finish dsl
-** add hc_dsl_eval()+test
+** add fix reader
+** add id reader
+1.2 3.4 +
 
 * add ref
 ** struct hc_ref
