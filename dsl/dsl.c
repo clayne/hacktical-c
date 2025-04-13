@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <math.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "dsl.h"
@@ -73,3 +74,65 @@ struct hc_sloc hc_sloc(const char *source, int row, int col) {
   strncpy(s.source, source, sizeof(s.source)-1);
   return s;
 }
+
+static void form_init(struct hc_form *f,
+		      const struct hc_form_type *t,
+		      const struct hc_sloc sloc) {
+  f->type = t;
+  f->sloc = sloc;
+}
+
+static void id_deinit(struct hc_form *f, struct hc_dsl *dsl) {
+  free(hc_baseof(f, struct hc_id, form)->name);
+}
+
+static void id_emit(const struct hc_form *f, struct hc_dsl *dsl) {
+  //struct hc_id *id = hc_baseof(f, struct hc_id, form);
+}
+
+static void id_print(const struct hc_form *f, struct hc_stream *out) {
+  struct hc_id *id = hc_baseof(f, struct hc_id, form);
+  _hc_stream_puts(out, id->name);
+}
+
+void hc_id_init(struct hc_id *f,
+		const struct hc_sloc sloc,
+		const char *name) {
+  static const struct hc_form_type type = {
+    .deinit = id_deinit,
+    .emit = id_emit,
+    .print = id_print
+  };
+  
+  form_init(&f->form, &type, sloc);
+  f->name = strdup(name);
+}
+
+static void literal_emit(const struct hc_form *f, struct hc_dsl *dsl) {
+  struct hc_literal *lt = hc_baseof(f, struct hc_literal, form); 
+
+  hc_dsl_emit(dsl,
+	      &hc_push_op,
+	      &(struct hc_push_op){
+		.value = lt->value
+	      });
+}
+
+static void literal_print(const struct hc_form *f, struct hc_stream *out) {
+  struct hc_literal *lt = hc_baseof(f, struct hc_literal, form);
+  hc_fix_print(lt->value, out);
+}
+
+void hc_literal_init(struct hc_literal *f,
+		     const struct hc_sloc sloc,
+		     const hc_fix value) {
+  static const struct hc_form_type type = {
+    .deinit = NULL,
+    .emit = literal_emit,
+    .print = literal_print
+  };
+  
+  form_init(&f->form, &type, sloc);
+  f->value = value;
+}
+

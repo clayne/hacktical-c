@@ -1,6 +1,9 @@
 #include <assert.h>
+#include <inttypes.h>
+
 #include "fix.h"
 #include "macro/macro.h"
+#include "stream1/stream1.h"
 
 uint32_t hc_scale(const uint8_t exp) {
   static const uint32_t scale[HC_FIX_MAX_EXP+1] = {
@@ -78,4 +81,11 @@ hc_fix hc_fix_mul(const hc_fix x, const hc_fix y) {
 hc_fix hc_fix_div(const hc_fix x, const hc_fix y) {
   return hc_fix_new(hc_fix_exp(x), hc_fix_val(x) /
 		    hc_fix_val(y) / hc_scale(hc_fix_exp(y)));
+}
+
+void hc_fix_print(const hc_fix v, struct hc_stream *out) {
+  _hc_stream_printf(out,
+		    "%" PRId64 ".%" PRId64,
+		    hc_fix_int(v),
+		    hc_fix_frac(v));
 }

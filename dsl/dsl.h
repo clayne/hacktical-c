@@ -45,9 +45,27 @@ struct hc_form_type {
 };
   
 struct hc_form {
-  struct hc_form_type *type;
+  const struct hc_form_type *type;
   struct hc_sloc sloc;
 };
+
+struct hc_id {
+  struct hc_form form;
+  char *name;
+};
+
+void hc_id_init(struct hc_id *f,
+		struct hc_sloc sloc,
+		const char *name);
+
+struct hc_literal {
+  struct hc_form form;
+  hc_fix value;
+};
+
+void hc_literal_init(struct hc_literal *f,
+		     struct hc_sloc sloc,
+		     hc_fix value);
 
 struct hc_op {
   const char *name;

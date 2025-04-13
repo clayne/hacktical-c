@@ -1,11 +1,14 @@
 * finish slog readme
 
+* remove ->stream accessors
+** compile/test
+
 * finish dsl
-** add forms
-*** add hc_id
-**** add id reader
-*** add hc_literal
-**** add fix reader
+** finish id emit
+*** add vm.env
+**** struct hc_set
+*** add id reader
+*** add fix reader
 1.2 3.4 +
 ** add var support
 pi=3.14

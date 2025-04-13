@@ -8,6 +8,8 @@
 
 #define HC_FIX_MAX_EXP 7
 
+struct hc_stream;
+
 typedef uint64_t hc_fix;
 
 uint32_t hc_scale(uint8_t exp);
@@ -24,5 +26,7 @@ hc_fix hc_fix_div(hc_fix x, hc_fix y);
 
 int64_t hc_fix_int(hc_fix x);
 int64_t hc_fix_frac(hc_fix x);
+
+void hc_fix_print(const hc_fix v, struct hc_stream *out);
 
 #endif
