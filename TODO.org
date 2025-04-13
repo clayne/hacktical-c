@@ -1,12 +1,38 @@
 * finish slog readme
 
 * finish dsl
+** add hc_form_type interface
+*** deinit
+*** emit
+*** print(stream)
+** add hc_form struct
+*** struct hc_form_type *type
+*** sloc
+** add hc_literal
+** add hc_id
 ** add fix reader
 ** add id reader
 1.2 3.4 +
 ** add var support
 pi=3.14
 ** add paren grouping
+
+* add slab allocator to malloc2
+
+* add term
+** ansi
+** sharpl
+
+* network stream
+** rename stream to stream1
+** add stream2
+
+* mud reload
+** links
+
+https://github.com/fungos/cr
+
+* ecs
 
 * add hc_string
 ** add hc_string_dup() constructor
@@ -21,31 +47,5 @@ struct hc_string {
   uint8_t data[];
 }
 
-* rename stream to stream1
-** cp to stream2
-
-* add slab allocator to malloc2
-
-* network stream
-** rename stream to stream1
-** add stream2
-
-* add term
-** ansi
-** sharpl
-
-* ecs using vectors
-
-* channels using fd pairs
-** files/sockets/pipes
-** uring
-
-https://unix.stackexchange.com/questions/11946/how-big-is-the-pipe-buffer
-https://sumofbytes.com/blog/understanding-asynchronous-in-linux-io-uring
-
-* mud reload
-** links
-
-https://github.com/fungos/cr
 
 DR.H10

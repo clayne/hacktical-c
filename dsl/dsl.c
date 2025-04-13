@@ -67,3 +67,9 @@ void hc_dsl_eval(struct hc_dsl *dsl, const hc_pc pc) {
        p < dsl->code.end;
        p = (*(hc_eval *)p)(dsl, p + dsl->code.item_size));
 }
+
+struct hc_sloc hc_sloc(const char *source, int row, int col) {
+  struct hc_sloc s = {.source = {0}, .row = row, .col = col};
+  strncpy(s.source, source, sizeof(s.source)-1);
+  return s;
+}

@@ -27,6 +27,14 @@ void hc_dsl_push(struct hc_dsl *dsl, hc_fix v);
 hc_fix hc_dsl_peek(struct hc_dsl *dsl);
 hc_fix hc_dsl_pop(struct hc_dsl *dsl);
 
+struct hc_sloc {
+  char source[32];
+  int row;
+  int col;
+};
+
+struct hc_sloc hc_sloc(const char *source, int row, int col);
+
 struct hc_op {
   const char *name;
   size_t size;
