@@ -4,39 +4,66 @@
 #include <string.h>
 
 #include "dsl.h"
+#include "error/error.h"
 
-static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
-  struct hc_push_op *op = (void *)data;
-  hc_dsl_push(dsl, op->value);
-  return data + hc_push_op.size;
+enum hc_order hc_strcmp(const char *x, const char *y) {
+  const int result = strcmp(x, y);
+  if (!result) { return HC_EQ; }
+  return (result < 0) ? HC_LT : HC_GT;
 }
 
-const struct hc_op hc_push_op = (struct hc_op){
-  .name = "push",
-  .size = sizeof(struct hc_push_op),
-  .eval = push_eval
+struct env_item {
+  const char *key;
+  struct hc_value value;
 };
 
-static const uint8_t *stop_eval(struct hc_dsl *dsl, const uint8_t *data) {
-  return dsl->code.end;
+static enum hc_order env_cmp(const void *x, const void *y) {
+  return hc_strcmp(*(const char **)x, *(const char **)y);
 }
 
-const struct hc_op hc_stop_op = (struct hc_op){
-  .name = "stop",
-  .size = 0,
-  .eval = stop_eval
-};
+static const void *env_key(const void *x) {
+  return &((const struct env_item *)x)->key;
+}
 
 void hc_dsl_init(struct hc_dsl *dsl) {
   hc_vector_init(&dsl->code, sizeof(hc_eval));
+
+  hc_set_init(&dsl->env, sizeof(struct env_item), env_cmp);
+  dsl->env.key = env_key;
+  
   hc_vector_init(&dsl->registers, sizeof(hc_fix));
   hc_vector_init(&dsl->stack, sizeof(hc_fix));
 }
 
 void hc_dsl_deinit(struct hc_dsl *dsl) {
   hc_vector_deinit(&dsl->code);
+  hc_set_deinit(&dsl->env);
   hc_vector_deinit(&dsl->registers);
   hc_vector_deinit(&dsl->stack);
+}
+
+struct hc_value hc_dsl_getenv(struct hc_dsl *dsl,
+			      const char *key,
+			      const struct hc_sloc sloc) {
+  struct env_item *found = hc_set_find(&dsl->env, &key);
+
+  if (found == NULL) {
+    hc_throw(0, "Unknown identifier: %s", key);
+  }
+
+  return found->value;
+}
+
+void hc_dsl_setenv(struct hc_dsl *dsl,
+		   const char *key,
+		   struct hc_value value) {
+  struct env_item *it = hc_set_find(&dsl->env, &key);
+
+  if (it == NULL) {
+    it = hc_set_add(&dsl->env, &key, false);
+  }
+  
+  it->value = value;
 }
 
 void hc_dsl_push(struct hc_dsl *dsl, const hc_fix v) {
@@ -93,7 +120,23 @@ static void id_deinit(struct hc_form *f, struct hc_dsl *dsl) {
 }
 
 static void id_emit(const struct hc_form *f, struct hc_dsl *dsl) {
-  //struct hc_id *id = hc_baseof(f, struct hc_id, form);
+  struct hc_id *id = hc_baseof(f, struct hc_id, form);
+  const struct hc_value v = hc_dsl_getenv(dsl, id->name, f->sloc);
+
+  switch (v.type) {
+  case HC_DSL_FUN:
+    //TODO emit call
+    break;
+  case HC_DSL_FIX:
+    hc_dsl_emit(dsl,
+		&hc_push_op,
+		&(struct hc_push_op){
+		  .value = v.as_fix
+		});
+    break;
+  default:
+    hc_throw(0, "Invald value: %d", v.type);
+  }
 }
 
 static void id_print(const struct hc_form *f, struct hc_stream *out) {
@@ -142,3 +185,24 @@ void hc_literal_init(struct hc_literal *f,
   f->value = value;
 }
 
+static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
+  struct hc_push_op *op = (void *)data;
+  hc_dsl_push(dsl, op->value);
+  return data + hc_push_op.size;
+}
+
+const struct hc_op hc_push_op = (struct hc_op){
+  .name = "push",
+  .size = sizeof(struct hc_push_op),
+  .eval = push_eval
+};
+
+static const uint8_t *stop_eval(struct hc_dsl *dsl, const uint8_t *data) {
+  return dsl->code.end;
+}
+
+const struct hc_op hc_stop_op = (struct hc_op){
+  .name = "stop",
+  .size = 0,
+  .eval = stop_eval
+};

@@ -4,11 +4,9 @@
 ** compile/test
 
 * finish dsl
-** finish id emit
-*** add vm.env
-**** struct hc_set
-*** add id reader
-*** add fix reader
+** finish id call emit
+** add id reader
+** add fix reader
 1.2 3.4 +
 ** add var support
 pi=3.14

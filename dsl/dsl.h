@@ -2,15 +2,21 @@
 #define HACKTICAL_DSL_H
 
 #include "fix/fix.h"
+#include "set/set.h"
 #include "stream1/stream1.h"
 #include "vector/vector.h"
 
+struct hc_dsl_value;
 struct hc_op;
+struct hc_sloc;
 
 typedef size_t hc_pc;
 
+enum hc_order hc_strcmp(const char *x, const char *y);
+
 struct hc_dsl {
   struct hc_vector code;
+  struct hc_set env;
   struct hc_vector registers;
   struct hc_vector stack;
 };
@@ -18,15 +24,38 @@ struct hc_dsl {
 void hc_dsl_init(struct hc_dsl *dsl);
 void hc_dsl_deinit(struct hc_dsl *dsl);
 
+struct hc_value hc_dsl_getenv(struct hc_dsl *dsl,
+			      const char *key,
+			      const struct hc_sloc sloc);
+
+void hc_dsl_setenv(struct hc_dsl *dsl,
+		   const char *key,
+		   struct hc_value val);
+
+void hc_dsl_push(struct hc_dsl *dsl, hc_fix v);
+hc_fix hc_dsl_peek(struct hc_dsl *dsl);
+hc_fix hc_dsl_pop(struct hc_dsl *dsl);
+
 hc_pc hc_dsl_emit(struct hc_dsl *dsl,
 		  const struct hc_op *op,
 		  const void *data);
 
 void hc_dsl_eval(struct hc_dsl *dsl, hc_pc start_pc, hc_pc end_pc);
 
-void hc_dsl_push(struct hc_dsl *dsl, hc_fix v);
-hc_fix hc_dsl_peek(struct hc_dsl *dsl);
-hc_fix hc_dsl_pop(struct hc_dsl *dsl);
+typedef void (*hc_fun)(struct hc_dsl *, struct hc_sloc);
+
+enum hc_type {
+  HC_DSL_FIX, HC_DSL_FUN
+};
+
+struct hc_value {
+  enum hc_type type;
+  
+  union {
+    hc_fix as_fix;
+    hc_fun as_fun;
+  };
+};
 
 struct hc_sloc {
   char source[32];
@@ -81,7 +110,6 @@ struct hc_push_op {
 };
 
 extern const struct hc_op hc_push_op;
-
 extern const struct hc_op hc_stop_op;
 
 #endif
