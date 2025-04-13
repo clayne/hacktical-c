@@ -13,7 +13,7 @@ void dsl_tests() {
 		.value = v
 	      });
 
-  hc_dsl_eval(&dsl, 0);
+  hc_dsl_eval(&dsl, 0, -1);
   assert(dsl.stack.length == 1);
   assert(hc_dsl_pop(&dsl) == v);
 }

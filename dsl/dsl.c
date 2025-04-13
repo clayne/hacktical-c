@@ -8,7 +8,7 @@
 static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_push_op *op = (void *)data;
   hc_dsl_push(dsl, op->value);
-  return data + sizeof(hc_push_op);
+  return data + hc_push_op.size;
 }
 
 const struct hc_op hc_push_op = (struct hc_op){
@@ -63,9 +63,15 @@ hc_pc hc_dsl_emit(struct hc_dsl *dsl,
   return pc;
 }
 
-void hc_dsl_eval(struct hc_dsl *dsl, const hc_pc pc) {
-  for (const uint8_t *p = hc_vector_get(&dsl->code, pc);
-       p < dsl->code.end;
+void hc_dsl_eval(struct hc_dsl *dsl,
+		 const hc_pc start_pc,
+		 const hc_pc end_pc) {
+  const uint8_t *const ep = (end_pc == -1)
+    ? dsl->code.end
+    : hc_vector_get(&dsl->code, end_pc);
+
+  for (const uint8_t *p = hc_vector_get(&dsl->code, start_pc);
+       p != ep;
        p = (*(hc_eval *)p)(dsl, p + dsl->code.item_size));
 }
 

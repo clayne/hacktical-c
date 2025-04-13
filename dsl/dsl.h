@@ -22,7 +22,7 @@ hc_pc hc_dsl_emit(struct hc_dsl *dsl,
 		  const struct hc_op *op,
 		  const void *data);
 
-void hc_dsl_eval(struct hc_dsl *dsl, const hc_pc pc);
+void hc_dsl_eval(struct hc_dsl *dsl, hc_pc start_pc, hc_pc end_pc);
 
 void hc_dsl_push(struct hc_dsl *dsl, hc_fix v);
 hc_fix hc_dsl_peek(struct hc_dsl *dsl);
