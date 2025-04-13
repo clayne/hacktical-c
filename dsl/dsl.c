@@ -63,7 +63,6 @@ void hc_dsl_eval(struct hc_dsl *dsl, const hc_pc pc) {
 
   while (p < dsl->code.end) {
     struct hc_op *op = hc_vector_get(&dsl->ops, *p);
-    p = hc_align(p+1, op->size);
-    p = op->eval(dsl, p);
+    p = op->eval(dsl, hc_align(p+1, op->size));
   }
 }
