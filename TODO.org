@@ -1,17 +1,11 @@
 * finish slog readme
 
 * finish dsl
-** add hc_form_type interface
-*** deinit
-*** emit
-*** print(stream)
-** add hc_form struct
-*** struct hc_form_type *type
-*** sloc
-** add hc_literal
-** add hc_id
-** add fix reader
-** add id reader
+** add forms
+*** add hc_id
+**** add id reader
+*** add hc_literal
+**** add fix reader
 1.2 3.4 +
 ** add var support
 pi=3.14

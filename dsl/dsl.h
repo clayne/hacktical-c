@@ -2,6 +2,7 @@
 #define HACKTICAL_DSL_H
 
 #include "fix/fix.h"
+#include "stream1/stream1.h"
 #include "vector/vector.h"
 
 struct hc_op;
@@ -35,11 +36,24 @@ struct hc_sloc {
 
 struct hc_sloc hc_sloc(const char *source, int row, int col);
 
+struct hc_form;
+
+struct hc_form_type {
+  void (*deinit)(struct hc_form *, struct hc_dsl *);
+  void (*emit)(const struct hc_form *, struct hc_dsl *);
+  void (*print)(const struct hc_form *, struct hc_stream *);
+};
+  
+struct hc_form {
+  struct hc_form_type *type;
+  struct hc_sloc sloc;
+};
+
 struct hc_op {
   const char *name;
   size_t size;
   
-  const uint8_t *(*eval)(struct hc_dsl *dsl, const uint8_t *data);
+  const uint8_t *(*eval)(struct hc_dsl *, const uint8_t *);
 };
 
 typedef const uint8_t *(*hc_eval)(struct hc_dsl *dsl, const uint8_t *data);
