@@ -37,15 +37,11 @@ struct hc_slog_field {
   };  
 };
 
-typedef void (*hc_slog_deinit)(struct hc_slog *s);
-
-typedef void (*hc_slog_write)(struct hc_slog *s,
-			      size_t n,
-			      struct hc_slog_field fields[]);
-
 struct hc_slog {
-  hc_slog_deinit deinit;
-  hc_slog_write write;
+  void (*deinit)(struct hc_slog *s);
+  void (*write)(struct hc_slog *s,
+		size_t n,
+		struct hc_slog_field fields[]);
 };
 
 struct hc_slog_stream {

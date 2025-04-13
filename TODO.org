@@ -1,4 +1,4 @@
-* slog readme
+* finish slog readme
 
 * finish dsl
 ** add fix reader
