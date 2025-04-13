@@ -1,7 +1,7 @@
 ## Composable Memory Allocators - Part 1
 Writing your own memory allocator is a common rite of passage for novice C programmers. Which makes sense, since one of the defining features of C is raw memory access.
 
-Here we're going to explore a composable design that allows defining pipelines of allocators to conveniently custom tailor the allocation strategy. Individual allocators follow the Unix-principle of doing one thing well.
+Here we're going to explore a composable design that allows conveniently custom tailoring the allocation strategy. Individual allocators follow the Unix-principle of doing one thing well.
 
 Allocators are required to support the following API:
 
@@ -113,3 +113,5 @@ void bump_release(struct hc_malloc *m, void *p) {
   // Do nothing
 }
 ```
+
+Continued in [Part 2](https://github.com/codr7/hacktical-c/tree/main/malloc2).

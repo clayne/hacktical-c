@@ -1,8 +1,26 @@
 ## Composable Memory Allocators - Part 2
-Welcome back to memory allocator land. We now have enough features in place to design more interesting allocators. Before we're done, the goal is to share enough examples of what's possible for you to start dreaming up your own designs.
+Welcome back to memory allocator land.
+
+We now have enough features in place to implement more elaborate allocators.
+
+It might make sense to give [Part 1](https://github.com/codr7/hacktical-c/tree/main/malloc1) a quick scan before diving in.
 
 ### Recycling
-Recycling memory is a common requirement for allocators, we'll design the feature as a separate allocator that can be added at any point in a pipeline. A multi-`struct hc_set` ordered by allocation size is used to track allocations.
+Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be plugged in at any point.
+
+Example:
+```C
+struct hc_memo_alloc a;
+hc_memo_alloc_init(&a, hc_malloc);
+
+hc_malloc_do(&a) {
+  const int *p = hc_acquire(sizeof(int));
+  hc_release(p);
+  assert(hc_acquire(sizeof(int)) == p);
+}
+```
+
+A multi-`struct hc_set` keyed on size is used to track allocations.
 
 ```C
 struct hc_memo_alloc {
