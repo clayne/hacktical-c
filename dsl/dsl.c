@@ -4,10 +4,6 @@
 
 #include "dsl.h"
 
-struct hc_push_op {
-  hc_fix value;
-};
-
 static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_push_op *op = (void *)data;
   hc_dsl_push(dsl, op->value);
@@ -18,6 +14,16 @@ const struct hc_op hc_push_op = (struct hc_op){
   .name = "push",
   .size = sizeof(struct hc_push_op),
   .eval = push_eval
+};
+
+static const uint8_t *stop_eval(struct hc_dsl *dsl, const uint8_t *data) {
+  return dsl->code.end;
+}
+
+const struct hc_op hc_stop_op = (struct hc_op){
+  .name = "stop",
+  .size = 0,
+  .eval = stop_eval
 };
 
 void hc_dsl_init(struct hc_dsl *dsl) {

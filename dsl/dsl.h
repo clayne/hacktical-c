@@ -36,6 +36,12 @@ struct hc_op {
 
 typedef const uint8_t *(*hc_eval)(struct hc_dsl *dsl, const uint8_t *data);
 
+struct hc_push_op {
+  hc_fix value;
+};
+
 extern const struct hc_op hc_push_op;
+
+extern const struct hc_op hc_stop_op;
 
 #endif

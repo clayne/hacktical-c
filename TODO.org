@@ -4,6 +4,9 @@
 ** add fix reader
 ** add id reader
 1.2 3.4 +
+** add var support
+pi=3.14
+** add paren grouping
 
 * add hc_string
 ** add hc_string_dup() constructor
