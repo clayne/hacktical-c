@@ -7,13 +7,13 @@ Example:
   hc_slog_stream_init(&s, &hc_stdout(), true);
   
   hc_slog_do(&s) {
-    hc_slog_context_do(hc_slog_string("context", "foo")) {
-      hc_slog_write(hc_slog_time("time", hc_time(2025, 4, 13, 1, 40, 0)));
+    hc_slog_context_do(hc_slog_string("foo", "bar")) {
+      hc_slog_write(hc_slog_time("baz", hc_time(2025, 4, 13, 1, 40, 0)));
     }
   }
 ```
 ```
-context="foo", time=2025-04-13T1:40:00
+foo="bar", baz=2025-04-13T1:40:00
 ```
 
 Let's start with the interface.
@@ -48,7 +48,7 @@ struct hc_slog_field {
 };
 ```
 
-Each thread keeps its own global stack of logs, which defaults to printing to dumping output to `stdout`.
+Each thread tracks its own default log, which defaults to `stdout`.
 
 ```C
 __thread struct hc_slog *_hc_slog = NULL;
