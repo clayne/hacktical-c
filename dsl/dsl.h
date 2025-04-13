@@ -10,7 +10,6 @@ typedef size_t hc_pc;
 
 struct hc_dsl {
   struct hc_vector code;
-  struct hc_vector ops;
   struct hc_vector registers;
   struct hc_vector stack;
 };
@@ -29,17 +28,14 @@ hc_fix hc_dsl_peek(struct hc_dsl *dsl);
 hc_fix hc_dsl_pop(struct hc_dsl *dsl);
 
 struct hc_op {
-  uint8_t code;
   const char *name;
   size_t size;
   
   const uint8_t *(*eval)(struct hc_dsl *dsl, const uint8_t *data);
 };
 
-extern const struct hc_op hc_push_op;
+typedef const uint8_t *(*hc_eval)(struct hc_dsl *dsl, const uint8_t *data);
 
-struct hc_push_op {
-  hc_fix value;
-};
+extern const struct hc_op hc_push_op;
 
 #endif
