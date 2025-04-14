@@ -28,7 +28,7 @@ The repository is set up for sponsoring via Stripe and Liberapay, alternatively 
 ## Why C?
 The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language, offering similar levels of freedom.
 
-C doesn't try to save you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
+C doesn't try very hard to prevent you from making mistakes. It has very few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
 
 These days; many programmers will recommend choosing a stricter language, regardless of the problem being solved. Most of those programmers wouldn't trust themselves with the kind of freedom C offers, many haven't even bothered to learn the language properly.
 
