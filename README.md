@@ -14,7 +14,7 @@ You could say that there are two kinds of programmers, with very different motiv
 
 I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
-I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Forth, Haskell, SmallTalk, Go, Swift.
+I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Forth, Haskell, SmallTalk, Go, C#, Swift.
 
 For a long time, I didn't care much about C at all, it felt very primitive compared to other languages. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously.
 
