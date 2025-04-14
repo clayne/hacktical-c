@@ -1,4 +1,13 @@
-* finish slog readme
+Structs, designated initializers, and preprocessor variadic macroes
+for creating functions with user-orderable named parameters with default
+values when not supplied explicitly.
+
+* convert bump alloc to static struct
+
+* fix malloc1 bug
+https://www.reddit.com/r/C_Programming/comments/1jyrbfb/comment/mn35kyd/?context=3
+
+* finish slog text
 
 * remove ->stream accessors
 ** compile/test
