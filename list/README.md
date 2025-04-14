@@ -7,7 +7,7 @@ The other common objection is memory locality. Since list nodes are separate fro
 
 Intrusive means that the list's infrastructure is stored inside the values. This means no extra allocations for list nodes and potentially no pointer chasing if values are allocated as a single block of memory.
 
-At this point you might wonder what is the point of a list of values stored in a single block of memory. The point is that the allocation strategy has little to do with what sequences we choose to put values in. One common strategy in C is to allocate a bunch of values as a single block of memory, as opposed to asking the memory allocator for one value at a time; which reduces memory fragmentation.
+At this point you may wonder: what is the point of a list of values stored in a single block of memory? The point is that the allocation strategy has little to do with what sequences we choose to put values in. One common strategy in C is to allocate a bunch of values as a single block of memory, as opposed to asking the memory allocator for one value at a time; which reduces memory fragmentation.
 
 This is what a list node looks like; as promised there is no trace of the value, just the links.
 
@@ -17,7 +17,7 @@ struct hc_list {
 };
 ```
 
-And this is a value which is set up to be part of two lists.
+And this is a value which is prepared for inclusion in two lists (at a time).
 
 ```C
 struct my_item {

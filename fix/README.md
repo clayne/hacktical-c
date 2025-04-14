@@ -1,7 +1,7 @@
 ## Fixed-Point Arithmetic
 Fixed-point is a method of representing fractional values by storing a fixed number of digits of the fractional part; or, seen from another angle, by multiplying them with a fixed power of ten. This means they can be stored and processed as regular integers.
 
-The reasons one might wish to do so are mainly performance and correctness. Floating point values are more complicated to implement and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
+The reason one might wish to do o could be performance, but I feel correctness is the more important consideration. Floating point values are more complicated to implement and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
 
 We'll use unsigned 64-bit integers to store fixed-point values; using 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
 
