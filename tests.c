@@ -16,8 +16,6 @@
 #include "vector/tests.c"
 
 int main() {
-  hc_malloc_init();
-
   chrono_tests();
   dsl_tests();
   dynamic_tests();

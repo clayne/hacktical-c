@@ -23,20 +23,27 @@ void default_release(struct hc_malloc *m, void *p) {
   free(p);
 }
 
-struct hc_malloc hc_malloc = {.acquire = default_acquire,
-			      .release = default_release};
+struct hc_malloc hc_malloc_default = {.acquire = default_acquire,
+				      .release = default_release};
+
+__thread struct hc_malloc *hc_mallocp = NULL;
+
+struct hc_malloc *hc_malloc() {
+  return hc_mallocp ? hc_mallocp : &hc_malloc_default;
+}
 ```
 
 A set of macros are provided to simplify use. `_x()`-variants are intended for use with bare `struct hc_malloc`-pointers, while the outer layer adds `->malloc` to avoid having to type it out at every use.
 
 ```C
-#define __hc_malloc_do(m, _pm)						
-  for (struct hc_malloc *_pm = hc_malloc;				
-       _pm && (hc_malloc = (m));					
-       hc_malloc = _pm, _pm = NULL)
+#define __hc_malloc_do(m, _pm, _done)		
+  bool _done = false;				
+  for (struct hc_malloc *_pm = hc_mallocp;	
+       !_done && (hc_mallocp = (m));		
+       hc_mallocp = _pm, _done = true)
 
-#define _hc_malloc_do(m)			
-  __hc_malloc_do(m, hc_unique(malloc_p))
+#define _hc_malloc_do(m)						
+  __hc_malloc_do(m, hc_unique(malloc_pm), hc_unique(malloc_done))
 
 #define hc_malloc_do(m)				
   _hc_malloc_do(&(m)->malloc)
@@ -50,7 +57,7 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
   __hc_acquire(m, hc_unique(malloc_m), s)
 
 #define hc_acquire(s)				
-  _hc_acquire(hc_malloc, s)
+  _hc_acquire(hc_malloc(), s)
 
 #define __hc_release(m, _m, p)			
   struct hc_malloc *_m = m;			
@@ -60,7 +67,7 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
   __hc_release(m, hc_unique(malloc_m), p)
 
 #define hc_release(p)				
-  _hc_release(hc_malloc, p)
+  _hc_release(hc_malloc(), p)
 ```
 
 ### Bump Allocation

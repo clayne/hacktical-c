@@ -3,7 +3,7 @@
 
 static void memo_tests() {
   struct hc_memo_alloc a;
-  hc_memo_alloc_init(&a, hc_malloc);
+  hc_memo_alloc_init(&a, hc_malloc());
 
   hc_malloc_do(&a) {
     int *ip1 = hc_acquire(sizeof(int));

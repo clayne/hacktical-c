@@ -20,7 +20,7 @@ typedef void (*hc_task_body)(struct hc_task *);
 
 We also need a way to track of a list of tasks, a scheduler.
 
-```
+```C
 struct hc_task_list {
   struct hc_list tasks;
 };
@@ -28,7 +28,7 @@ struct hc_task_list {
 
 To keep it simple, we'll simply keep running tasks until all are `done`. One obvious improvement would be to keep running tasks on a separate list.
 
-```
+```C
 void hc_task_list_run(struct hc_task_list *tl) {
   bool all_done = false;
   

@@ -4,13 +4,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define __hc_malloc_do(m, _pm)						\
-  for (struct hc_malloc *_pm = hc_malloc;				\
-       _pm && (hc_malloc = (m));					\
-       hc_malloc = _pm, _pm = NULL)
+#define __hc_malloc_do(m, _pm, _done)		\
+  bool _done = false;				\
+  for (struct hc_malloc *_pm = hc_mallocp;	\
+       !_done && (hc_mallocp = (m));		\
+       hc_mallocp = _pm, _done = true)
 
-#define _hc_malloc_do(m)			\
-  __hc_malloc_do(m, hc_unique(malloc_p))
+#define _hc_malloc_do(m)						\
+  __hc_malloc_do(m, hc_unique(malloc_pm), hc_unique(malloc_done))
 
 #define hc_malloc_do(m)				\
   _hc_malloc_do(&(m)->malloc)
@@ -24,7 +25,7 @@
   __hc_acquire(m, hc_unique(malloc_m), s)
 
 #define hc_acquire(s)				\
-  _hc_acquire(hc_malloc, s)
+  _hc_acquire(hc_malloc(), s)
 
 #define __hc_release(m, _m, p)			\
   struct hc_malloc *_m = m;			\
@@ -34,7 +35,7 @@
   __hc_release(m, hc_unique(malloc_m), p)
 
 #define hc_release(p)				\
-  _hc_release(hc_malloc, p)
+  _hc_release(hc_malloc(), p)
 
 
 struct hc_malloc {
@@ -42,9 +43,10 @@ struct hc_malloc {
   void (*release)(struct hc_malloc *, void *);
 };
 
-extern __thread struct hc_malloc *hc_malloc;
+extern __thread struct hc_malloc *hc_mallocp;
+struct hc_malloc *hc_malloc();
 
-void hc_malloc_init();
+extern struct hc_malloc hc_malloc_default;
 
 /* Bump */
 
