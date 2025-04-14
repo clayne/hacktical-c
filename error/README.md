@@ -1,9 +1,7 @@
 ## Exceptions
-How to best deal with errors is something we're still very much figuring out in software development. But it is very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions make a much better solution.
+How to deal with errors is something we're still very much figuring out in software. But it is very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions make a better solution.
 
 C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
-
-One important limitation that might not be obvious at first glance is that you can only restore a context as long as the original stack frame exists, luckily that's exactly the behavior we're looking for.
 
 Example:
 ```C
@@ -120,3 +118,6 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
   return e;
 }
 ```
+
+Keep in mind that code calling functions that throw exceptions has to use `hc_defer()` or similar to clean up on failure.
+
