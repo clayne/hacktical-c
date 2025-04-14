@@ -64,7 +64,7 @@ const hc_fix x = hc_fix_new(2, -125);
 assert(hc_fix_double(x) == -1.25);
 ```
 
-Addition and subtraction are identical except for the operator. A fast path is provided for the case when both values share the same exponent.
+Addition and subtraction are identical except for the operator, the left hand side exponent is preserved. A fast path is provided for the case when both values share the same exponent.
 
 ```C
 hc_fix hc_fix_add(hc_fix x, hc_fix y) {
