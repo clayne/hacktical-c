@@ -7,6 +7,8 @@ one of the greatest hackers this world has known.*
 ## About the book
 This book assumes basic programming knowledge. We're not going to spend a lot of time and space on explaining basic features, except where they behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility C offers.
 
+The book is very much a work in progress. I'd say we're about half way there in terms of material; and it needs more polish, please mind the gaps. And please report any issues you come across or suggestions for improvements in the repo.
+
 ## About the author
 You could say that there are two kinds of programmers, with very different motivations; academics and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a change in the real world.
 
