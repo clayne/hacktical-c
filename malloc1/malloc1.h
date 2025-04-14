@@ -27,10 +27,11 @@
 #define hc_acquire(s)				\
   _hc_acquire(hc_malloc(), s)
 
-#define __hc_release(m, _m, p)			\
+#define __hc_release(m, _m, p) do {		\
   struct hc_malloc *_m = m;			\
-  _m->release(_m, p)
-
+  _m->release(_m, p);				\
+} while (0)
+    
 #define _hc_release(m, p)			\
   __hc_release(m, hc_unique(malloc_m), p)
 

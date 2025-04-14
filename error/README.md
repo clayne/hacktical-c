@@ -17,7 +17,7 @@ hc_catch(on_catch) {
 
 Output:
 ```
-Failure 12345 in 'error/tests.c', line 14:
+Error 12345 in 'error/tests.c', line 14:
 Going Down!
 ```
 
@@ -119,5 +119,4 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
 }
 ```
 
-Keep in mind that code calling functions that throw exceptions has to use `hc_defer()` or similar to clean up on failure.
-
+Keep in mind that code calling functions that throw exceptions has to use `hc_defer()` or similar to clean up.

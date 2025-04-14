@@ -48,7 +48,7 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
 #define hc_malloc_do(m)				
   _hc_malloc_do(&(m)->malloc)
 
-#define __hc_acquire(m, _m, 
+#define __hc_acquire(m, _m, s) ({		
       struct hc_malloc *_m = m;			
       _m->acquire(_m, s);			
     })
@@ -59,9 +59,10 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
 #define hc_acquire(s)				
   _hc_acquire(hc_malloc(), s)
 
-#define __hc_release(m, _m, p)			
+#define __hc_release(m, _m, p) do {		
   struct hc_malloc *_m = m;			
-  _m->release(_m, p)
+  _m->release(_m, p);
+} while (0)
 
 #define _hc_release(m, p)			
   __hc_release(m, hc_unique(malloc_m), p)
