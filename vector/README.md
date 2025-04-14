@@ -74,7 +74,7 @@ for (int i = 0; i < n; i++) {
 }  
 ```
 
-While not the primary use case for vectors, it's sometimes useful to be able to insert/delete blocks of items. `hc_vector_insert()` returns a pointer to the start of the inserted block.
+While not the primary use case for vectors, it's sometimes useful to be able to insert/delete blocks of items. `hc_vector_insert()` moves the tail if needed and returns a pointer to the start of the inserted block.
 
 ```C
 void *hc_vector_insert(struct hc_vector *v, int i, int n) {
@@ -92,9 +92,9 @@ void *hc_vector_insert(struct hc_vector *v, int i, int n) {
 }
 ```
 
-`hc_vector_delete()` simply removes the specified items.
+`hc_vector_delete()` similarly moves the tail if needed.
 
-```
+```C
 void hc_vector_delete(struct hc_vector *v, int i, int n) {
   const int m = i+n;
   assert(v->length <= m);
