@@ -13,8 +13,22 @@ void malloc1_tests() {
     
     long *lp = hc_acquire(sizeof(long));
     *lp = 42L;
+    
+    assert(a->offset >= sizeof(int) + sizeof(long));
+    bool caught = false;
+    
+    void on_catch(struct hc_error *e) {
+      assert(e->code == HC_NO_MEMORY);
+      caught = true;
+    }
+    
+    hc_catch(on_catch) {
+      hc_acquire(s);
+      assert(false);
+    }
+
+    assert(caught);
   }
 
-  assert(a->offset >= sizeof(int) + sizeof(long));
   hc_bump_alloc_free(a);
 }

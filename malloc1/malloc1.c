@@ -24,16 +24,19 @@ struct hc_malloc *hc_malloc() {
 /* Bump */
 
 static void *bump_acquire(struct hc_malloc *a, size_t size) {
+  if (size <= 0) {
+    hc_throw(HC_INVALID_SIZE, "Invalid size");
+  } 
+
   struct hc_bump_alloc *ba = hc_baseof(a, struct hc_bump_alloc, malloc);
+  
+  if (ba->size - ba->offset < size) {
+    hc_throw(HC_NO_MEMORY, "Out of memory");
+  } 
+
   uint8_t *p = ba->memory + ba->offset;
   uint8_t *pa = hc_align(p, size);
-  const size_t new_offset = ba->offset + pa - p + size;
-  
-  if (new_offset >= ba->size) {
-    hc_throw(0, "Out of memory");
-  }   
-
-  ba->offset = new_offset;
+  ba->offset = ba->offset + pa - p + size;
   return pa;
 }
 

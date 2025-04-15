@@ -5,6 +5,9 @@
 #include <setjmp.h>
 #include "macro/macro.h"
 
+#define HC_NO_MEMORY 1000
+#define HC_INVALID_SIZE 1001
+
 #define __hc_throw(c, _c, m, ...) do {				\
     int _c = c;							\
     struct hc_error *_e =					\
