@@ -1,5 +1,3 @@
-* finish slog text
-
 * remove ->stream accessors?
 ** compile/test
 
