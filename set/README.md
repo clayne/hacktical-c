@@ -3,7 +3,9 @@ Besides lists and vectors, some kind of mapping/lookup functionality is often ne
 
 Most people would likely instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs.
 
-A binary searched vector is as simple as it gets and performs pretty good while being more predictable. The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to do.
+A binary searched vector is as simple as it gets and performs pretty well while being more predictable. Once nice advantage is that since they don't need any infrastructure, they're comparably cheap to create.
+
+The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to perform.
 
 Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run unpredictable issues with values clustering on a minority of buckets in the general case.
 
