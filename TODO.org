@@ -1,6 +1,6 @@
 * finish slog text
 
-* remove ->stream accessors
+* remove ->stream accessors?
 ** compile/test
 
 * convert stream/slog options (close_x)?
@@ -37,7 +37,7 @@ https://github.com/fungos/cr
 
 * ecs
 
-* add hc_string
+* hc_string
 ** add hc_string_dup() constructor
 ** record malloc on construction
 ** u8
@@ -49,6 +49,3 @@ struct hc_string {
   struct hc_malloc *malloc;
   uint8_t data[];
 }
-
-
-DR.H10
