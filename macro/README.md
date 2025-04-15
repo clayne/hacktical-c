@@ -34,7 +34,7 @@ Since it doesn't make much sense to generate unique identifiers that are never u
   int _v __attribute__ ((__cleanup__(_d)))
 
 #define hc_defer(...)
-  _hc_defer(hc_unique(defer_d), hc_unique(defer_v), __VA_ARGS__)
+  _hc_defer(hc_unique(defer_d), hc_unique(defer_v), ##__VA_ARGS__)
 ```
 Example:
 ```C

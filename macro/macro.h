@@ -9,12 +9,12 @@
       _x < 0 ? -x : x;				\
     })						\
 
-#define hc_align(base, size) ({						\
-      __auto_type _base = base;						\
-      __auto_type _size = _Alignof(max_align_t);			\
-      __auto_type _rest = (ptrdiff_t)_base % _size;			\
-      (_rest) ? _base + _size - _rest : base;				\
-    })									\
+#define hc_align(base, size) ({				\
+      __auto_type _base = base;				\
+      __auto_type _size = _Alignof(max_align_t);	\
+      __auto_type _rest = (ptrdiff_t)_base % _size;	\
+      (_rest) ? _base + _size - _rest : base;		\
+    })							\
 
 #define hc_baseof(p, t, m) ({			\
       uint8_t *_p = (uint8_t *)p;		\
@@ -29,7 +29,7 @@
   int _v __attribute__ ((__cleanup__(_d)))
 
 #define hc_defer(...)							\
-  _hc_defer(hc_unique(defer_d), hc_unique(defer_v), __VA_ARGS__)
+  _hc_defer(hc_unique(defer_d), hc_unique(defer_v), ##__VA_ARGS__)
 
 #define _hc_id(x, y)				\
   x ## y
