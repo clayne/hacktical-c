@@ -86,7 +86,11 @@ A few macros to simplify typical use are provided:
 
 #define hc_slog_deinit(s)			
   _hc_slog_deinit(&(s)->slog)
+```
 
+The trick used in `hc_slog_write()` to convert a vararg into an array and a length is worth memorizing.
+
+```C
 #define _hc_slog_write(s, ...) do {				
     struct hc_slog_field fs[] = {__VA_ARGS__};			
     size_t n = sizeof(fs) / sizeof(struct hc_slog_field);	
