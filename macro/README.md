@@ -17,7 +17,7 @@ int hc_id(foo, bar) = 42;
 assert(foobar == 42);
 ```
 
-`hc_unique()` generates unique identifiers with specfied prefix. It uses a system macro named `__COUNTER__` for the unique part, this macro increases its value on each expansion.
+`hc_unique()` generates unique identifiers with specified prefix. It uses a system macro named `__COUNTER__` for the unique part, this macro increases its value on each expansion.
 
 ```C
 #define hc_unique(x)
