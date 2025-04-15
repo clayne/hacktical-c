@@ -1,5 +1,15 @@
 ## Ordered Sets and Maps
-Besides lists and vectors, some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched vectors. What we're actually going to build is an ordered set; but since it's value based, maps are easily implemented on top with low overhead.
+Besides lists and vectors, some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched `struct hc_vector`s.
+
+Most people would likely instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs.
+
+A binary searched vector is as simple as it gets and performs pretty good while being more predictable. The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to do.
+
+Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run unpredictable issues with values clustering on a minority of buckets in the general case.
+
+Besides, the natural dual to a lookup table is a list of pairs, and having an order strengthens that connection.
+
+What we're actually going to build is an ordered set; but since it's value based, maps are easily implemented on top with low overhead.
 
 Example:
 ```C
