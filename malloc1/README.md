@@ -73,30 +73,29 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
 
 ### Bump Allocation
 
-A bump allocator consists of a fixed block of memory, a size and an offset. The memory block is allocated together with the structure. Bump allocators lack built-in support for releasing memory.
+A bump allocator consists of a fixed block of memory, a size and an offset. Bump allocators lack support for memory recycling.
 
 ```C
 struct hc_bump_alloc {
   struct hc_malloc malloc;
   struct hc_malloc *source;
   size_t size, offset;
-  uint8_t memory[];
+  uint8_t *memory;
 };
 
-struct hc_bump_alloc *hc_bump_alloc_new(struct hc_malloc *source,
-					size_t size) {
-  struct hc_bump_alloc *a = _hc_acquire(source,
-					sizeof(struct hc_bump_alloc) + size);
+void hc_bump_alloc_init(struct hc_bump_alloc *a,
+			struct hc_malloc *source,
+			size_t size) {
   a->malloc.acquire = bump_acquire;
   a->malloc.release = bump_release;
   a->source = source;
   a->size = size;
   a->offset = 0;
-  return a;
+  a->memory = _hc_acquire(source, size);
 }
 
-void hc_bump_alloc_free(struct hc_bump_alloc *a) {
-  _hc_release(a->source, a);
+void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
+  _hc_release(a->source, a->memory);
 }
 ```
 

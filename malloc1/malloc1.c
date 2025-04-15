@@ -44,18 +44,17 @@ static void bump_release(struct hc_malloc *a, void *p) {
   // Do nothing
 }
 
-struct hc_bump_alloc *hc_bump_alloc_new(struct hc_malloc *source,
-					size_t size) {
-  struct hc_bump_alloc *a = _hc_acquire(source,
-					sizeof(struct hc_bump_alloc) + size);
+void hc_bump_alloc_init(struct hc_bump_alloc *a,
+			struct hc_malloc *source,
+			size_t size) {
   a->malloc.acquire = bump_acquire;
   a->malloc.release = bump_release;
   a->source = source;
   a->size = size;
   a->offset = 0;
-  return a;
+  a->memory = _hc_acquire(source, size);
 }
 
-void hc_bump_alloc_free(struct hc_bump_alloc *a) {
-  _hc_release(a->source, a);
+void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
+  _hc_release(a->source, a->memory);
 }

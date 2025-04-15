@@ -55,12 +55,13 @@ struct hc_bump_alloc {
   struct hc_malloc malloc;
   struct hc_malloc *source;
   size_t size, offset;
-  uint8_t memory[];
+  uint8_t *memory;
 };
 
-struct hc_bump_alloc *hc_bump_alloc_new(struct hc_malloc *source,
-					size_t size);
+void hc_bump_alloc_init(struct hc_bump_alloc *a,
+			struct hc_malloc *source,
+			size_t size);
 
-void hc_bump_alloc_free(struct hc_bump_alloc *a);
+void hc_bump_alloc_deinit(struct hc_bump_alloc *a);
 
 #endif
