@@ -62,3 +62,5 @@ Example:
 ```C
 assert(hc_min(7, 42) == 7);
 ```
+
+Before leaving the subject; I should mention a common foot gun that is best avoided in macro context, double expansion of macro arguments. What it means is that macros simply paste arguments as is; if the argument has an effect, the effect will be repeated for every expansion by default. That's the reason why we're assigning temporaries whenever we need to refer to a macro argument multiple times within the body.
