@@ -11,8 +11,9 @@
 
 #define hc_align(base, size) ({						\
       __auto_type _base = base;						\
-      __auto_type _size = hc_min((size), _Alignof(max_align_t));	\
-      (_base) + _size - ((ptrdiff_t)(_base)) % _size;			\
+      __auto_type _size = _Alignof(max_align_t);			\
+      __auto_type _rest = (ptrdiff_t)_base % _size;			\
+      (_rest) ? _base + _size - _rest : base;				\
     })									\
 
 #define hc_baseof(p, t, m) ({			\
