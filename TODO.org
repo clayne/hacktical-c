@@ -23,9 +23,11 @@ pi=3.14
 * add iter
 ** unified iterator protocol
 ** set
+** vector/slog
 ** add pair type
 ** add map type
 *** iter as pairs
+** add zip/unzip
 
 * add term
 ** ansi
