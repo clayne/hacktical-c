@@ -20,6 +20,13 @@ pi=3.14
 
 * add slab allocator to malloc2
 
+* add iter
+** unified iterator protocol
+** set
+** add pair type
+** add map type
+*** iter as pairs
+
 * add term
 ** ansi
 ** sharpl
