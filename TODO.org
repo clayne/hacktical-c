@@ -7,10 +7,14 @@ Structs, designated initializers, and preprocessor variadic macroes
 for creating functions with user-orderable named parameters with default
 values when not supplied explicitly.
 
+#define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
+#define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
+    
 * add alignment section to malloc1
 
 * finish dsl
 ** finish id call emit
+*** add call op
 ** add id reader
 ** add fix reader
 1.2 3.4 +
@@ -41,6 +45,8 @@ pi=3.14
 ** links
 
 https://github.com/fungos/cr
+
+* framebuffer gui
 
 * ecs
 
