@@ -13,8 +13,6 @@ values when not supplied explicitly.
 * add alignment section to malloc1
 
 * finish dsl
-** finish id call emit
-*** add call op
 ** add id reader
 ** add fix reader
 1.2 3.4 +

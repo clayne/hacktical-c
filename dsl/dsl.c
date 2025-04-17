@@ -14,7 +14,7 @@ enum hc_order hc_strcmp(const char *x, const char *y) {
 
 struct env_item {
   const char *key;
-  struct hc_dsl_value value;
+  struct hc_value value;
 };
 
 static enum hc_order env_cmp(const void *x, const void *y) {
@@ -26,7 +26,7 @@ static const void *env_key(const void *x) {
 }
 
 void hc_dsl_init(struct hc_dsl *dsl) {
-  hc_vector_init(&dsl->code, sizeof(hc_eval));
+  hc_vector_init(&dsl->code, sizeof(hc_op_eval));
 
   hc_set_init(&dsl->env, sizeof(struct env_item), env_cmp);
   dsl->env.key = env_key;
@@ -42,9 +42,9 @@ void hc_dsl_deinit(struct hc_dsl *dsl) {
   hc_vector_deinit(&dsl->stack);
 }
 
-struct hc_dsl_value hc_dsl_getenv(struct hc_dsl *dsl,
+struct hc_value hc_dsl_getenv(struct hc_dsl *dsl,
 				  const char *key,
-				  const struct hc_dsl_sloc sloc) {
+				  const struct hc_sloc sloc) {
   struct env_item *found = hc_set_find(&dsl->env, &key);
 
   if (found == NULL) {
@@ -56,7 +56,7 @@ struct hc_dsl_value hc_dsl_getenv(struct hc_dsl *dsl,
 
 void hc_dsl_setenv(struct hc_dsl *dsl,
 		   const char *key,
-		   struct hc_dsl_value value) {
+		   struct hc_value value) {
   struct env_item *it = hc_set_find(&dsl->env, &key);
 
   if (it == NULL) {
@@ -79,13 +79,13 @@ hc_fix hc_dsl_pop(struct hc_dsl *dsl) {
 }
 
 hc_pc hc_dsl_emit(struct hc_dsl *dsl,
-		  const struct hc_dsl_op *op,
+		  const struct hc_op *op,
 		  const void *data) {
   const hc_pc pc = dsl->code.length;
   uint8_t *p = hc_vector_insert(&dsl->code,
 				dsl->code.length,
 				ceil(op->size / dsl->code.item_size) + 1);
-  *(hc_eval *)p = op->eval;
+  *(hc_op_eval *)p = op->eval;
   memcpy(p + dsl->code.item_size, data, op->size);
   return pc;
 }
@@ -99,18 +99,18 @@ void hc_dsl_eval(struct hc_dsl *dsl,
 
   for (const uint8_t *p = hc_vector_get(&dsl->code, start_pc);
        p != ep;
-       p = (*(hc_eval *)p)(dsl, p + dsl->code.item_size));
+       p = (*(hc_op_eval *)p)(dsl, p + dsl->code.item_size));
 }
 
-struct hc_dsl_sloc hc_dsl_sloc(const char *source, int row, int col) {
-  struct hc_dsl_sloc s = {.source = {0}, .row = row, .col = col};
+struct hc_sloc hc_sloc(const char *source, int row, int col) {
+  struct hc_sloc s = {.source = {0}, .row = row, .col = col};
   strncpy(s.source, source, sizeof(s.source)-1);
   return s;
 }
 
 static void form_init(struct hc_form *f,
 		      const struct hc_form_type *t,
-		      const struct hc_dsl_sloc sloc) {
+		      const struct hc_sloc sloc) {
   f->type = t;
   f->sloc = sloc;
 }
@@ -121,11 +121,16 @@ static void id_deinit(struct hc_form *f, struct hc_dsl *dsl) {
 
 static void id_emit(const struct hc_form *f, struct hc_dsl *dsl) {
   struct hc_id *id = hc_baseof(f, struct hc_id, form);
-  const struct hc_dsl_value v = hc_dsl_getenv(dsl, id->name, f->sloc);
+  const struct hc_value v = hc_dsl_getenv(dsl, id->name, f->sloc);
 
   switch (v.type) {
   case HC_DSL_FUN:
-    //TODO emit call
+    hc_dsl_emit(dsl,
+		&hc_call_op,
+		&(struct hc_call_op){
+		  .target = v.as_fun,
+		  .sloc = f->sloc
+		});
     break;
   case HC_DSL_FIX:
     hc_dsl_emit(dsl,
@@ -145,7 +150,7 @@ static void id_print(const struct hc_form *f, struct hc_stream *out) {
 }
 
 void hc_id_init(struct hc_id *f,
-		const struct hc_dsl_sloc sloc,
+		const struct hc_sloc sloc,
 		const char *name) {
   static const struct hc_form_type type = {
     .deinit = id_deinit,
@@ -173,7 +178,7 @@ static void literal_print(const struct hc_form *f, struct hc_stream *out) {
 }
 
 void hc_literal_init(struct hc_literal *f,
-		     const struct hc_dsl_sloc sloc,
+		     const struct hc_sloc sloc,
 		     const hc_fix value) {
   static const struct hc_form_type type = {
     .deinit = NULL,
@@ -185,13 +190,25 @@ void hc_literal_init(struct hc_literal *f,
   f->value = value;
 }
 
+static const uint8_t *call_eval(struct hc_dsl *dsl, const uint8_t *data) {
+  struct hc_call_op *op = (void *)data;
+  op->target(dsl, op->sloc);
+  return data + hc_call_op.size;
+}
+
+const struct hc_op hc_call_op = (struct hc_op){
+  .name = "call",
+  .size = sizeof(struct hc_call_op),
+  .eval = call_eval
+};
+
 static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_push_op *op = (void *)data;
   hc_dsl_push(dsl, op->value);
   return data + hc_push_op.size;
 }
 
-const struct hc_dsl_op hc_push_op = (struct hc_dsl_op){
+const struct hc_op hc_push_op = (struct hc_op){
   .name = "push",
   .size = sizeof(struct hc_push_op),
   .eval = push_eval
@@ -201,7 +218,7 @@ static const uint8_t *stop_eval(struct hc_dsl *dsl, const uint8_t *data) {
   return dsl->code.end;
 }
 
-const struct hc_dsl_op hc_stop_op = (struct hc_dsl_op){
+const struct hc_op hc_stop_op = (struct hc_op){
   .name = "stop",
   .size = 0,
   .eval = stop_eval
