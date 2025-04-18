@@ -9,13 +9,6 @@
       _x < 0 ? -x : x;				\
     })						\
 
-#define hc_align(base, size) ({				\
-      __auto_type _base = base;				\
-      __auto_type _size = size;				\
-      __auto_type _rest = (ptrdiff_t)_base % _size;	\
-      (_rest) ? _base + _size - _rest : _base;		\
-    })							\
-
 #define hc_baseof(p, t, m) ({			\
       uint8_t *_p = (uint8_t *)p;		\
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\

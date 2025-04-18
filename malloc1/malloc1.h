@@ -49,6 +49,15 @@ struct hc_malloc *hc_malloc();
 
 extern struct hc_malloc hc_malloc_default;
 
+#define hc_align(base, size) ({						\
+      __auto_type _base = base;						\
+      __auto_type _size = hc_alignof(size);				\
+      __auto_type _rest = (ptrdiff_t)_base % _size;			\
+      (_rest) ? _base + _size - _rest : _base;				\
+    })									\
+
+size_t hc_alignof(size_t size);
+
 /* Bump */
 
 struct hc_bump_alloc {

@@ -21,6 +21,14 @@ struct hc_malloc *hc_malloc() {
   return hc_mallocp ? hc_mallocp : &hc_malloc_default;
 }
 
+size_t hc_alignof(size_t size) {
+  const size_t max = _Alignof(max_align_t);
+  if (size >= max) { return max; }
+  size_t v = 1;
+  while (v < size) { v <<= 1; }
+  return v;
+}
+
 /* Bump */
 
 static void *bump_acquire(struct hc_malloc *a, size_t size) {

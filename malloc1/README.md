@@ -72,15 +72,23 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
 ```
 
 ### Alignment
-Before we dive into the first real implementation, alignment deserves a brief discussion. The short story is that the CPU requires data to be aligned to size multiples, meaning the start address is required to be a multiple of the size. Since this is something we're going to do now and then, `hc_align()` is provided to simplify the process.
+Before we dive into the first real implementation, alignment deserves a brief discussion. The short story is that the CPU requires data to be aligned to size multiples, meaning the start address is required to be a multiple of the size (up to `_Alignof(max_align_t)`). Since this is something we're going to do now and then, a macro is provided to simplify the process.
 
-```
-#define hc_align(base, size) ({				
-      __auto_type _base = base;				
-      __auto_type _size = size;				
-      __auto_type _rest = (ptrdiff_t)_base % _size;	
-      (_rest) ? _base + _size - _rest : _base;		
+```C
+#define hc_align(base, size) ({						
+      __auto_type _base = base;						
+      __auto_type _size = hc_alignof(size);				
+      __auto_type _rest = (ptrdiff_t)_base % _size;			
+      (_rest) ? _base + _size - _rest : _base;				
     })
+
+size_t hc_alignof(size_t size) {
+  const size_t max = _Alignof(max_align_t);
+  if (size >= max) { return max; }
+  size_t v = 1;
+  while (v < size) { v <<= 1; }
+  return v;
+}
 ```
 
 ### Bump Allocation

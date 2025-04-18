@@ -2,6 +2,12 @@
 #include "malloc1.h"
 
 void malloc1_tests() {
+  assert(hc_align(0, 4) == 0);
+  assert(hc_align(1, 4) == 4);
+  assert(hc_align(3, 4) == 4);
+  assert(hc_align(4, 4) == 4);
+  assert(hc_align(5, 4) == 8);
+
   const int s = 1024;
   struct hc_bump_alloc a;
   hc_bump_alloc_init(&a, hc_malloc(), s);
