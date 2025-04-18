@@ -20,11 +20,8 @@ Let's start with the interface.
 
 ```C
 struct hc_slog {
-  void (*deinit)(struct hc_slog *s);
-
-  void (*write)(struct hc_slog *s,
-  		size_t n,
-		struct hc_slog_field fields[]);
+  void (*deinit)(struct hc_slog *);
+  void (*write)(struct hc_slog *, size_t, struct hc_slog_field []);
 };
 ```
 
