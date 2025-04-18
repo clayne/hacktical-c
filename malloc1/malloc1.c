@@ -25,13 +25,7 @@ size_t hc_alignof(size_t size) {
   const size_t max = _Alignof(max_align_t);
   if (size >= max) { return max; }
   size_t v = 1;
-
-  for (;;) {
-    const size_t nv = v << 1;
-    if (nv > size) { return v; }
-    v = nv;
-  }
-  
+  for (size_t nv = 1; nv <= size; v = nv, nv = v << 1);
   return v;
 }
 

@@ -72,7 +72,7 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
 ```
 
 ### Alignment
-Before we dive into the first real implementation, alignment deserves a brief discussion. The short story is that the CPU requires data to be aligned to size multiples, meaning the start address is required to be a multiple of the size (up to `_Alignof(max_align_t)`). Since this is something we're going to do now and then, a macro is provided to simplify the process.
+Before we dive into the first real implementation, alignment deserves a brief discussion. The short story is that the CPU requires data to be aligned to size multiples, meaning the start address is required to be a multiple of the size (up to `_Alignof(max_align_t)`). Since this is something we're going to do now and then, `hc_align()` is provided to simplify the process.
 
 ```C
 #define hc_align(base, size) ({						
@@ -86,13 +86,7 @@ size_t hc_alignof(size_t size) {
   const size_t max = _Alignof(max_align_t);
   if (size >= max) { return max; }
   size_t v = 1;
-
-  for (;;) {
-    const size_t nv = v << 1;
-    if (nv > size) { return v; }
-    v = nv;
-  }
-  
+  for (size_t nv = 1; nv <= size; v = nv, nv = v << 1);
   return v;
 }
 ```
