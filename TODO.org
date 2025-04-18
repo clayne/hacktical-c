@@ -1,11 +1,9 @@
-* va_list issue
-
-* add slab allocator to malloc2
-
 * add task alt
 
 #define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
 #define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
+
+* add slab allocator to malloc2
 
 * finish dsl
 ** add id reader

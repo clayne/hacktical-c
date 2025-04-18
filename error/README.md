@@ -88,7 +88,12 @@ void _hc_throw(struct hc_error *e) {
 }
 ```
 
-Errors are defined as dynamically sized structs, which are allocated/freed automagically. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be comsumed once.
+### Vararg Functions
+From this point on we're going to be defining plenty of vararg functions. In C, they require a tiny bit more work and discipline than other common languages.
+
+`va_start` initializes a vararg, it expects the final non-vararg id. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this you cannot retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the vararg.
+
+Errors are defined as dynamically sized structs, which are allocated/freed automagically. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be consumed once.
 
 ```C
 struct hc_error {
@@ -119,4 +124,5 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
 }
 ```
 
+### Cleaning Up
 Keep in mind that code calling functions that throw exceptions has to use `hc_defer()` or similar to clean up.
