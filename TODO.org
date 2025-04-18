@@ -1,10 +1,8 @@
-* remove ->stream accessors?
-** compile/test
-
-#define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
-#define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
-    
 * add alignment section to malloc1
+
+* va_list issue
+
+* add slab allocator to malloc2
 
 * finish dsl
 ** add id reader
@@ -13,8 +11,6 @@
 ** add var support
 pi=3.14
 ** add paren grouping
-
-* add slab allocator to malloc2
 
 * add iter
 ** unified iterator protocol
@@ -54,3 +50,6 @@ struct hc_string {
   struct hc_malloc *malloc;
   uint8_t data[];
 }
+
+#define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
+#define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
