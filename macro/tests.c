@@ -18,4 +18,10 @@ void macro_tests() {
 
     assert(foo == 2);
   }
+
+  assert(hc_align(0, 4) == 0);
+  assert(hc_align(1, 4) == 4);
+  assert(hc_align(3, 4) == 4);
+  assert(hc_align(4, 4) == 4);
+  assert(hc_align(5, 4) == 8);
 }

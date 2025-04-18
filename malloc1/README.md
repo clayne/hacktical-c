@@ -71,6 +71,18 @@ A set of macros are provided to simplify use. `_x()`-variants are intended for u
   _hc_release(hc_malloc(), p)
 ```
 
+### Alignment
+Before we dive into the first real implementation, alignment deserves a brief discussion. The short story is that the CPU requires data to be aligned to size multiples, meaning the start address is required to be a multiple of the size. Since this is something we're going to do now and then, `hc_align()` is provided to simplify the process.
+
+```
+#define hc_align(base, size) ({				
+      __auto_type _base = base;				
+      __auto_type _size = size;				
+      __auto_type _rest = (ptrdiff_t)_base % _size;	
+      (_rest) ? _base + _size - _rest : _base;		
+    })
+```
+
 ### Bump Allocation
 
 A bump allocator consists of a fixed block of memory, a size and an offset. Bump allocators lack support for memory recycling.
@@ -99,7 +111,7 @@ void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
 }
 ```
 
-`acquire()` bumps the offset, while `release()` is a no op.
+`acquire()` bumps the offset to a correctly aligned address plus the requested size, `release()` is a no op.
 
 ```C
 void *bump_acquire(struct hc_malloc *m, size_t size) {
