@@ -35,7 +35,7 @@ We use a `for`-loop to push/pop handlers around the catch body, a neat trick for
   _hc_catch(hc_unique(env), hc_unique(flag), h)
 ```
 
-We use a static thread-local `struct hc_vector` to store handlers. Note that the only way to deinitialize it is by manually calling `hc_errors_deinit()` at the end of every thread.
+A static thread-local `struct hc_vector` stores currently active handlers. Note that the only way to deinitialize it is by manually calling `hc_errors_deinit()` at the end of every thread.
 
 ```C
 static struct hc_vector *handlers() {
@@ -88,19 +88,23 @@ void _hc_throw(struct hc_error *e) {
 }
 ```
 
-### Vararg Functions
-From this point on we're going to be defining plenty of vararg functions. In C, they require a tiny bit more work and discipline than other common languages.
-
-`va_start` initializes a vararg, it expects the final non-vararg id. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this you cannot retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the vararg.
-
-Errors are defined as dynamically sized structs, which are allocated/freed automagically. We use `vsnprintf` with a `NULL` argument to get the message length before allocating memory for the error, this means that we have to copy the argument list since a `va_list` can only be consumed once.
+Errors are defined as dynamically sized structs, which are allocated/freed automagically. 
 
 ```C
 struct hc_error {
   int code;
   char message[];
 };
+```
 
+### Vararg Functions
+From this point on we're going to be defining plenty of vararg functions. In C, they require a tiny bit more work and discipline than other common languages.
+
+`va_start` initializes a vararg, it expects the final non-vararg id. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this you cannot retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the vararg.
+
+Back to errors. Calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
+
+```
 struct hc_error *hc_error_new(int code, const char *message, ...) {
   va_list args;
   va_start(args, message);
