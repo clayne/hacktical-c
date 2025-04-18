@@ -4,6 +4,11 @@
 
 * add slab allocator to malloc2
 
+* add task alt
+
+#define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
+#define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
+
 * finish dsl
 ** add id reader
 ** add fix reader
@@ -50,6 +55,3 @@ struct hc_string {
   struct hc_malloc *malloc;
   uint8_t data[];
 }
-
-#define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
-#define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
