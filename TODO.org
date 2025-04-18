@@ -1,12 +1,6 @@
 * remove ->stream accessors?
 ** compile/test
 
-* convert stream/slog options (close_x)?
-
-Structs, designated initializers, and preprocessor variadic macroes
-for creating functions with user-orderable named parameters with default
-values when not supplied explicitly.
-
 #define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
 #define CO_RETURN(x) ({ __label__ resume; cr_state_ = &&resume; return (x); resume:; })
     

@@ -44,10 +44,14 @@ struct hc_slog {
 		struct hc_slog_field fields[]);
 };
 
+struct hc_slog_stream_opts {
+  bool close_out;
+};
+
 struct hc_slog_stream {
   struct hc_slog slog;
   struct hc_stream *out;
-  bool close_out;
+  struct hc_slog_stream_opts opts;
 };
 
 extern __thread struct hc_slog *_hc_slog;
@@ -72,9 +76,15 @@ struct hc_slog_field hc_slog_time(const char *name, struct hc_time value);
 #define hc_slog_write(...)			\
   _hc_slog_write(hc_slog(), ##__VA_ARGS__)
 
-struct hc_slog_stream *hc_slog_stream_init(struct hc_slog_stream *s,
-					   struct hc_stream *out,
-					   bool close_out);
+#define hc_slog_stream_init(s, out, ...)				\
+  _hc_slog_stream_init(s, out, (struct hc_slog_stream_opts){		\
+      .close_out = false,						\
+      ##__VA_ARGS__							\
+    })
+
+struct hc_slog_stream *_hc_slog_stream_init(struct hc_slog_stream *s,
+					    struct hc_stream *out,
+					    struct hc_slog_stream_opts opts);
 
 void _hc_slog_deinit(struct hc_slog *s);
 

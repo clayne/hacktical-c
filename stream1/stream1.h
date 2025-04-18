@@ -47,16 +47,26 @@ size_t _hc_stream_vprintf(struct hc_stream *s,
 
 size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...);
 
-struct hc_file_stream {
-  struct hc_stream stream;
-  FILE *file;
+struct hc_file_stream_opts {
   bool close_file;
 };
 
+struct hc_file_stream {
+  struct hc_stream stream;
+  FILE *file;
+  struct hc_file_stream_opts opts;
+};
+
+#define hc_file_stream_init(s, f, ...)					\
+  _hc_file_stream_init(s, f, (struct hc_file_stream_opts){		\
+      .close_file = false,						\
+      ##__VA_ARGS__							\
+    })
+
 extern struct hc_stream hc_file_stream;
-struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file,
-					   bool close_file);
+struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
+					    FILE *file,
+					    struct hc_file_stream_opts opts);
 
 struct hc_stream *hc_stdout();
 

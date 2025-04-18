@@ -88,13 +88,17 @@ size_t _hc_stream_vprintf(struct hc_stream *s,
 }
 ```
 
-The first implementation is file streams, which simply delegate to `stdio`. If `close` is `true`, the file is closed with the stream.
+The first implementation is file streams, which simply delegate to `stdio`. If `opts.close_file` is `true`, the file is closed with the stream.
 
 ```C
+struct hc_file_stream_opts {
+  bool close_file;
+};
+
 struct hc_file_stream {
   struct hc_stream stream;
   FILE *file;
-  bool close;
+  struct hc_file_stream_opts opts;
 };
 
 void file_deinit(struct hc_stream *s) {
@@ -120,10 +124,20 @@ size_t file_put(struct hc_stream *s, const uint8_t *data, size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   return fwrite(data, n, 1, fs->file);
 }
+```
 
-struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file,
-					   bool close) {
+We'll add a macro on top of the init function to make the option syntax nicer, this a very useful technique for implementing optional function arguments with defaults.
+
+```C
+#define hc_file_stream_init(s, f, ...)					
+  _hc_file_stream_init(s, f, (struct hc_file_stream_opts){		
+      .close_file = false,						
+      ##__VA_ARGS__							
+    })
+
+struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
+			 		    FILE *file,
+					    struct hc_file_stream_opts opts) {
   s->stream = (struct hc_stream){
     .deinit  = file_deinit,
     .get     = file_get,
@@ -131,7 +145,7 @@ struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
   };
 
   s->file = file;
-  s->close = close;
+  s->opts = opts;
   return s;
 };
 ```

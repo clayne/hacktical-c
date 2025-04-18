@@ -104,15 +104,19 @@ The trick used in `hc_slog_write()` to convert a vararg into an array and a leng
 The primary kind of log writes fields to a `struct hc_stream`.
 
 ```C
+struct hc_slog_stream_opts {
+  bool close_out;
+};
+
 struct hc_slog_stream {
   struct hc_slog slog;
   struct hc_stream *out;
-  bool close_out;
+  struct hc_slog_stream_opts opts;
 };
 
 void stream_deinit(struct hc_slog *s) {
   struct hc_slog_stream *ss = hc_baseof(s, struct hc_slog_stream, slog);
-  if (ss->close_out) { _hc_stream_deinit(ss->out); }
+  if (ss->opts.close_out) { _hc_stream_deinit(ss->out); }
 }
 
 void stream_write(struct hc_slog *s,
@@ -128,14 +132,24 @@ void stream_write(struct hc_slog *s,
 
   _hc_stream_putc(ss->out, '\n');
 }
+```
+
+A convenience macro is provided to make the option syntax nicer.
+
+```
+#define hc_slog_stream_init(s, out, ...)				
+  _hc_slog_stream_init(s, out, (struct hc_slog_stream_opts){		
+      .close_out = false,						
+      ##__VA_ARGS__							
+    })
 
 struct hc_slog_stream *hc_slog_stream_init(struct hc_slog_stream *s,
 					   struct hc_stream *out,
-					   const bool close_out) {
+					   struct hc_slog_stream_opts opts) {
   s->slog.deinit = stream_deinit;
   s->slog.write = stream_write;
   s->out = out;
-  s->close_out = close_out;
+  s->opts = opts;
   return s;
 }
 ```

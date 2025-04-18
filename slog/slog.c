@@ -19,7 +19,7 @@ struct hc_slog *hc_slog() {
   static __thread struct hc_slog_stream s;
 
   if (init) {
-    hc_slog_stream_init(&s, hc_stdout(), false);
+    hc_slog_stream_init(&s, hc_stdout());
     init = false;
   }
 
@@ -122,7 +122,7 @@ struct hc_slog_field hc_slog_time(const char *name,
 
 void stream_deinit(struct hc_slog *s) {
   struct hc_slog_stream *ss = hc_baseof(s, struct hc_slog_stream, slog);
-  if (ss->close_out) { _hc_stream_deinit(ss->out); }
+  if (ss->opts.close_out) { _hc_stream_deinit(ss->out); }
 }
 
 static void stream_write(struct hc_slog *s,
@@ -139,13 +139,13 @@ static void stream_write(struct hc_slog *s,
   _hc_stream_putc(ss->out, '\n');
 }
 
-struct hc_slog_stream *hc_slog_stream_init(struct hc_slog_stream *s,
-					   struct hc_stream *out,
-					   const bool close_out) {
+struct hc_slog_stream *_hc_slog_stream_init(struct hc_slog_stream *s,
+					    struct hc_stream *out,
+					    const struct hc_slog_stream_opts opts) {
   s->slog.deinit = stream_deinit;
   s->slog.write = stream_write;
   s->out = out;
-  s->close_out = close_out;
+  s->opts = opts;
   return s;
 }
 

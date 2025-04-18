@@ -8,7 +8,7 @@ void slog_tests() {
   hc_memory_stream_init(&out);
   
   struct hc_slog_stream s;
-  hc_slog_stream_init(&s, &out.stream, true);
+  hc_slog_stream_init(&s, &out.stream, .close_out=true);
   
   hc_slog_do(&s) {
     hc_slog_context_do(hc_slog_string("string", "abc")) {

@@ -53,7 +53,7 @@ void file_deinit(struct hc_stream *s) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   assert(fs->file);
 
-  if (fs->close_file) {  
+  if (fs->opts.close_file) {  
     if (fclose(fs->file) == EOF) {
       hc_throw(0, "Failed closing file");
     }
@@ -74,9 +74,9 @@ size_t file_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
   return fwrite(data, n, 1, fs->file);
 }
 
-struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
-					   FILE *file,
-					   bool close_file) {
+struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
+					    FILE *file,
+					    const struct hc_file_stream_opts opts) {
   s->stream = (struct hc_stream){
     .deinit  = file_deinit,
     .get     = file_get,
@@ -84,7 +84,7 @@ struct hc_file_stream *hc_file_stream_init(struct hc_file_stream *s,
   };
   
   s->file = file;
-  s->close_file = close_file;
+  s->opts = opts;
   return s;
 };
 
@@ -93,7 +93,7 @@ struct hc_stream *hc_stdout() {
   static __thread struct hc_file_stream s;
 
   if (init) {
-    hc_file_stream_init(&s, stdout, false);
+    hc_file_stream_init(&s, stdout);
     init = false;
   }
 
