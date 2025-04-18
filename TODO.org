@@ -1,3 +1,8 @@
+* add _t suffix on typedefs
+
+* remove error code
+** replace with strncmp on message prefix
+
 * add task alt
 
 #define CO_BEGIN static void* cr_state_ = &&cr_st_0; goto *cr_state_; cr_st_0:
