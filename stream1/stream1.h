@@ -9,9 +9,9 @@
 #include "vector/vector.h"
 
 struct hc_stream {
-  void   (*deinit)(struct hc_stream *s);
-  size_t (*get)(struct hc_stream *s, uint8_t *data, size_t n);
-  size_t (*put)(struct hc_stream *s, const uint8_t *data, size_t n);
+  void   (*deinit)(struct hc_stream *);
+  size_t (*get)(struct hc_stream *, uint8_t *, size_t);
+  size_t (*put)(struct hc_stream *, const uint8_t *, size_t);
 };
 
 #define hc_stream_deinit(s)			\

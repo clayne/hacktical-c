@@ -1,4 +1,7 @@
 * add alignment section to malloc1
+** add tests
+** check hc_align use
+*** hc_vector
 
 * va_list issue
 
