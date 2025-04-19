@@ -1,9 +1,6 @@
-* add _t suffix on typedefs
-
-* remove error code
-** replace with strncmp on message prefix
-
 * add slab allocator to malloc2
+
+* add _t suffix on typedefs
 
 * finish dsl
 ** add id reader
