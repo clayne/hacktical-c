@@ -33,13 +33,13 @@ size_t hc_alignof(size_t size) {
 
 static void *bump_acquire(struct hc_malloc *a, size_t size) {
   if (size <= 0) {
-    hc_throw(HC_INVALID_SIZE, "Invalid size");
+    hc_throw(HC_INVALID_SIZE);
   } 
 
   struct hc_bump_alloc *ba = hc_baseof(a, struct hc_bump_alloc, malloc);
   
   if (ba->size - ba->offset < size) {
-    hc_throw(HC_NO_MEMORY, "Out of memory");
+    hc_throw(HC_NO_MEMORY);
   } 
 
   uint8_t *p = ba->memory + ba->offset;

@@ -59,11 +59,11 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
     char *const env[] = {"PATH=/bin:/sbin", NULL};
       
     if (execve(cp, as, env) == -1) {
-      hc_throw(0, "Failed to exec '%s': %d", c, errno);
+      hc_throw("Failed to exec '%s': %d", c, errno);
     }
   }
   case -1:
-    hc_throw(0, "Failed forking process: %d", errno);
+    hc_throw("Failed forking process: %d", errno);
   default:
     close(fds[0]);
     free(cp);
@@ -99,27 +99,11 @@ void hc_compile(const char *code, const char *out) {
   fclose(stdin);
 }
 
-char *hc_vsprintf(const char *format, va_list args) {
-  va_list tmp_args;
-  va_copy(tmp_args, args);
-  int len = vsnprintf(NULL, 0, format, tmp_args);
-  va_end(tmp_args);
-
-  if (len < 0) {
-    hc_throw(0, "Formatting '%s' failed: %d", format, errno);
-  }
-
-  len++;
-  char *out = hc_acquire(len);
-  vsnprintf(out, len, format, args);
-  return out;
-} 
-
 struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
   lib->handle = dlopen(path, RTLD_NOW);
 
   if (!lib->handle) {
-    hc_throw(0, "Error opening dynamic library '%s': %s", path, dlerror());
+    hc_throw("Error opening dynamic library '%s': %s", path, dlerror());
   }
   
   return lib;
@@ -127,7 +111,7 @@ struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
 
 struct hc_dlib *hc_dlib_deinit(struct hc_dlib *lib) {
   if (dlclose(lib->handle) != 0) {
-    hc_throw(0, "Failed closing dynamic library: ", dlerror());
+    hc_throw("Failed closing dynamic library: ", dlerror());
   }
 
   return lib;
@@ -139,8 +123,24 @@ void *hc_dlib_find(const struct hc_dlib *lib, const char *s) {
   char *e = dlerror();
 
   if (e) {
-    hc_throw(0, "Symbol '%s' not found: %s", e);
+    hc_throw("Symbol '%s' not found: %s", e);
   }
 
   return v;
 }
+
+char *hc_vsprintf(const char *format, va_list args) {
+  va_list tmp_args;
+  va_copy(tmp_args, args);
+  int len = vsnprintf(NULL, 0, format, tmp_args);
+  va_end(tmp_args);
+
+  if (len < 0) {
+    hc_throw("Formatting '%s' failed: %d", format, errno);
+  }
+
+  len++;
+  char *out = hc_acquire(len);
+  vsnprintf(out, len, format, args);
+  return out;
+} 

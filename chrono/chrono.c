@@ -10,7 +10,7 @@ struct hc_time hc_now() {
   struct hc_time t;
   
   if (!timespec_get(&t.value, TIME_UTC)) {
-    hc_throw(0, "Failed getting time: %d", errno);
+    hc_throw("Failed getting time: %d", errno);
   }
 
   return t;
@@ -79,7 +79,7 @@ uint64_t hc_sleep(uint64_t ns) {
   case EINTR:
     return t.tv_nsec;
   default:
-    hc_throw(0, "Failed sleeping: %d", errno);
+    hc_throw("Failed sleeping: %d", errno);
   }
 
   return 0;

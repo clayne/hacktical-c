@@ -48,7 +48,7 @@ struct hc_value hc_dsl_getenv(struct hc_dsl *dsl,
   struct env_item *found = hc_set_find(&dsl->env, &key);
 
   if (found == NULL) {
-    hc_throw(0, "Unknown identifier: %s", key);
+    hc_throw("Unknown identifier: %s", key);
   }
 
   return found->value;
@@ -140,7 +140,7 @@ static void id_emit(const struct hc_form *f, struct hc_dsl *dsl) {
 		});
     break;
   default:
-    hc_throw(0, "Invald value: %d", v.type);
+    hc_throw("Invald value: %d", v.type);
   }
 }
 

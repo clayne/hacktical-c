@@ -14,8 +14,6 @@ struct hc_proc *hc_proc_deinit(struct hc_proc *proc);
 
 void hc_compile(const char *code, const char *out);
 
-char *hc_vsprintf(const char *format, va_list args);
-
 struct hc_dlib {
   void *handle;
 };
@@ -23,5 +21,7 @@ struct hc_dlib {
 struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path);
 struct hc_dlib *hc_dlib_deinit(struct hc_dlib *lib);
 void *hc_dlib_find(const struct hc_dlib *lib, const char *s);
+
+char *hc_vsprintf(const char *format, va_list args);
 
 #endif

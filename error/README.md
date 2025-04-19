@@ -11,14 +11,14 @@ void on_catch(struct hc_error *e) {
 }
   
 hc_catch(on_catch) {
-  hc_throw(12345, "Going %s", "Down!");
+  hc_throw("E123 Going %s", "Down!");
 }
 ```
 
 Output:
 ```
-Error 12345 in 'error/tests.c', line 14:
-Going Down!
+Error in 'error/tests.c', line 14:
+E123 Going Down!
 ```
 
 We use a `for`-loop to push/pop handlers around the catch body, a neat trick for whenever you need to do something after a user defined block of code in macro context.
@@ -63,13 +63,13 @@ void hc_errors_deinit() {
 }
 ```
 
-`hc_throw()` takes a code and a `printf`-compatable format and argument list. We're taking advantage of the fact that adjacent string literals are automagically concatenated by the compiler to add context.
+`hc_throw()` takes a `printf`-compatable format and argument list. We're taking advantage of the fact that adjacent string literals are automagically concatenated by the compiler to add context.
 
 ```C
-#define hc_throw(c, m, ...) {						
+#define hc_throw(m, ...) {						
       struct hc_error *e =					
-	hc_error_new((c), "Failure %d in '%s', line %d:\n" m "\n",
-		     (c), __FILE__, __LINE__, ##__VA_ARGS__);	
+	hc_error_new("Failure in '%s', line %d:\n" m "\n",
+		     __FILE__, __LINE__, ##__VA_ARGS__);	
       _hc_throw(e);						
   } do while(0)
 
@@ -92,8 +92,7 @@ Errors are defined as dynamically sized structs, which are allocated/freed autom
 
 ```C
 struct hc_error {
-  int code;
-  char message[];
+  char *message[];
 };
 ```
 
@@ -105,7 +104,8 @@ From this point on we're going to be defining plenty of vararg functions. In C, 
 Back to errors. Calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
 
 ```
-struct hc_error *hc_error_new(int code, const char *message, ...) {
+struct hc_error *hc_error_new(const char *message, ...) {
+  struct hc_error *e = malloc(sizeof(struct hc_error));
   va_list args;
   va_start(args, message);
   
@@ -120,8 +120,7 @@ struct hc_error *hc_error_new(int code, const char *message, ...) {
   }
   
   len++;
-  struct hc_error *e = malloc(sizeof(struct hc_error) + len);
-  e->code = code;
+  e->message = malloc(len);
   vsnprintf(e->message, len, message, args);
   va_end(args);
   return e;

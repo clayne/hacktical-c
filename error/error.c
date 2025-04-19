@@ -46,7 +46,9 @@ void _hc_throw(struct hc_error *e) {
   longjmp(t, 1);
 }
 
-struct hc_error *hc_error_new(const int code, const char *message, ...) {
+struct hc_error *hc_error_new(const char *message, ...) {
+  struct hc_error *e = malloc(sizeof(struct hc_error));
+
   va_list args;
   va_start(args, message);
   
@@ -61,13 +63,18 @@ struct hc_error *hc_error_new(const int code, const char *message, ...) {
   }
   
   len++;
-  struct hc_error *e = malloc(sizeof(struct hc_error) + len);
-  e->code = code;
+  e->message = malloc(len);
   vsnprintf(e->message, len, message, args);
   va_end(args);
   return e;
 }
 
 void hc_error_free(struct hc_error *e) {
+  free(e->message);
   free(e);
+}
+
+bool hc_streq(const char *l, const char *r) {
+  for (; *l && *l == *r; l++, r++);
+  return *l == *r;
 }

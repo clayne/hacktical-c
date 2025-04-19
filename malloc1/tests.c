@@ -26,7 +26,7 @@ void malloc1_tests() {
     bool caught = false;
     
     void on_catch(struct hc_error *e) {
-      assert(e->code == HC_NO_MEMORY);
+      assert(hc_streq(e->message, HC_NO_MEMORY) == 0);
       caught = true;
     }
     

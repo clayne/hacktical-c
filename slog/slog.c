@@ -87,7 +87,7 @@ static void field_write(struct hc_slog_field *f, struct hc_stream *out) {
     break;
   }
   default:
-    hc_throw(0, "Invalid slog field type: %d", f->type);
+    hc_throw("Invalid slog field type: %d", f->type);
   }
 }
 

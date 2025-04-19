@@ -55,7 +55,7 @@ void file_deinit(struct hc_stream *s) {
 
   if (fs->opts.close_file) {  
     if (fclose(fs->file) == EOF) {
-      hc_throw(0, "Failed closing file");
+      hc_throw("Failed closing file");
     }
     
     fs->file = NULL;
