@@ -91,7 +91,11 @@ static struct slab *get_slab(struct hc_slab_alloc *a) {
 
 static void *slab_acquire(struct hc_malloc *a, size_t size) {
   struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
-  if (size != sa->slot_size)
+
+  if (size != sa->slot_size) {
+    hc_throw("Invalid allocation size");
+  }
+  
   struct slab *s = get_slab(sa);
   return s->slots + sa->slot_index++ * sa->slot_size;
 }
