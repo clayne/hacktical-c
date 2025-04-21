@@ -64,3 +64,60 @@ void hc_memo_alloc_deinit(struct hc_memo_alloc *a) {
   
   hc_set_deinit(&a->memo);
 }
+
+/* Slab */
+
+struct slab {
+  struct hc_list slabs;
+  uint8_t slots[];
+};
+
+
+static struct slab *add_slab(struct hc_slab_alloc *a) {
+  struct slab *s = _hc_acquire(a->source,
+			       sizeof(struct slab) +
+			       a->slot_count * a->slot_size);
+  
+  hc_list_push_back(&a->slabs, &s->slabs);
+  a->slot_index = 0;
+  return s;
+}
+
+static struct slab *get_slab(struct hc_slab_alloc *a) {
+  return (a->slot_index < a->slot_count)
+    ? hc_baseof(a->slabs.prev, struct slab, slabs)
+    : add_slab(a);
+}
+
+static void *slab_acquire(struct hc_malloc *a, size_t size) {
+  struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
+  if (size != sa->slot_size)
+  struct slab *s = get_slab(sa);
+  return s->slots + sa->slot_index++ * sa->slot_size;
+}
+
+static void slab_release(struct hc_malloc *a, void *p) {
+  // Do nothing
+}
+
+struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
+					 struct hc_malloc *source,
+					 size_t slot_count,
+					 size_t slot_size) {
+  a->malloc.acquire = slab_acquire;
+  a->malloc.release = slab_release;
+  a->source = source;
+  hc_list_init(&a->slabs);
+  a->slot_count = slot_count;
+  a->slot_size = slot_size;
+  a->slot_index = 0;
+  add_slab(a);
+  return a;
+}
+
+void hc_slab_alloc_deinit(struct hc_slab_alloc *a) {
+  hc_list_do(&a->slabs, _s) {
+    struct slab *s = hc_baseof(_s, struct slab, slabs);
+    _hc_release(a->source, s);
+  }
+}

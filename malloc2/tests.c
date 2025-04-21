@@ -29,6 +29,24 @@ static void memo_tests() {
   hc_memo_alloc_deinit(&a);
 }
 
+static void slab_tests() {
+  struct hc_slab_alloc a;
+  hc_slab_alloc_init(&a, hc_malloc(), 3, sizeof(int));
+  assert(a.slot_count == 3);
+  assert(a.slot_size == sizeof(int));
+
+  hc_malloc_do(&a) {
+    for (int i = 0; i < 4; i++) {
+      *(int *)hc_acquire(sizeof(int)) = i;
+    }
+
+    assert(a.slot_index == 1);
+  }
+
+  hc_slab_alloc_deinit(&a);
+}
+
 void malloc2_tests() {
   memo_tests();
+  slab_tests();
 }

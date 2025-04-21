@@ -1,8 +1,11 @@
-* add slab allocator to malloc2
+* finish slab allocator readme
+
+* add malloc benchmark
 
 * add _t suffix on typedefs
 
 * finish dsl
+** rename to dsl1?
 ** add id reader
 ** add fix reader
 1.2 3.4 +
@@ -18,6 +21,9 @@ pi=3.14
 ** add map type
 *** iter as pairs
 ** add zip/unzip
+
+* dsl2
+** template engine
 
 * add term
 ** ansi

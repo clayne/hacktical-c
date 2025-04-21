@@ -20,7 +20,7 @@ For a long time, I didn't care much about C at all, it felt very primitive compa
 
 Since then I've written a ton of C; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
 
-## Donations
+## Support
 If you would like to see this project succeed, all contributions are welcome.
 
 I've decided to release the project using an open license to benefit as many as possible, because I believe knowledge should be shared freely. But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 

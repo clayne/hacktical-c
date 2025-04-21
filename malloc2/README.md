@@ -5,8 +5,8 @@ We now have enough features in place to implement more elaborate allocators.
 
 It might make sense to give [Part 1](https://github.com/codr7/hacktical-c/tree/main/malloc1) a quick scan before diving in.
 
-### Recycling
-Recycling memory is a common requirement, we'll design the feature as a separate allocator that can be plugged in at any point.
+### Recycling Memory
+Memory recycling is a common requirement, we'll design the feature as a separate allocator that can be plugged in at any point.
 
 Example:
 ```C
@@ -99,3 +99,6 @@ void memo_release(struct hc_malloc *a, void *p) {
   *(struct memo **)hc_set_add(&ma->memo, &m->size, true) = m;
 }
 ```
+
+### Slab Allocation
+Slab allocators allocate memory in slabs of `slot_count * slot_size` bytes.
