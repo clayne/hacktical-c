@@ -49,6 +49,12 @@ static void *bump_acquire(struct hc_malloc *a, size_t size) {
 }
 
 static void bump_release(struct hc_malloc *a, void *p) {
+  struct hc_bump_alloc *ba = hc_baseof(a, struct hc_bump_alloc, malloc);
+
+  if ((uint8_t *)p < ba->memory || (uint8_t *)p >= ba->memory + ba->size) {
+    _hc_release(ba->source, p);
+  }
+  
   // Do nothing
 }
 

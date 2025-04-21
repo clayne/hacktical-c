@@ -89,11 +89,11 @@ static struct slab *get_slab(struct hc_slab_alloc *a) {
     : add_slab(a);
 }
 
-static void *slab_acquire(struct hc_malloc *a, size_t size) {
+static void *slab_acquire(struct hc_malloc *a, const size_t size) {
   struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
 
   if (size != sa->slot_size) {
-    hc_throw("Invalid allocation size");
+    return _hc_acquire(sa->source, size);
   }
   
   struct slab *s = get_slab(sa);
@@ -101,6 +101,23 @@ static void *slab_acquire(struct hc_malloc *a, size_t size) {
 }
 
 static void slab_release(struct hc_malloc *a, void *p) {
+  struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
+  bool own = false;
+  
+  hc_list_do(&sa->slabs, _s) {
+    struct slab *s = hc_baseof(_s, struct slab, slabs);
+
+    if ((uint8_t *)p >= s->slots &&
+	(uint8_t *)p < s->slots + sa->slot_count * sa->slot_size) {
+      own = true;
+      break;
+    }
+  }
+
+  if (!own) {
+    _hc_release(sa->source, p);
+  }
+
   // Do nothing
 }
 
