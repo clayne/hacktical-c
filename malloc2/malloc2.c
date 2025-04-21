@@ -114,7 +114,6 @@ struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
   hc_list_init(&a->slabs);
   a->slot_count = slot_count;
   a->slot_size = slot_size;
-  a->slot_index = 0;
   add_slab(a);
   return a;
 }
