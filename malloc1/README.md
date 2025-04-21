@@ -119,7 +119,7 @@ void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
 }
 ```
 
-`acquire()` bumps the offset to a correctly aligned address plus the requested size, `release()` is a no op.
+`acquire()` bumps the offset to a correctly aligned address plus the requested size.
 
 ```C
 void *bump_acquire(struct hc_malloc *m, size_t size) {
@@ -138,8 +138,18 @@ void *bump_acquire(struct hc_malloc *m, size_t size) {
   ba->offset = ba->offset + pa - p + size;
   return pa;
 }
+```
 
+`release()` is delegated to `source` unless the pointer belongs to us, in which case it's a no op.
+
+```C
 void bump_release(struct hc_malloc *m, void *p) {
+  struct hc_bump_alloc *ba = hc_baseof(a, struct hc_bump_alloc, malloc);
+
+  if ((uint8_t *)p < ba->memory || (uint8_t *)p >= ba->memory + ba->size) {
+    _hc_release(ba->source, p);
+  }
+  
   // Do nothing
 }
 ```
