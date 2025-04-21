@@ -1,0 +1,50 @@
+[
+    {
+        "chapter_root": "macro",
+        "code_supplements": ["tests.c", "macro.h"]
+    },
+    {
+        "chapter_root": "fix",
+        "code_supplements": ["benchmark.c", "fix.h", "fix.c"]
+    },
+    {
+        "chapter_root": "list",
+        "code_supplements": ["tests.c", "list.h", "list.c"]
+    },
+    {
+        "chapter_root": "task",
+        "code_supplements": ["tests.c", "task.h", "task.c"]
+    },
+    {
+        "chapter_root": "malloc1",
+        "code_supplements": ["tests.c", "malloc1.h", "malloc1.c"]
+    },
+    {
+        "chapter_root": "vector",
+        "code_supplements": ["tests.c", "vector.h", "vector.c"]
+    },
+    {
+        "chapter_root": "error",
+        "code_supplements": ["tests.c", "error.h", "error.c"]
+    },
+    {
+        "chapter_root": "set",
+        "code_supplements": ["tests.c", "set.h", "set.c"]
+    },
+    {
+        "chapter_root": "malloc2",
+        "code_supplements": ["tests.c", "malloc2.h", "malloc2.c"]
+    },
+    {
+        "chapter_root": "dynamic",
+        "code_supplements": ["tests.c", "dynamic.h", "dynamic.c"]
+    },
+    {
+        "chapter_root": "stream1",
+        "code_supplements": ["tests.c", "stream1.h", "stream1.c"]
+    },
+    {
+        "chapter_root": "slog",
+        "code_supplements": ["tests.c", "slog.h", "slog.c"]
+    }
+]
