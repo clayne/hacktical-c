@@ -69,35 +69,60 @@ void hc_memo_alloc_deinit(struct hc_memo_alloc *a) {
 
 struct slab {
   struct hc_list slabs;
-  uint8_t slots[];
+  uint8_t *next;
+  uint8_t memory[];
 };
 
 
 static struct slab *add_slab(struct hc_slab_alloc *a) {
   struct slab *s = _hc_acquire(a->source,
 			       sizeof(struct slab) +
-			       a->slot_count * a->slot_size);
+			       a->slab_size);
   
-  hc_list_push_back(&a->slabs, &s->slabs);
-  a->slot_index = 0;
+  hc_list_push_front(&a->slabs, &s->slabs);
+  s->next = s->memory;
   return s;
 }
 
-static struct slab *get_slab(struct hc_slab_alloc *a) {
-  return (a->slot_index < a->slot_count)
-    ? hc_baseof(a->slabs.prev, struct slab, slabs)
-    : add_slab(a);
+static struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
+  struct slab *result = NULL;
+  
+  hc_list_do(&a->slabs, sl) {
+    struct slab *s = hc_baseof(sl, struct slab, slabs);
+    const uint8_t *const p = hc_align(s->next, size);
+
+    if (p + size > s->memory + a->slab_size) {
+      break;
+    }
+
+    result = s;
+  }
+
+  return result ? result : add_slab(a);
 }
 
 static void *slab_acquire(struct hc_malloc *a, const size_t size) {
   struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
-
-  if (size != sa->slot_size) {
+  struct slab *s = get_slab(sa, size);
+  uint8_t *const p = hc_align(s->next, size);
+  
+  if (p + size > s->memory + sa->slab_size) {
     hc_throw(HC_INVALID_SIZE);
   }
+
+  s->next = p + size;
+
+  while (s->slabs.next != &s->slabs) {
+    struct slab *ns = hc_baseof(s->slabs.next, struct slab, slabs);
+
+    if (ns->next - ns->memory > s->next - s->memory) {
+      hc_list_shift_back(&s->slabs);
+    } else {
+      break;
+    }
+  }
   
-  struct slab *s = get_slab(sa);
-  return s->slots + sa->slot_index++ * sa->slot_size;
+  return p;
 }
 
 static void slab_release(struct hc_malloc *a, void *p) {
@@ -114,6 +139,7 @@ struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
   hc_list_init(&a->slabs);
   a->slot_count = slot_count;
   a->slot_size = slot_size;
+  a->slab_size = slot_count * slot_size;
   add_slab(a);
   return a;
 }

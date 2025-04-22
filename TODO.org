@@ -1,17 +1,8 @@
 * finish slab allocator
-** allow <= count*size
-*** switch count*size to size
-*** move slot_index to slab.offset
-*** store slabs in reverse order of free space
-*** attempt to drill down
-*** allow new if head < size
+** add benchmark
+*** n ints
+*** malloc/free/bump/slab
 ** readme
-
-* add malloc2 benchmark
-** n ints
-** malloc/free
-** bump
-** slab
 
 * add _t suffix on typedefs
 

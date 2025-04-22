@@ -101,4 +101,18 @@ void memo_release(struct hc_malloc *a, void *p) {
 ```
 
 ### Slab Allocation
-Slab allocators acquire memory in fixed size blocks. They're commonly used in combination with a fixed allocation size, where each block (or slab) contain the same number of slots. We're going to add a tiny bit of flexibility by allowing different sizes as long as they don't exceed the size of a slab.
+Slab allocators acquire memory in fixed size blocks. They're commonly used in combination with a fixed allocation size, where each block (or slab) contains the same number of slots. We're going to introduce a tiny bit of flexibility by allowing different allocation sizes as long as they don't exceed the slab size.
+
+Example:
+```C
+struct hc_slab_alloc a;
+hc_slab_alloc_init(&a, hc_malloc(), 2, sizeof(int));
+
+hc_malloc_do(&a) {
+  const int *p1 = hc_acquire(sizeof(int));
+  const int *p2 = hc_acquire(sizeof(int));
+  assert(p2 == p1 + 1);
+  const int *p3 = hc_acquire(sizeof(int));
+  assert(p3 > p2 + 1);
+}
+```

@@ -27,5 +27,6 @@ struct hc_list *hc_list_peek_front(struct hc_list *l);
 void hc_list_push_back(struct hc_list *l, struct hc_list *it);
 struct hc_list *hc_list_pop_back(struct hc_list *l);
 struct hc_list *hc_list_peek_back(struct hc_list *l);
+void hc_list_shift_back(struct hc_list *l);
 
 #endif
