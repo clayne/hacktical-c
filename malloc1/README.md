@@ -140,16 +140,10 @@ void *bump_acquire(struct hc_malloc *m, size_t size) {
 }
 ```
 
-`release()` is delegated to `source` unless the pointer belongs to us, in which case it's a no op.
+`release()` is a no op.
 
 ```C
 void bump_release(struct hc_malloc *m, void *p) {
-  struct hc_bump_alloc *ba = hc_baseof(a, struct hc_bump_alloc, malloc);
-
-  if ((uint8_t *)p < ba->memory || (uint8_t *)p >= ba->memory + ba->size) {
-    _hc_release(ba->source, p);
-  }
-  
   // Do nothing
 }
 ```

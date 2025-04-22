@@ -5,8 +5,8 @@
 #include <setjmp.h>
 #include "macro/macro.h"
 
-#define HC_NO_MEMORY "ENO_MEMORY"
-#define HC_INVALID_SIZE "EINVALID_SIZE"
+#define HC_NO_MEMORY "NO_MEMORY"
+#define HC_INVALID_SIZE "INVALID_SIZE"
 
 #define hc_throw(m, ...) do {					\
     struct hc_error *_e =					\

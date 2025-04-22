@@ -1,4 +1,5 @@
-* finish slab allocator readme
+* finish slab allocator
+** readme
 
 * add malloc benchmark
 
