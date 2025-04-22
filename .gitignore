@@ -1,3 +1,5 @@
 build/
-epub/**/*.epub
-epub/**/*.md
+
+# ignore epub and .md files generated within sub-directories of the epub/ folder
+epub/*/**/*.epub
+epub/*/**/*.md
