@@ -16,7 +16,7 @@ I've been writing code for fun on a mostly daily basis since I got a Commodore 6
 
 I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Forth, Haskell, SmallTalk, Go, C#, Swift.
 
-For a long time, I didn't care much about C; the language felt primitive compared to the other languages I had experience with, especially C++. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously.
+For a long time, I didn't care much about C; the language felt primitive compared to other languages, especially C++. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously.
 
 Since then I've written a ton of C; and along the way I've picked up many interesting techniques that helped me make the most out of the language and appreciate it for its strengths.
 
