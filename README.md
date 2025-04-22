@@ -66,6 +66,8 @@ Some chapters come with benchmarks, `make build/benchmark` builds and runs all o
 ## Chapters
 The content is arranged to form a natural progression, where later chapters build on concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
 
+An `ePUB`-book may be built by following these [instructions](./epub/README.md).
+
 - [Macros](https://github.com/codr7/hacktical-c/tree/main/macro)
 - [Fixed-Point Arithmetic](https://github.com/codr7/hacktical-c/tree/main/fix)
 - [Intrusive Doubly Linked Lists](https://github.com/codr7/hacktical-c/tree/main/list)
@@ -79,4 +81,3 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Extensible Streams - Part 1](https://github.com/codr7/hacktical-c/tree/main/stream1)
 - [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
 
-[epub](./epub/README.md)
