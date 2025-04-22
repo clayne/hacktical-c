@@ -79,4 +79,4 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Extensible Streams - Part 1](https://github.com/codr7/hacktical-c/tree/main/stream1)
 - [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
 
-An ebook format of these chapters is also available to build from source. See [`epub/`](./epub/README.md) for more information.
+An ebook is also available to build from source, see [`epub/`](./epub/README.md) for more information.
