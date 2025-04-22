@@ -101,4 +101,4 @@ void memo_release(struct hc_malloc *a, void *p) {
 ```
 
 ### Slab Allocation
-Slab allocators allocate memory in slabs of `slot_count * slot_size` bytes.
+Slab allocators acquire memory in fixed size blocks. They're commonly used in combination with a fixed allocation size, where each block (or slab) contain the same number of slots. We're going to add a tiny bit of flexibility by allowing different sizes as long as they don't exceed the size of a slab.

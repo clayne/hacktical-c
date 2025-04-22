@@ -16,14 +16,14 @@ I've been writing code for fun on a mostly daily basis since I got a Commodore 6
 
 I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Forth, Haskell, SmallTalk, Go, C#, Swift.
 
-For a long time, I didn't care much about C at all, it felt very primitive compared to other languages. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously.
+For a long time, I didn't care much about C; the language felt primitive compared to the other languages I had experience with, especially C++. But gradually over time, I learned that the worst enemy in software is complexity, and started taking C more seriously.
 
-Since then I've written a ton of C; and along the way I've picked up many interesting, lesser known techniques that helped me make the most out of the language and appreciate it for its strengths.
+Since then I've written a ton of C; and along the way I've picked up many interesting techniques that helped me make the most out of the language and appreciate it for its strengths.
 
 ## Support
-If you would like to see this project succeed, all contributions are welcome.
+I've decided to release the project using an open license to benefit as many as possible, because I believe knowledge should be shared freely.
 
-I've decided to release the project using an open license to benefit as many as possible, because I believe knowledge should be shared freely. But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 
+But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 
 
 The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
 
