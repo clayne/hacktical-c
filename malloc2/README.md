@@ -109,10 +109,34 @@ struct hc_slab_alloc a;
 hc_slab_alloc_init(&a, hc_malloc(), 2, sizeof(int));
 
 hc_malloc_do(&a) {
+  // Same slab
   const int *p1 = hc_acquire(sizeof(int));
   const int *p2 = hc_acquire(sizeof(int));
   assert(p2 == p1 + 1);
+
+  // New slab
   const int *p3 = hc_acquire(sizeof(int));
   assert(p3 > p2 + 1);
 }
+```
+
+We'll use a `struct hc_list` to keep track of our slabs.
+
+```C
+struct hc_slab_alloc {
+  struct hc_malloc malloc;
+  struct hc_malloc *source;
+  struct hc_list slabs;
+  size_t slab_size;
+};
+```
+
+Slabs are defined as dynamically sized structs that track the current offset.
+
+```C
+struct slab {
+  struct hc_list slabs;
+  uint8_t *next;
+  uint8_t memory[];
+};
 ```

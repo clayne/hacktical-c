@@ -137,8 +137,6 @@ struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
   a->malloc.release = slab_release;
   a->source = source;
   hc_list_init(&a->slabs);
-  a->slot_count = slot_count;
-  a->slot_size = slot_size;
   a->slab_size = slot_count * slot_size;
   add_slab(a);
   return a;

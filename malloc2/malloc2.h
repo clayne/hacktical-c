@@ -27,8 +27,6 @@ struct hc_slab_alloc {
   struct hc_malloc malloc;
   struct hc_malloc *source;
   struct hc_list slabs;
-  size_t slot_count;
-  size_t slot_size;
   size_t slab_size;
 };
 
