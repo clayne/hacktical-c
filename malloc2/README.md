@@ -129,6 +129,25 @@ struct hc_slab_alloc {
   struct hc_list slabs;
   size_t slab_size;
 };
+
+struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
+					 struct hc_malloc *source,
+					 size_t slot_count,
+					 size_t slot_size) {
+  a->malloc.acquire = slab_acquire;
+  a->malloc.release = slab_release;
+  a->source = source;
+  hc_list_init(&a->slabs);
+  a->slab_size = slot_count * slot_size;
+  return a;
+}
+
+void hc_slab_alloc_deinit(struct hc_slab_alloc *a) {
+  hc_list_do(&a->slabs, _s) {
+    struct slab *s = hc_baseof(_s, struct slab, slabs);
+    _hc_release(a->source, s);
+  }
+}
 ```
 
 Slabs are defined as dynamically sized structs that track the current offset.
@@ -139,4 +158,75 @@ struct slab {
   uint8_t *next;
   uint8_t memory[];
 };
+```
+
+Slabs are ordered by available memory, descending. Finding a slab means startinh at the head of the list and moving down until we reach a slab that can't fit the allocation.
+
+```C
+struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
+  struct slab *result = NULL;
+  
+  hc_list_do(&a->slabs, sl) {
+    struct slab *s = hc_baseof(sl, struct slab, slabs);
+    uint8_t *p = hc_align(s->next, size);
+
+    if (p + size > s->memory + a->slab_size) {
+      break;
+    }
+
+    result = s;
+  }
+
+  return result ? result : add_slab(a);
+}
+```
+
+If no suitable slabs are found, we add a new one.
+
+```
+struct slab *add_slab(struct hc_slab_alloc *a) {
+  struct slab *s = _hc_acquire(a->source,
+			       sizeof(struct slab) +
+			       a->slab_size);
+  
+  hc_list_push_front(&a->slabs, &s->slabs);
+  s->next = s->memory;
+  return s;
+}
+```
+
+`acquire()` checks the size, gets a slab, and finally adjusts it's position before returning the pointer.
+
+```C
+void *slab_acquire(struct hc_malloc *a, const size_t size) {
+  struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
+
+  if (size > sa->slab_size) {
+    hc_throw(HC_INVALID_SIZE);
+  }
+
+  struct slab *s = get_slab(sa, size);
+  uint8_t *p = hc_align(s->next, size);
+  s->next = p + size;
+
+  while (s->slabs.next != &s->slabs) {
+    struct slab *ns = hc_baseof(s->slabs.next, struct slab, slabs);
+
+    if (ns->next - ns->memory > s->next - s->memory) {
+      hc_list_shift_back(&s->slabs);
+    } else {
+      break;
+    }
+  }
+  
+  return p;
+}
+```
+
+`release()` is a no op.
+
+```
+void slab_release(struct hc_malloc *a, void *p) {
+  // Do nothing
+}
 ```

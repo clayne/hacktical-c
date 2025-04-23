@@ -2,12 +2,11 @@
 ** add benchmark
 *** n ints
 *** malloc/free/bump/slab
-** readme
 
 * add _t suffix on typedefs
 
 * finish dsl
-** rename to dsl1?
+** rename to dsl1
 ** add id reader
 ** add fix reader
 1.2 3.4 +

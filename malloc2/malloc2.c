@@ -73,7 +73,6 @@ struct slab {
   uint8_t memory[];
 };
 
-
 static struct slab *add_slab(struct hc_slab_alloc *a) {
   struct slab *s = _hc_acquire(a->source,
 			       sizeof(struct slab) +
@@ -89,7 +88,7 @@ static struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
   
   hc_list_do(&a->slabs, sl) {
     struct slab *s = hc_baseof(sl, struct slab, slabs);
-    const uint8_t *const p = hc_align(s->next, size);
+    uint8_t *p = hc_align(s->next, size);
 
     if (p + size > s->memory + a->slab_size) {
       break;
@@ -103,13 +102,13 @@ static struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
 
 static void *slab_acquire(struct hc_malloc *a, const size_t size) {
   struct hc_slab_alloc *sa = hc_baseof(a, struct hc_slab_alloc, malloc);
-  struct slab *s = get_slab(sa, size);
-  uint8_t *const p = hc_align(s->next, size);
-  
-  if (p + size > s->memory + sa->slab_size) {
+
+  if (size > sa->slab_size) {
     hc_throw(HC_INVALID_SIZE);
   }
 
+  struct slab *s = get_slab(sa, size);
+  uint8_t *p = hc_align(s->next, size);
   s->next = p + size;
 
   while (s->slabs.next != &s->slabs) {
@@ -126,7 +125,7 @@ static void *slab_acquire(struct hc_malloc *a, const size_t size) {
 }
 
 static void slab_release(struct hc_malloc *a, void *p) {
-  //Do nothing
+  // Do nothing
 }
 
 struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
@@ -138,7 +137,6 @@ struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
   a->source = source;
   hc_list_init(&a->slabs);
   a->slab_size = slot_count * slot_size;
-  add_slab(a);
   return a;
 }
 

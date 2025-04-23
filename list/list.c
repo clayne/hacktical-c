@@ -20,12 +20,12 @@ void hc_list_push_front(struct hc_list *l, struct hc_list *it) {
 }
 
 struct hc_list *hc_list_pop_front(struct hc_list *l) {
-  struct hc_list *const it = l->next;
+  struct hc_list *it = l->next;
   return (it == l) ? NULL : hc_list_delete(it);
 }
 
 struct hc_list *hc_list_peek_front(struct hc_list *l) {
-  struct hc_list *const it = l->next;
+  struct hc_list *it = l->next;
   return (it == l) ? NULL : it;
 }
 
@@ -37,12 +37,12 @@ void hc_list_push_back(struct hc_list *l, struct hc_list *it) {
 }
 
 struct hc_list *hc_list_pop_back(struct hc_list *l) {
-  struct hc_list *const it = l->prev;
+  struct hc_list *it = l->prev;
   return (it == l) ? NULL : hc_list_delete(it);
 }
 
 struct hc_list *hc_list_peek_back(struct hc_list *l) {
-  struct hc_list *const it = l->prev;
+  struct hc_list *it = l->prev;
   return (it == l) ? NULL : it;
 }
 
