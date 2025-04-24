@@ -2,6 +2,7 @@
 #define HACKTICAL_DSL_H
 
 #include "fix/fix.h"
+#include "list/list.h"
 #include "set/set.h"
 #include "stream1/stream1.h"
 #include "vector/vector.h"
@@ -74,6 +75,7 @@ struct hc_form_type {
 };
   
 struct hc_form {
+  struct hc_list owner;
   const struct hc_form_type *type;
   struct hc_sloc sloc;
 };
