@@ -20,6 +20,9 @@ For a long time, I didn't care much about C; the language felt primitive compare
 
 Since then I've written a ton of C; and along the way I've picked up many interesting techniques that helped me make the most out of the language and appreciate it for its strengths.
 
+## License
+The content of this book is openly licensed via [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
 ## Support
 I've decided to release the project using an open license to benefit as many as possible, because I believe knowledge should be shared freely.
 
