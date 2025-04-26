@@ -32,8 +32,7 @@ struct hc_slab_alloc {
 
 struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
 					 struct hc_malloc *source,
-					 size_t slot_count,
-					 size_t slot_size);
+					 size_t slab_size);
 
 void hc_slab_alloc_deinit(struct hc_slab_alloc *a);
 

@@ -31,15 +31,19 @@ static void memo_tests() {
 
 static void slab_tests() {
   struct hc_slab_alloc a;
-  hc_slab_alloc_init(&a, hc_malloc(), 2, sizeof(int));
+  hc_slab_alloc_init(&a, hc_malloc(), 2 * sizeof(int));
   assert(a.slab_size == 2 * sizeof(int));
 
   hc_malloc_do(&a) {
     const int *p1 = hc_acquire(sizeof(int));
     const int *p2 = hc_acquire(sizeof(int));
     assert(p2 == p1 + 1);
+
     const int *p3 = hc_acquire(sizeof(int));
     assert(p3 > p2 + 1);
+    
+    const int *p4 = hc_acquire(10 * sizeof(int));
+    assert(p4 > p3 + 1);
   }
 
   hc_slab_alloc_deinit(&a);
