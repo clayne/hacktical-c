@@ -4,11 +4,13 @@ export LDFLAGS=
 
 CHAPTERS=build/chrono.o build/dsl.o build/dynamic.o build/error.o build/fix.o build/list.o build/malloc1.o build/malloc2.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o
 
-build/test: clean tests.c $(CHAPTERS) 
+all: clean build/test build/benchmark
+
+build/test: tests.c $(CHAPTERS) 
 	$(CC) $(CFLAGS) tests.c $(CHAPTERS) -o build/test
 	valgrind build/test
 
-build/benchmark: clean benchmarks.c $(CHAPTERS) 
+build/benchmark: benchmarks.c $(CHAPTERS) 
 	$(CC) $(CFLAGS) benchmarks.c $(CHAPTERS) -o build/benchmark
 	build/benchmark
 
