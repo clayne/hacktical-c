@@ -1,7 +1,7 @@
 #include "chrono/chrono.h"
 #include "fix.h"
 
-void fix_benchmark() {
+void fix_benchmarks() {
   struct hc_time t;
   const int n = 100000;
 

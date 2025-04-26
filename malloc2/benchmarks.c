@@ -3,7 +3,7 @@
 #include "chrono/chrono.h"
 #include "malloc2.h"
 
-static void malloc_benchmark(const int n, const int s) {
+static void run_malloc(const int n, const int s) {
   int *ps[n];
   struct hc_time t = hc_now();
   
@@ -18,7 +18,7 @@ static void malloc_benchmark(const int n, const int s) {
   hc_time_print(&t, "malloc: "); 
 }
 
-static void bump_benchmark(const int n, const int s) {
+static void run_bump(const int n, const int s) {
   struct hc_bump_alloc a;
   hc_bump_alloc_init(&a, hc_malloc(), n * s);
   struct hc_time t = hc_now();
@@ -33,9 +33,9 @@ static void bump_benchmark(const int n, const int s) {
   hc_time_print(&t, "bump: ");
 }
 
-static void slab_benchmark(const int n, const int s) {
+static void run_slab(const int n, const int s) {
   struct hc_slab_alloc a;
-  hc_slab_alloc_init(&a, hc_malloc(), n * s);
+  hc_slab_alloc_init(&a, hc_malloc(), n * s / 10);
   struct hc_time t = hc_now();
 
   hc_malloc_do(&a) {
@@ -48,11 +48,11 @@ static void slab_benchmark(const int n, const int s) {
   hc_time_print(&t, "slab: ");
 }
 
-void malloc2_benchmark() {
+void malloc2_benchmarks() {
   const int n = 1000000;
   const int s = sizeof(int);
   
-  malloc_benchmark(n, s);
-  bump_benchmark(n, s);
-  slab_benchmark(n, s);
+  run_malloc(n, s);
+  run_bump(n, s);
+  run_slab(n, s);
 }

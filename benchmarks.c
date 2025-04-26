@@ -1,11 +1,11 @@
 #include "error/error.h"
 
-#include "fix/benchmark.c"
-#include "malloc2/benchmark.c"
+#include "fix/benchmarks.c"
+#include "malloc2/benchmarks.c"
 
 int main() {
-  fix_benchmark();
-  malloc2_benchmark();
+  fix_benchmarks();
+  malloc2_benchmarks();
 
   hc_errors_deinit();
   return 0;
