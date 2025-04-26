@@ -49,7 +49,7 @@ static void run_slab(const int n, const int s) {
 }
 
 void malloc2_benchmarks() {
-  const int n = 1000000;
+  const int n = 10000;
   const int s = sizeof(int);
   
   run_malloc(n, s);
