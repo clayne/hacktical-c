@@ -74,10 +74,7 @@ struct slab {
 };
 
 static struct slab *add_slab(struct hc_slab_alloc *a, const size_t size) {
-  struct slab *s = _hc_acquire(a->source,
-			       sizeof(struct slab) +
-			       size);
-  
+  struct slab *s = _hc_acquire(a->source, sizeof(struct slab) + size);
   hc_list_push_front(&a->slabs, &s->slabs);
   s->next = s->memory;
   return s;

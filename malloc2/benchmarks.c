@@ -3,29 +3,33 @@
 #include "chrono/chrono.h"
 #include "malloc2.h"
 
-static void run_malloc(const int n, const int s) {
-  int *ps[n];
+#define N 1000
+#define MAX_SIZE 64
+#define GET_SIZE() ((rand() % MAX_SIZE) + 1)
+
+static void run_malloc() {
+  int *ps[N];
   struct hc_time t = hc_now();
   
-  for (int i = 0; i < n; i++) {
-    ps[i] = malloc(s);
+  for (int i = 0; i < N; i++) {
+    ps[i] = malloc(GET_SIZE());
   }
 
-  for (int i = 0; i < n; i++) {
+  for (int i = 0; i < N; i++) {
     free(ps[i]);
   }
 
   hc_time_print(&t, "malloc: "); 
 }
 
-static void run_bump(const int n, const int s) {
+static void run_bump() {
   struct hc_bump_alloc a;
-  hc_bump_alloc_init(&a, hc_malloc(), n * s);
+  hc_bump_alloc_init(&a, hc_malloc(), N * MAX_SIZE);
   struct hc_time t = hc_now();
 
   hc_malloc_do(&a) {
-    for (int i = 0; i < n; i++) {
-      hc_acquire(s);
+    for (int i = 0; i < N; i++) {
+      hc_acquire(GET_SIZE());
     }
   }
 
@@ -33,14 +37,14 @@ static void run_bump(const int n, const int s) {
   hc_time_print(&t, "bump: ");
 }
 
-static void run_slab(const int n, const int s) {
+static void run_slab() {
   struct hc_slab_alloc a;
-  hc_slab_alloc_init(&a, hc_malloc(), n * s / 10);
+  hc_slab_alloc_init(&a, hc_malloc(), N);
   struct hc_time t = hc_now();
 
   hc_malloc_do(&a) {
-    for (int i = 0; i < n; i++) {
-      hc_acquire(s);
+    for (int i = 0; i < N; i++) {
+      hc_acquire(GET_SIZE());
     }
   }
 
@@ -49,10 +53,14 @@ static void run_slab(const int n, const int s) {
 }
 
 void malloc2_benchmarks() {
-  const int n = 1000;
-  const int s = sizeof(int);
+  const int s = time(NULL);
   
-  run_malloc(n, s);
-  run_bump(n, s);
-  run_slab(n, s);
+  srand(s);
+  run_malloc();
+
+  srand(s);
+  run_bump();
+
+  srand(s);
+  run_slab();
 }
