@@ -40,7 +40,7 @@ struct hc_slog_field {
     bool as_bool;
     int as_int;
     char *as_string;
-    struct hc_time as_time;
+    hc_time_t as_time;
   };  
 };
 ```

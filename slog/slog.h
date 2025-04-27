@@ -33,7 +33,7 @@ struct hc_slog_field {
     bool as_bool;
     int as_int;
     char *as_string;
-    struct hc_time as_time;
+    hc_time_t as_time;
   };  
 };
 
@@ -60,7 +60,7 @@ struct hc_slog_field;
 struct hc_slog_field hc_slog_bool(const char *name, bool value);
 struct hc_slog_field hc_slog_int(const char *name, int value);
 struct hc_slog_field hc_slog_string(const char *name, const char *value);
-struct hc_slog_field hc_slog_time(const char *name, struct hc_time value);
+struct hc_slog_field hc_slog_time(const char *name, hc_time_t value);
 
 #define hc_slog_deinit(s)			\
   _hc_slog_deinit(&(s)->slog)

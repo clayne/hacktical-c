@@ -9,7 +9,7 @@
 
 static void run_malloc() {
   int *ps[N];
-  struct hc_time t = hc_now();
+  hc_time_t t = hc_now();
   
   for (int i = 0; i < N; i++) {
     ps[i] = malloc(GET_SIZE());
@@ -25,7 +25,7 @@ static void run_malloc() {
 static void run_bump() {
   struct hc_bump_alloc a;
   hc_bump_alloc_init(&a, hc_malloc(), N * MAX_SIZE);
-  struct hc_time t = hc_now();
+  hc_time_t t = hc_now();
 
   hc_malloc_do(&a) {
     for (int i = 0; i < N; i++) {
@@ -40,7 +40,7 @@ static void run_bump() {
 static void run_slab() {
   struct hc_slab_alloc a;
   hc_slab_alloc_init(&a, hc_malloc(), N);
-  struct hc_time t = hc_now();
+  hc_time_t t = hc_now();
 
   hc_malloc_do(&a) {
     for (int i = 0; i < N; i++) {

@@ -2,7 +2,7 @@
 #include "fix.h"
 
 void fix_benchmarks() {
-  struct hc_time t;
+  hc_time_t t;
   const int n = 100000;
 
   t = hc_now();

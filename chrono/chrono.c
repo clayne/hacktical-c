@@ -6,8 +6,8 @@
 #include "error/error.h"
 #include "malloc1/malloc1.h"
 
-struct hc_time hc_now() {
-  struct hc_time t;
+hc_time_t hc_now() {
+  hc_time_t t;
   
   if (!timespec_get(&t.value, TIME_UTC)) {
     hc_throw("Failed getting time: %d", errno);
@@ -16,7 +16,7 @@ struct hc_time hc_now() {
   return t;
 }
 
-struct hc_time hc_time(int year,
+hc_time_t hc_time(int year,
 		       int month,
 		       int day,
 		       int hour,
@@ -30,12 +30,12 @@ struct hc_time hc_time(int year,
   t.tm_min = minute;
   t.tm_sec = second;
 
-  struct hc_time result = {0};
+  hc_time_t result = {0};
   result.value.tv_sec = timegm(&t);
   return result;
 }
 
-uint64_t hc_time_ns(const struct hc_time *t) {
+uint64_t hc_time_ns(const hc_time_t *t) {
   const struct timespec now = hc_now().value;
   
   return
@@ -43,11 +43,11 @@ uint64_t hc_time_ns(const struct hc_time *t) {
     (now.tv_nsec - t->value.tv_nsec);
 }
 
-void hc_time_print(const struct hc_time *t, const char *m) {
+void hc_time_print(const hc_time_t *t, const char *m) {
   printf("%s%" PRIu64 "ns\n", m, hc_time_ns(t));
 }
 
-char *hc_time_printf(const struct hc_time *t, const char *spec) {
+char *hc_time_printf(const hc_time_t *t, const char *spec) {
   struct tm tm;
   gmtime_r(&(t->value.tv_sec), &tm);
   size_t len = 8;

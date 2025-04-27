@@ -113,7 +113,7 @@ struct hc_slog_field hc_slog_string(const char *name, const char *value) {
 }
 
 struct hc_slog_field hc_slog_time(const char *name,
-				  const struct hc_time value) {
+				  const hc_time_t value) {
   struct hc_slog_field f;  
   field_init(&f, name, HC_SLOG_TIME);
   f.as_time = value;
