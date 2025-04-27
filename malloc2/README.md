@@ -101,12 +101,12 @@ void memo_release(struct hc_malloc *a, void *p) {
 ```
 
 ### Slab Allocation
-Slab allocators acquire memory in fixed size blocks. They're commonly used in combination with a fixed allocation size, where each block (or slab) contains the same number of slots. We're going to introduce a tiny bit of flexibility to allow different allocation sizes.
+Slab allocators acquire memory in fixed size blocks, or slabs. They're commonly used in combination with a fixed allocation size, where each slab contains the same number of slots. We're going to introduce a tiny bit of flexibility by allowing different allocation sizes.
 
 Example:
 ```C
 struct hc_slab_alloc a;
-hc_slab_alloc_init(&a, hc_malloc(), 2, sizeof(int));
+hc_slab_alloc_init(&a, hc_malloc(), 2 * sizeof(int));
 
 hc_malloc_do(&a) {
   // Same slab
@@ -149,7 +149,7 @@ void hc_slab_alloc_deinit(struct hc_slab_alloc *a) {
 }
 ```
 
-Slabs are defined as dynamically sized structs that track the current offset.
+Slabs are defined as dynamically sized structs that keep track of used/available memory.
 
 ```C
 struct slab {
@@ -159,7 +159,7 @@ struct slab {
 };
 ```
 
-Slabs are ordered by available memory, descending. Finding a slab means moving down the list until we reach a slab that can't fit the allocation and returning the previous slab. Allocation with sizes that exceed the slab size skip the search.
+Slabs are ordered by available memory, descending. Finding a slab means moving down the list until we reach a slab that can't fit the allocation and returning the previous slab. Allocation sizes that exceed the specified slab size always return new custom sized slabs.
 
 ```C
 struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
@@ -184,7 +184,7 @@ struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
 }
 ```
 
-If no suitable slabs are found, we add a new one.
+If no suitable slabs are found, a new one is added.
 
 ```
 struct slab *add_slab(struct hc_slab_alloc *a, size_t size) {
@@ -198,7 +198,7 @@ struct slab *add_slab(struct hc_slab_alloc *a, size_t size) {
 }
 ```
 
-`acquire()` gets a slab and adjusts it's position in the list before returning a pointer to the new allocation.
+`acquire()` gets a slab and adjusts it's position in the list before returning a pointer to the allocation.
 
 ```C
 void *slab_acquire(struct hc_malloc *a, const size_t size) {
