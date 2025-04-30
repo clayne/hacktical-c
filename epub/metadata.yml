@@ -10,5 +10,5 @@ identifier:
 # the book are recognized as the same book.
 - scheme: URN
   text: urn:uuid:4eb54e25-66bf-4f42-9ee3-16fd2e7e1de5
-rights: Open License
+rights: CC BY-NC-ND 4.0
 ...
