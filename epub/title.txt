@@ -1,6 +1,0 @@
----
-title: Hacktical C
-author: Andreas Codr7
-rights: Open License
-language: en-US
-...
