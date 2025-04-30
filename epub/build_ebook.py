@@ -2,6 +2,7 @@
 # pylint: disable=missing-function-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=line-too-long
+# pylint: disable=consider-using-f-string
 
 import argparse
 import dataclasses
@@ -21,7 +22,7 @@ class BuildConfig:
     output_dir: pathlib.Path
     output_int_dir: pathlib.Path
     output_epub_path: pathlib.Path
-    title_data_path: pathlib.Path
+    epub_metadata_path: pathlib.Path
     css_path: pathlib.Path
     chapters_data_json: pathlib.Path
     chapters_root: pathlib.Path
@@ -79,7 +80,7 @@ def main() -> None:
     logging.debug("output directory: %s", config.output_dir)
     logging.debug("intermediate output directory: %s", config.output_int_dir)
     logging.debug("output epub path: %s", config.output_epub_path)
-    logging.debug("title data path: %s", config.title_data_path)
+    logging.debug("epub metadata path: %s", config.epub_metadata_path)
     logging.debug("book css path: %s", config.css_path)
     logging.debug("chapters data json path: %s", config.chapters_data_json)
     logging.debug("chapters root: %s", config.chapters_root)
@@ -114,7 +115,8 @@ def main() -> None:
             PANDOC_EXE_NAME,
             "-o", str(config.output_epub_path),
             "--css", str(config.css_path),
-            "--toc", str(config.title_data_path),
+            "--toc", # auto-generate ToC
+            "--metadata-file", str(config.epub_metadata_path),
             ] + [str(p) for p in formatted_chapter_file_paths]
         logging.debug("generating %s: cmd=%s", config.output_epub_path, pandoc_args)
 
@@ -146,7 +148,7 @@ def parse_config(args: argparse.Namespace) -> BuildConfig:
     output_dir = output_dir.resolve()
     output_int_dir = output_dir / "int"
     output_epub_path = output_dir / args.output_epub_name
-    title_data_path = script_dir / "title.txt"
+    epub_metadata_path = script_dir / "metadata.yml"
     book_css_path = script_dir / "styles.css"
     chapters_data_json_path = script_dir / "book_data.json"
     chapters_root = chapters_root.resolve()
@@ -155,7 +157,7 @@ def parse_config(args: argparse.Namespace) -> BuildConfig:
         output_dir=output_dir,
         output_int_dir=output_int_dir,
         output_epub_path=output_epub_path,
-        title_data_path=title_data_path,
+        epub_metadata_path=epub_metadata_path,
         css_path=book_css_path,
         chapters_data_json=chapters_data_json_path,
         chapters_root=chapters_root)
@@ -222,24 +224,25 @@ def reformat_chapter_data(
         reformatted_chapter_content_lines = [ line.rstrip() for line in f.readlines() ]
         if len(reformatted_chapter_content_lines) < 1:
             raise RuntimeError(f"missing title line in {main_chapter_file}")
-        title_line_match = CHAPTER_TITLE_LINE_RE.match(reformatted_chapter_content_lines[0])
-        if title_line_match is None:
+        chapter_title_line_match = CHAPTER_TITLE_LINE_RE.match(reformatted_chapter_content_lines[0])
+        if chapter_title_line_match is None:
             raise RuntimeError(f"first line isn't title line in {main_chapter_file}: {reformatted_chapter_content_lines[0]}")
 
-        section_name: str = title_line_match.group(1)
-        new_title_line = "# Ch %d. %s" % (chapter_number, section_name)
+        section_name: str = chapter_title_line_match.group(1)
+        new_chapter_title_line = "# Ch %d. %s" % (chapter_number, section_name)
 
-        reformatted_chapter_content_lines[0] = new_title_line
+        reformatted_chapter_content_lines[0] = new_chapter_title_line
 
     section_name_file_id = section_name.replace(" ", "_")
     chapter_file_prefix = f"CHAPTER_{chapter_number:02d}_{section_name_file_id}"
     reformatted_chapter_file_path = output_int_path / f"{chapter_file_prefix}_MAIN.md"
+
     write_file_lines(reformatted_chapter_file_path, reformatted_chapter_content_lines)
     logging.debug("generated %s", reformatted_chapter_file_path)
 
     if len(chapter_data.code_supplements) > 0:
         supplement_chapter_title = f"# Supplements: {section_name}"
-        new_chap_supplement_path = output_int_path / f"{chapter_file_prefix}_SUPP.md"
+        new_chapter_supplement_path = output_int_path / f"{chapter_file_prefix}_SUPP.md"
 
         supplement_chapter_lines = []
 
@@ -256,12 +259,13 @@ def reformat_chapter_data(
                 supplement_chapter_lines += ( line.rstrip() for line in f.readlines() )
             supplement_chapter_lines.append("```")
 
-        write_file_lines(new_chap_supplement_path, supplement_chapter_lines)
-        logging.debug("generated %s", new_chap_supplement_path)
-    else:
-        new_chap_supplement_path = None
+        write_file_lines(new_chapter_supplement_path, supplement_chapter_lines)
+        logging.debug("generated %s", new_chapter_supplement_path)
 
-    return (reformatted_chapter_file_path, new_chap_supplement_path)
+    else:
+        new_chapter_supplement_path = None
+
+    return (reformatted_chapter_file_path, new_chapter_supplement_path)
 
 def write_file_lines(filepath: pathlib.Path, lines: list[str], line_separator='\n', encoding="utf8"):
     """
