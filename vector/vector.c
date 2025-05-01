@@ -20,7 +20,7 @@ struct hc_vector *hc_vector_init(struct hc_vector *v,
 }
 
 void hc_vector_deinit(struct hc_vector *v) {
-  if (v->items) { free(v->items); }
+  if (v->items) { _hc_release(v->malloc, v->items); }
 }
 
 void hc_vector_grow(struct hc_vector *v, const size_t capacity) {

@@ -1,5 +1,5 @@
-#ifndef HACKTICAL_DSL_H
-#define HACKTICAL_DSL_H
+#ifndef HACKTICAL_DSL1_H
+#define HACKTICAL_DSL1_H
 
 #include "fix/fix.h"
 #include "list/list.h"
@@ -69,16 +69,25 @@ struct hc_sloc hc_sloc(const char *source, int row, int col);
 struct hc_form;
 
 struct hc_form_type {
-  void (*deinit)(struct hc_form *, struct hc_dsl *);
+  void (*deinit)(struct hc_form *);
   void (*emit)(const struct hc_form *, struct hc_dsl *);
   void (*print)(const struct hc_form *, struct hc_stream *);
 };
   
 struct hc_form {
-  struct hc_list owner;
   const struct hc_form_type *type;
   struct hc_sloc sloc;
+  struct hc_list list;
 };
+
+void hc_form_init(struct hc_form *f,
+		  const struct hc_form_type *type,
+		  struct hc_sloc sloc,
+		  struct hc_list *list);
+
+void hc_form_deinit(struct hc_form *f);
+
+struct hc_form_type *hc_id_form();
 
 struct hc_id {
   struct hc_form form;
@@ -87,6 +96,7 @@ struct hc_id {
 
 void hc_id_init(struct hc_id *f,
 		struct hc_sloc sloc,
+		struct hc_list *list,
 		const char *name);
 
 struct hc_literal {
@@ -96,7 +106,18 @@ struct hc_literal {
 
 void hc_literal_init(struct hc_literal *f,
 		     struct hc_sloc sloc,
+		     struct hc_list *list,
 		     hc_fix value);
+
+void hc_skip_ws(const char **in, struct hc_sloc *sloc);
+
+bool hc_read_id(const char **in,
+		struct hc_list *out,
+		struct hc_sloc *sloc);
+
+bool hc_read_form(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc);
 
 struct hc_op {
   const char *name;

@@ -18,6 +18,11 @@ size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, const size_t n) {
   return s->get(s, data, n);
 }
 
+char _hc_stream_getc(struct hc_stream *s) {
+  char c = 0;
+  return _hc_stream_get(s, (uint8_t *)&c, 1) ? c : 0;
+}
+
 size_t _hc_stream_put(struct hc_stream *s,
 		      const uint8_t *data,
 		      const size_t n) {

@@ -20,6 +20,9 @@ struct hc_stream {
 #define hc_stream_get(s, d, n)			\
   _hc_stream_get(&(s)->stream, d, n)
 
+#define hc_stream_getc(s)			\
+  _hc_stream_getc(&(s)->stream)
+
 #define hc_stream_put(s, d, n)			\
   _hc_stream_put(&(s)->stream, d, n)
 
@@ -37,6 +40,7 @@ struct hc_stream {
 
 void _hc_stream_deinit(struct hc_stream *s);
 size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, size_t n);
+char _hc_stream_getc(struct hc_stream *s);
 size_t _hc_stream_put(struct hc_stream *s, const uint8_t *data, size_t n);
 size_t _hc_stream_putc(struct hc_stream *s, char data);
 size_t _hc_stream_puts(struct hc_stream *s, const char *data);

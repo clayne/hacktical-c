@@ -2,7 +2,7 @@ export CC=ccache gcc
 export CFLAGS=-g -O0 -flto -Wall -fsanitize=undefined -I. -lm
 export LDFLAGS=
 
-CHAPTERS=build/chrono.o build/dsl.o build/dynamic.o build/error.o build/fix.o build/list.o build/malloc1.o build/malloc2.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o
+CHAPTERS=build/chrono.o build/dsl1.o build/dynamic.o build/error.o build/fix.o build/list.o build/malloc1.o build/malloc2.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o
 
 all: clean build/test build/benchmark
 
@@ -14,8 +14,8 @@ build/benchmark: benchmarks.c $(CHAPTERS)
 	$(CC) $(CFLAGS) benchmarks.c $(CHAPTERS) -o build/benchmark
 	build/benchmark
 
-build/dsl.o:
-	$(MAKE) -C dsl
+build/dsl1.o:
+	$(MAKE) -C dsl1
 
 build/dynamic.o:
 	$(MAKE) -C dynamic
