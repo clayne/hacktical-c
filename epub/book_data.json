@@ -5,7 +5,7 @@
     },
     {
         "chapter_root": "fix",
-        "code_supplements": ["benchmark.c", "fix.h", "fix.c"]
+        "code_supplements": ["benchmarks.c", "fix.h", "fix.c"]
     },
     {
         "chapter_root": "list",
