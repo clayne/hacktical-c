@@ -13,7 +13,7 @@ struct hc_stream;
 typedef uint64_t hc_fix_t;
 
 uint32_t hc_scale(uint8_t exp);
-hc_fix_t hc_fix_new(uint8_t exp, int64_t val);
+hc_fix_t hc_fix(uint8_t exp, int64_t val);
 
 uint8_t hc_fix_exp(hc_fix_t x);
 int64_t hc_fix_val(hc_fix_t x);

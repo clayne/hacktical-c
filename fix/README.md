@@ -15,7 +15,7 @@ typedef uint64_t hc_fix_t;
 The constructor takes an exponent and a pre-scaled, signed value.
 
 ```C
-hc_fix_t hc_fix_new(uint8_t exp, int64_t val) {
+hc_fix_t hc_fix(uint8_t exp, int64_t val) {
   return (hc_fix_t)hc_bitmask(exp, HC_FIX_EXP) +
     (hc_fix_t)(((val < 0) ? 1 : 0) << HC_FIX_EXP) +
     (hc_fix_t)(hc_abs(val) << HC_FIX_HDR);
@@ -24,7 +24,7 @@ hc_fix_t hc_fix_new(uint8_t exp, int64_t val) {
 
 Example:
 ```C
-const hc_fix_t x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix(2, -125);
 assert(hc_fix_exp(x) == 2);
 assert(hc_fix_val(x) == -125);
 ```
@@ -45,7 +45,7 @@ int64_t hc_fix_frac(hc_fix_t x) {
 
 Example:
 ```C
-const hc_fix_t x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix(2, -125);
 assert(hc_fix_int(x) == -1);
 assert(hc_fix_frac(x) == -25);
 ```
@@ -60,7 +60,7 @@ double hc_fix_t_double(hc_fix_t x) {
 
 Example:
 ```C
-const hc_fix_t x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix(2, -125);
 assert(hc_fix_double(x) == -1.25);
 ```
 
@@ -72,33 +72,33 @@ hc_fix_t hc_fix_add(hc_fix_t x, hc_fix_t y) {
   const uint8_t ye = hc_fix_exp(y);
 
   if (xe == ye) {
-    return hc_fix_new(xe, hc_fix_val(x) + hc_fix_val(y));
+    return hc_fix(xe, hc_fix_val(x) + hc_fix_val(y));
   }
     
-  return hc_fix_new(xe, hc_fix_val(x) +
+  return hc_fix(xe, hc_fix_val(x) +
 		    hc_fix_val(y) * hc_scale(xe) / hc_scale(ye));
 }
 ```
 
 Example:
 ```C
-const hc_fix_t x = hc_fix_new(2, 175);
-const hc_fix_t y = hc_fix_new(2, 25);
-assert(hc_fix_add(x, y) == hc_fix_new(2, 200));
+const hc_fix_t x = hc_fix(2, 175);
+const hc_fix_t y = hc_fix(2, 25);
+assert(hc_fix_add(x, y) == hc_fix(2, 200));
 ```
 
 Multiplication and division are likewise identical except for the operator.
 
 ```C
 hc_fix_t hc_fix_mul(hc_fix_t x, hc_fix_t y) {
-  return hc_fix_new(hc_fix_exp(x), hc_fix_val(x) *
+  return hc_fix(hc_fix_exp(x), hc_fix_val(x) *
 		    hc_fix_val(y) / hc_scale(hc_fix_exp(y)));
 }
 ```
 
 Example:
 ```C
-const hc_fix_t x = hc_fix_new(2, 150);
-const hc_fix_t y = hc_fix_new(1, 5);
-assert(hc_fix_mul(x, y) == hc_fix_new(2, 75));
+const hc_fix_t x = hc_fix(2, 150);
+const hc_fix_t y = hc_fix(1, 5);
+assert(hc_fix_mul(x, y) == hc_fix(2, 75));
 ```
