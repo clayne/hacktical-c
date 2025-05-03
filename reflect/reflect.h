@@ -4,19 +4,15 @@
 #include "chrono/chrono.h"
 #include "fix/fix.h"
 
-void hc_strncpy(char *dst, const char *src, size_t n);
-
 struct hc_value;
 
 struct hc_type {
-  char name[32];
+  const char *name;
   
   void (*copy)(struct hc_value *dst, struct hc_value *src);
   void (*deinit)(struct hc_value *);
   void (*write)(const struct hc_value *, struct hc_stream *out);
 };
-
-void hc_type_init(struct hc_type *t, const char *name);
 
 struct hc_value {
   const struct hc_type *type;

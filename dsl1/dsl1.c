@@ -336,10 +336,10 @@ static void fun_write(const struct hc_value *v, struct hc_stream *out) {
 
 const struct hc_type *HC_DSL_FUN() {
   static __thread struct hc_type t = {
+    .name = "DSL/Fun",
     .copy = fun_copy,
     .write = fun_write
   };
 
-  hc_type_init(&t, "DSL/Fun");
   return &t;
 }

@@ -5,20 +5,6 @@
 #include "reflect.h"
 #include "stream1/stream1.h"
 
-void hc_strncpy(char *dst, const char *src, size_t n) {
-  while (--n) {
-    *dst = *src;
-    dst++;
-    src++;
-  }
-
-  *dst = 0;
-}
-
-void hc_type_init(struct hc_type *t, const char *name) {
-  hc_strncpy(t->name, name, sizeof(t->name));
-}
-
 struct hc_value *hc_value_init(struct hc_value *v, const struct hc_type *t) {
   v->type = t;
   return v;
@@ -53,11 +39,11 @@ static void fix_write(const struct hc_value *v, struct hc_stream *out) {
 
 const struct hc_type *HC_FIX() {
   static __thread struct hc_type t = {
+    .name = "Fix",
     .copy = fix_copy,
     .write = fix_write
   };
 
-  hc_type_init(&t, "Fix");
   return &t;
 }
 
@@ -71,11 +57,11 @@ static void int_write(const struct hc_value *v, struct hc_stream *out) {
 
 const struct hc_type *HC_INT() {
   static __thread struct hc_type t = {
+    .name = "Int",
     .copy = int_copy,
     .write = int_write
   };
 
-  hc_type_init(&t, "Int");
   return &t;
 }
 
@@ -93,12 +79,12 @@ static void string_write(const struct hc_value *v, struct hc_stream *out) {
 
 const struct hc_type *HC_STRING() {
   static __thread struct hc_type t = {
+    .name = "String",
     .copy = string_copy,
     .deinit = string_deinit,
     .write = string_write
   };
 
-  hc_type_init(&t, "String");
   return &t;
 }
 
@@ -112,10 +98,10 @@ static void time_write(const struct hc_value *v, struct hc_stream *out) {
 
 const struct hc_type *HC_TIME() {
   static __thread struct hc_type t = {
+    .name = "Time",
     .copy = time_copy,
     .write = time_write
   };
 
-  hc_type_init(&t, "Time");
   return &t;
 }
