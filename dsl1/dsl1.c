@@ -138,7 +138,7 @@ static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
 
   if (v->type == HC_DSL_FUN()) {
     hc_dsl_emit(dsl,
-		&hc_call_op,
+		&HC_CALL,
 		&(struct hc_call_op){
 		  .target = v->as_other,
 		  .sloc = _f->sloc
@@ -146,7 +146,7 @@ static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   } else if (v->type == HC_FIX()) {
     struct hc_push_op op;
     hc_value_copy(&op.value, v);
-    hc_dsl_emit(dsl, &hc_push_op, &op);
+    hc_dsl_emit(dsl, &HC_PUSH, &op);
   } else {
     hc_throw("Invald value: %d", v->type->name);
   }
@@ -183,12 +183,12 @@ static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
   struct hc_push_op op;
   hc_value_copy(&op.value, &f->value);
-  hc_dsl_emit(dsl, &hc_push_op, &op);
+  hc_dsl_emit(dsl, &HC_PUSH, &op);
 }
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
-  hc_value_print(&f->value, out);
+  hc_value_write(&f->value, out);
 }
 
 void hc_literal_init(struct hc_literal *f,
@@ -267,10 +267,10 @@ bool hc_read_form(const char **in,
 static const uint8_t *call_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_call_op *op = (void *)data;
   op->target(dsl, op->sloc);
-  return data + hc_call_op.size;
+  return data + HC_CALL.size;
 }
 
-const struct hc_op hc_call_op = (struct hc_op){
+const struct hc_op HC_CALL = (struct hc_op){
   .name = "call",
   .size = sizeof(struct hc_call_op),
   .eval = call_eval
@@ -284,10 +284,10 @@ static void push_deinit(uint8_t *data) {
 static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_push_op *op = (void *)data;
   hc_value_copy(hc_dsl_push(dsl), &op->value);
-  return data + hc_push_op.size;
+  return data + HC_PUSH.size;
 }
 
-const struct hc_op hc_push_op = (struct hc_op){
+const struct hc_op HC_PUSH = (struct hc_op){
   .name = "push",
   .size = sizeof(struct hc_push_op),
   .deinit = push_deinit,
@@ -298,24 +298,24 @@ static const uint8_t *stop_eval(struct hc_dsl *dsl, const uint8_t *data) {
   return dsl->code.end;
 }
 
-const struct hc_op hc_stop_op = (struct hc_op){
+const struct hc_op HC_STOP = (struct hc_op){
   .name = "stop",
   .size = 0,
   .eval = stop_eval
 };
 
 static void fun_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_int = src->as_int;
+  dst->as_other = src->as_other;
 }
 
-static void fun_print(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_printf(out, "%d", v->as_int);
+static void fun_write(const struct hc_value *v, struct hc_stream *out) {
+  _hc_stream_printf(out, "%p", v->as_other);
 }
 
 const struct hc_type *HC_DSL_FUN() {
   static __thread struct hc_type t = {
     .copy = fun_copy,
-    .print = fun_print
+    .write = fun_write
   };
 
   hc_type_init(&t, "DSL/Fun");

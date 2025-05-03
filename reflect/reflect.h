@@ -13,7 +13,7 @@ struct hc_type {
   
   void (*copy)(struct hc_value *dst, struct hc_value *src);
   void (*deinit)(struct hc_value *);
-  void (*print)(const struct hc_value *, struct hc_stream *out);
+  void (*write)(const struct hc_value *, struct hc_stream *out);
 };
 
 void hc_type_init(struct hc_type *t, const char *name);
@@ -33,7 +33,7 @@ struct hc_value {
 struct hc_value *hc_value_init(struct hc_value *v, const struct hc_type *t);
 void hc_value_deinit(struct hc_value *v);
 struct hc_value *hc_value_copy(struct hc_value *dst, struct hc_value *src);
-void hc_value_print(struct hc_value *v, struct hc_stream *out);
+void hc_value_write(struct hc_value *v, struct hc_stream *out);
 
 const struct hc_type *HC_FIX();
 const struct hc_type *HC_INT();

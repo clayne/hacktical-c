@@ -38,23 +38,23 @@ struct hc_value *hc_value_copy(struct hc_value *dst, struct hc_value *src) {
   return dst;
 }
 
-void hc_value_print(struct hc_value *v, struct hc_stream *out) {
-  assert(v->type->print);
-  v->type->print(v, out);
+void hc_value_write(struct hc_value *v, struct hc_stream *out) {
+  assert(v->type->write);
+  v->type->write(v, out);
 }
 
 static void fix_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_fix = src->as_fix;
 }
 
-static void fix_print(const struct hc_value *v, struct hc_stream *out) {
+static void fix_write(const struct hc_value *v, struct hc_stream *out) {
   hc_fix_print(v->as_fix, out);
 }
 
 const struct hc_type *HC_FIX() {
   static __thread struct hc_type t = {
     .copy = fix_copy,
-    .print = fix_print
+    .write = fix_write
   };
 
   hc_type_init(&t, "Fix");
@@ -65,14 +65,14 @@ static void int_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_int = src->as_int;
 }
 
-static void int_print(const struct hc_value *v, struct hc_stream *out) {
+static void int_write(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_printf(out, "%d", v->as_int);
 }
 
 const struct hc_type *HC_INT() {
   static __thread struct hc_type t = {
     .copy = int_copy,
-    .print = int_print
+    .write = int_write
   };
 
   hc_type_init(&t, "Int");
@@ -87,7 +87,7 @@ static void string_deinit(struct hc_value *v) {
   free(v->as_string);
 }
 
-static void string_print(const struct hc_value *v, struct hc_stream *out) {
+static void string_write(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_puts(out, v->as_string);
 }
 
@@ -95,7 +95,7 @@ const struct hc_type *HC_STRING() {
   static __thread struct hc_type t = {
     .copy = string_copy,
     .deinit = string_deinit,
-    .print = string_print
+    .write = string_write
   };
 
   hc_type_init(&t, "String");
@@ -106,14 +106,14 @@ static void time_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_time = src->as_time;
 }
 
-static void time_print(const struct hc_value *v, struct hc_stream *out) {
+static void time_write(const struct hc_value *v, struct hc_stream *out) {
   hc_time_printf(&v->as_time, HC_TIME_FORMAT, out);
 }
 
 const struct hc_type *HC_TIME() {
   static __thread struct hc_type t = {
     .copy = time_copy,
-    .print = time_print
+    .write = time_write
   };
 
   hc_type_init(&t, "Time");

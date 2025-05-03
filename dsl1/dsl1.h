@@ -128,8 +128,8 @@ struct hc_push_op {
   struct hc_value value;
 };
 
-extern const struct hc_op hc_call_op;
-extern const struct hc_op hc_push_op;
-extern const struct hc_op hc_stop_op;
+extern const struct hc_op HC_CALL;
+extern const struct hc_op HC_PUSH;
+extern const struct hc_op HC_STOP;
 
 #endif
