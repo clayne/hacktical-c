@@ -47,13 +47,13 @@ void hc_vector_grow(struct hc_vector *v, int capacity) {
 A macro is provided to simplify looping.
 
 ```C
-#define _hc_vector_do(v, _v, var)			\
-  struct hc_vector *_v = v;				\
-  for (uint8_t *var = _v->start;			\
-       var < _v->end;					\
+#define _hc_vector_do(v, _v, var)
+  struct hc_vector *_v = v;
+  for (void *var = _v->start;
+       var < (void *)_v->end;
        var += _v->item_size)
 
-#define hc_vector_do(v, var)				\
+#define hc_vector_do(v, var)
   _hc_vector_do(v, hc_unique(vector), var)
 ```
 

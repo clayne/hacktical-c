@@ -38,7 +38,27 @@ void hc_dsl_init(struct hc_dsl *dsl) {
   hc_vector_init(&dsl->stack, sizeof(struct hc_value));
 }
 
-void hc_dsl_deinit(struct hc_dsl *dsl) {
+static size_t op_size(const struct hc_op *op, struct hc_dsl *dsl) {
+  return ceil(op->size / dsl->code.item_size);
+}
+
+static void deinit_ops(struct hc_dsl *dsl) {
+  uint8_t *p = dsl->code.start;
+  
+  hc_vector_do(&dsl->ops, _op) {
+    const struct hc_op *op = *(const struct hc_op **)_op;
+    p += sizeof(hc_op_eval_t);
+
+    if (op->deinit) {
+      op->deinit(p);
+    }
+
+    p += op_size(op, dsl);
+  }
+}
+
+void hc_dsl_deinit(struct hc_dsl *dsl) {  
+  deinit_ops(dsl);
   hc_vector_deinit(&dsl->code);
   hc_set_deinit(&dsl->env);
   hc_vector_deinit(&dsl->ops);
@@ -87,9 +107,11 @@ hc_pc hc_dsl_emit(struct hc_dsl *dsl,
 		  const void *data) {
   *(const struct hc_op **)hc_vector_push(&dsl->ops) = op;
   const hc_pc pc = dsl->code.length;
+  
   uint8_t *p = hc_vector_insert(&dsl->code,
 				dsl->code.length,
-				ceil(op->size / dsl->code.item_size) + 1);
+				op_size(op, dsl) + 1);
+  
   *(hc_op_eval_t *)p = op->eval;
   memcpy(p + dsl->code.item_size, data, op->size);
   return pc;
