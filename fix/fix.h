@@ -10,23 +10,23 @@
 
 struct hc_stream;
 
-typedef uint64_t hc_fix;
+typedef uint64_t hc_fix_t;
 
 uint32_t hc_scale(uint8_t exp);
-hc_fix hc_fix_new(uint8_t exp, int64_t val);
+hc_fix_t hc_fix_new(uint8_t exp, int64_t val);
 
-uint8_t hc_fix_exp(hc_fix x);
-int64_t hc_fix_val(hc_fix x);
-double hc_fix_double(hc_fix x);
+uint8_t hc_fix_exp(hc_fix_t x);
+int64_t hc_fix_val(hc_fix_t x);
+double hc_fix_double(hc_fix_t x);
 
-hc_fix hc_fix_add(hc_fix x, hc_fix y);
-hc_fix hc_fix_sub(hc_fix x, hc_fix y);
-hc_fix hc_fix_mul(hc_fix x, hc_fix y);
-hc_fix hc_fix_div(hc_fix x, hc_fix y);
+hc_fix_t hc_fix_add(hc_fix_t x, hc_fix_t y);
+hc_fix_t hc_fix_sub(hc_fix_t x, hc_fix_t y);
+hc_fix_t hc_fix_mul(hc_fix_t x, hc_fix_t y);
+hc_fix_t hc_fix_div(hc_fix_t x, hc_fix_t y);
 
-int64_t hc_fix_int(hc_fix x);
-int64_t hc_fix_frac(hc_fix x);
+int64_t hc_fix_int(hc_fix_t x);
+int64_t hc_fix_frac(hc_fix_t x);
 
-void hc_fix_print(const hc_fix v, struct hc_stream *out);
+void hc_fix_print(const hc_fix_t v, struct hc_stream *out);
 
 #endif

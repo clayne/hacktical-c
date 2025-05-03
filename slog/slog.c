@@ -81,9 +81,8 @@ static void field_write(struct hc_slog_field *f, struct hc_stream *out) {
     _hc_stream_printf(out, "%s=\"%s\"", f->name, f->as_string);
     break;
   case HC_SLOG_TIME: {
-    char *s = hc_time_printf(&f->as_time, "%Y-%m-%dT%H:%M:%S");
-    _hc_stream_printf(out, "%s=%s", f->name, s);
-    hc_release(s);
+    _hc_stream_printf(out, "%s=", f->name);
+    hc_time_printf(&f->as_time, HC_TIME_FORMAT, out);
     break;
   }
   default:

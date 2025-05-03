@@ -15,8 +15,8 @@ void fix_benchmarks() {
   hc_time_print(&t, "double: "); 
 
   t = hc_now();
-  hc_fix fv = hc_fix_new(3, 0);
-  hc_fix fd = hc_fix_new(3, 1);
+  hc_fix_t fv = hc_fix_new(3, 0);
+  hc_fix_t fd = hc_fix_new(3, 1);
   
   for (int i = 0; i < n; i++) {
     fv = hc_fix_add(fv, fd);

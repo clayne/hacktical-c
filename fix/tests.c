@@ -34,7 +34,7 @@ static void test_mul() {
 }
 
 static void test_new() {
-  hc_fix x = hc_fix_new(2, -125);
+  hc_fix_t x = hc_fix_new(2, -125);
   assert(hc_fix_exp(x) == 2);
   assert(hc_fix_val(x) == -125);
   assert(hc_fix_int(x) == -1);

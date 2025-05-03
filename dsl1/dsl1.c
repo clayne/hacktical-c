@@ -28,32 +28,34 @@ static const void *env_key(const void *x) {
 }
 
 void hc_dsl_init(struct hc_dsl *dsl) {
-  hc_vector_init(&dsl->code, sizeof(hc_op_eval));
+  hc_vector_init(&dsl->code, sizeof(hc_op_eval_t));
 
   hc_set_init(&dsl->env, sizeof(struct env_item), env_cmp);
   dsl->env.key = env_key;
   
-  hc_vector_init(&dsl->registers, sizeof(hc_fix));
-  hc_vector_init(&dsl->stack, sizeof(hc_fix));
+  hc_vector_init(&dsl->ops, sizeof(const struct hc_op *));
+  hc_vector_init(&dsl->registers, sizeof(struct hc_value));
+  hc_vector_init(&dsl->stack, sizeof(struct hc_value));
 }
 
 void hc_dsl_deinit(struct hc_dsl *dsl) {
   hc_vector_deinit(&dsl->code);
   hc_set_deinit(&dsl->env);
+  hc_vector_deinit(&dsl->ops);
   hc_vector_deinit(&dsl->registers);
   hc_vector_deinit(&dsl->stack);
 }
 
-struct hc_value hc_dsl_getenv(struct hc_dsl *dsl,
-			      const char *key,
-			      const struct hc_sloc sloc) {
+struct hc_value *hc_dsl_getenv(struct hc_dsl *dsl,
+			       const char *key,
+			       const struct hc_sloc sloc) {
   struct env_item *found = hc_set_find(&dsl->env, &key);
-
+  
   if (!found) {
     hc_throw("Unknown identifier: %s", key);
   }
-
-  return found->value;
+  
+  return &found->value;
 }
 
 void hc_dsl_setenv(struct hc_dsl *dsl,
@@ -68,26 +70,27 @@ void hc_dsl_setenv(struct hc_dsl *dsl,
   it->value = value;
 }
 
-void hc_dsl_push(struct hc_dsl *dsl, const hc_fix v) {
-  *(hc_fix *)hc_vector_push(&dsl->stack) = v;
+struct hc_value *hc_dsl_push(struct hc_dsl *dsl) {
+  return hc_vector_push(&dsl->stack);
 }
 
-hc_fix hc_dsl_peek(struct hc_dsl *dsl) {
-  return *(hc_fix *)hc_vector_peek(&dsl->stack);
+struct hc_value *hc_dsl_peek(struct hc_dsl *dsl) {
+  return hc_vector_peek(&dsl->stack);
 }
 
-hc_fix hc_dsl_pop(struct hc_dsl *dsl) {
-  return *(hc_fix *)hc_vector_pop(&dsl->stack);
+struct hc_value *hc_dsl_pop(struct hc_dsl *dsl) {
+  return hc_vector_pop(&dsl->stack);
 }
 
 hc_pc hc_dsl_emit(struct hc_dsl *dsl,
 		  const struct hc_op *op,
 		  const void *data) {
+  *(const struct hc_op **)hc_vector_push(&dsl->ops) = op;
   const hc_pc pc = dsl->code.length;
   uint8_t *p = hc_vector_insert(&dsl->code,
 				dsl->code.length,
 				ceil(op->size / dsl->code.item_size) + 1);
-  *(hc_op_eval *)p = op->eval;
+  *(hc_op_eval_t *)p = op->eval;
   memcpy(p + dsl->code.item_size, data, op->size);
   return pc;
 }
@@ -101,7 +104,7 @@ void hc_dsl_eval(struct hc_dsl *dsl,
 
   for (const uint8_t *p = hc_vector_get(&dsl->code, start_pc);
        p != ep;
-       p = (*(hc_op_eval *)p)(dsl, p + dsl->code.item_size));
+       p = (*(hc_op_eval_t *)p)(dsl, p + dsl->code.item_size));
 }
 
 struct hc_sloc hc_sloc(const char *source, int row, int col) {
@@ -129,34 +132,29 @@ static void id_deinit(struct hc_form *f) {
   free(hc_baseof(f, struct hc_id, form)->name);
 }
 
-static void id_emit(const struct hc_form *f, struct hc_dsl *dsl) {
-  struct hc_id *id = hc_baseof(f, struct hc_id, form);
-  const struct hc_value v = hc_dsl_getenv(dsl, id->name, f->sloc);
+static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
 
-  switch (v.type) {
-  case HC_DSL_FUN:
+  if (v->type == HC_DSL_FUN()) {
     hc_dsl_emit(dsl,
 		&hc_call_op,
 		&(struct hc_call_op){
-		  .target = v.as_fun,
-		  .sloc = f->sloc
+		  .target = v->as_other,
+		  .sloc = _f->sloc
 		});
-    break;
-  case HC_DSL_FIX:
-    hc_dsl_emit(dsl,
-		&hc_push_op,
-		&(struct hc_push_op){
-		  .value = v.as_fix
-		});
-    break;
-  default:
-    hc_throw("Invald value: %d", v.type);
+  } else if (v->type == HC_FIX()) {
+    struct hc_push_op op;
+    hc_value_copy(&op.value, v);
+    hc_dsl_emit(dsl, &hc_push_op, &op);
+  } else {
+    hc_throw("Invald value: %d", v->type->name);
   }
 }
 
-static void id_print(const struct hc_form *f, struct hc_stream *out) {
-  struct hc_id *id = hc_baseof(f, struct hc_id, form);
-  _hc_stream_puts(out, id->name);
+static void id_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  _hc_stream_puts(out, f->name);
 }
 
 struct hc_form_type *hc_id_form() {
@@ -177,33 +175,34 @@ void hc_id_init(struct hc_id *f,
   f->name = strdup(name);
 }
 
-static void literal_emit(const struct hc_form *f, struct hc_dsl *dsl) {
-  struct hc_literal *lt = hc_baseof(f, struct hc_literal, form); 
-
-  hc_dsl_emit(dsl,
-	      &hc_push_op,
-	      &(struct hc_push_op){
-		.value = lt->value
-	      });
+static void literal_deinit(struct hc_form *f) {
+  hc_value_deinit(&hc_baseof(f, struct hc_literal, form)->value);
 }
 
-static void literal_print(const struct hc_form *f, struct hc_stream *out) {
-  struct hc_literal *lt = hc_baseof(f, struct hc_literal, form);
-  hc_fix_print(lt->value, out);
+static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
+  struct hc_push_op op;
+  hc_value_copy(&op.value, &f->value);
+  hc_dsl_emit(dsl, &hc_push_op, &op);
+}
+
+static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
+  hc_value_print(&f->value, out);
 }
 
 void hc_literal_init(struct hc_literal *f,
 		     const struct hc_sloc sloc,
 		     struct hc_list *list,
-		     const hc_fix value) {
+		     struct hc_value *value) {
   static const struct hc_form_type type = {
-    .deinit = NULL,
+    .deinit = literal_deinit,
     .emit = literal_emit,
     .print = literal_print
   };
   
   hc_form_init(&f->form, &type, sloc, list);
-  f->value = value;
+  hc_value_copy(&f->value, value);
 }
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
@@ -277,15 +276,21 @@ const struct hc_op hc_call_op = (struct hc_op){
   .eval = call_eval
 };
 
+static void push_deinit(uint8_t *data) {
+  struct hc_push_op *op = (void *)data;
+  hc_value_deinit(&op->value);
+}
+
 static const uint8_t *push_eval(struct hc_dsl *dsl, const uint8_t *data) {
   struct hc_push_op *op = (void *)data;
-  hc_dsl_push(dsl, op->value);
+  hc_value_copy(hc_dsl_push(dsl), &op->value);
   return data + hc_push_op.size;
 }
 
 const struct hc_op hc_push_op = (struct hc_op){
   .name = "push",
   .size = sizeof(struct hc_push_op),
+  .deinit = push_deinit,
   .eval = push_eval
 };
 
@@ -298,3 +303,21 @@ const struct hc_op hc_stop_op = (struct hc_op){
   .size = 0,
   .eval = stop_eval
 };
+
+static void fun_copy(struct hc_value *dst, struct hc_value *src) {
+  dst->as_int = src->as_int;
+}
+
+static void fun_print(const struct hc_value *v, struct hc_stream *out) {
+  _hc_stream_printf(out, "%d", v->as_int);
+}
+
+const struct hc_type *HC_DSL_FUN() {
+  static __thread struct hc_type t = {
+    .copy = fun_copy,
+    .print = fun_print
+  };
+
+  hc_type_init(&t, "DSL/Fun");
+  return &t;
+}

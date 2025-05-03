@@ -9,22 +9,22 @@ We'll use unsigned 64-bit integers to store fixed-point values; using 3 bits for
 #define HC_FIX_EXP 3
 #define HC_FIX_HDR (HC_FIX_EXP+1)
 
-typedef uint64_t hc_fix;
+typedef uint64_t hc_fix_t;
 ```
 
 The constructor takes an exponent and a pre-scaled, signed value.
 
 ```C
-hc_fix hc_fix_new(uint8_t exp, int64_t val) {
-  return (hc_fix)hc_bitmask(exp, HC_FIX_EXP) +
-    (hc_fix)(((val < 0) ? 1 : 0) << HC_FIX_EXP) +
-    (hc_fix)(hc_abs(val) << HC_FIX_HDR);
+hc_fix_t hc_fix_new(uint8_t exp, int64_t val) {
+  return (hc_fix_t)hc_bitmask(exp, HC_FIX_EXP) +
+    (hc_fix_t)(((val < 0) ? 1 : 0) << HC_FIX_EXP) +
+    (hc_fix_t)(hc_abs(val) << HC_FIX_HDR);
 }
 ```
 
 Example:
 ```C
-const hc_fix x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix_new(2, -125);
 assert(hc_fix_exp(x) == 2);
 assert(hc_fix_val(x) == -125);
 ```
@@ -32,11 +32,11 @@ assert(hc_fix_val(x) == -125);
 `hc_fix_int()` and `hc_fix_frac()` returns signed integer and fractional parts respectively.
 
 ```C
-int64_t hc_fix_int(hc_fix x) {
+int64_t hc_fix_int(hc_fix_t x) {
   return hc_fix_val(x) / hc_scale(hc_fix_exp(x));
 }
 
-int64_t hc_fix_frac(hc_fix x) {
+int64_t hc_fix_frac(hc_fix_t x) {
   const int64_t xv = hc_fix_val(x);
   const uint32_t xs = hc_scale(hc_fix_exp(x));
   return xv - (xv / xs) * xs;
@@ -45,7 +45,7 @@ int64_t hc_fix_frac(hc_fix x) {
 
 Example:
 ```C
-const hc_fix x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix_new(2, -125);
 assert(hc_fix_int(x) == -1);
 assert(hc_fix_frac(x) == -25);
 ```
@@ -53,21 +53,21 @@ assert(hc_fix_frac(x) == -25);
 `hc_fix_double()` converts to signed double precision floating point.
 
 ```C
-double hc_fix_double(hc_fix x) {
+double hc_fix_t_double(hc_fix_t x) {
   return hc_fix_val(x) / (double)hc_scale(hc_fix_exp(x));
 }
 ```
 
 Example:
 ```C
-const hc_fix x = hc_fix_new(2, -125);
+const hc_fix_t x = hc_fix_new(2, -125);
 assert(hc_fix_double(x) == -1.25);
 ```
 
 Addition and subtraction are identical except for the operator, the left hand side exponent is preserved. A fast path is provided for the case when both values share the same exponent.
 
 ```C
-hc_fix hc_fix_add(hc_fix x, hc_fix y) {
+hc_fix_t hc_fix_add(hc_fix_t x, hc_fix_t y) {
   const uint8_t xe = hc_fix_exp(x);
   const uint8_t ye = hc_fix_exp(y);
 
@@ -82,15 +82,15 @@ hc_fix hc_fix_add(hc_fix x, hc_fix y) {
 
 Example:
 ```C
-const hc_fix x = hc_fix_new(2, 175);
-const hc_fix y = hc_fix_new(2, 25);
+const hc_fix_t x = hc_fix_new(2, 175);
+const hc_fix_t y = hc_fix_new(2, 25);
 assert(hc_fix_add(x, y) == hc_fix_new(2, 200));
 ```
 
 Multiplication and division are likewise identical except for the operator.
 
 ```C
-hc_fix hc_fix_mul(hc_fix x, hc_fix y) {
+hc_fix_t hc_fix_mul(hc_fix_t x, hc_fix_t y) {
   return hc_fix_new(hc_fix_exp(x), hc_fix_val(x) *
 		    hc_fix_val(y) / hc_scale(hc_fix_exp(y)));
 }
@@ -98,7 +98,7 @@ hc_fix hc_fix_mul(hc_fix x, hc_fix y) {
 
 Example:
 ```C
-const hc_fix x = hc_fix_new(2, 150);
-const hc_fix y = hc_fix_new(1, 5);
+const hc_fix_t x = hc_fix_new(2, 150);
+const hc_fix_t y = hc_fix_new(1, 5);
 assert(hc_fix_mul(x, y) == hc_fix_new(2, 75));
 ```
