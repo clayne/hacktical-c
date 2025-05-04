@@ -82,5 +82,6 @@ An `ePUB`-book may be built by following these [instructions](./epub/README.md).
 - [Composable Memory Allocators - Part 2](https://github.com/codr7/hacktical-c/tree/main/malloc2)
 - [Dynamic Compilation](https://github.com/codr7/hacktical-c/tree/main/dynamic)
 - [Extensible Streams - Part 1](https://github.com/codr7/hacktical-c/tree/main/stream1)
+- [Reflection](https://github.com/codr7/hacktical-c/tree/main/reflect)
 - [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
 
