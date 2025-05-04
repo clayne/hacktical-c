@@ -1,7 +1,7 @@
 ## Reflection
 Reflection is the ability of a program to examine and introspect its own structure and behavior. Since `C` lacks built-in support, we're going to add a layer of types and values on top. By itself, the functionality doesn't look very useful, but it enables generalizing over types when implementing other features.
 
-A type contains a name and the operations we wan't to be able to perform polymorphically.
+A type contains a name and a set of basic operations we wan't to be able to perform polymorphically.
 
 ```C
 struct hc_type {

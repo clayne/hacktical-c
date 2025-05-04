@@ -83,4 +83,4 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Reflection](https://github.com/codr7/hacktical-c/tree/main/reflect)
 - [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
 
-The contents of the book may be exported in `ePub`-format by following these [instructions](./epub/README.md).
+The entire book may be exported in `ePub`-format by following these [instructions](./epub/README.md).
