@@ -64,10 +64,10 @@ struct hc_slog_field *hc_slog_time(const char *name, hc_time_t value);
 #define hc_slog_write(...)			\
   _hc_slog_write(hc_slog(), ##__VA_ARGS__)
 
-#define hc_slog_stream_init(s, out, ...)				\
-  _hc_slog_stream_init(s, out, (struct hc_slog_stream_opts){		\
-      .close_out = false,						\
-      ##__VA_ARGS__							\
+#define hc_slog_stream_init(s, out, ...)			\
+  _hc_slog_stream_init(s, out, (struct hc_slog_stream_opts){	\
+      .close_out = false,					\
+      ##__VA_ARGS__						\
     })
 
 struct hc_slog_stream *_hc_slog_stream_init(struct hc_slog_stream *s,
