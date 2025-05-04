@@ -210,7 +210,7 @@ static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
-  hc_value_write(&f->value, out);
+  hc_value_put(&f->value, out);
 }
 
 void hc_literal_init(struct hc_literal *f,
@@ -330,7 +330,7 @@ static void fun_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_other = src->as_other;
 }
 
-static void fun_write(const struct hc_value *v, struct hc_stream *out) {
+static void fun_put(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_printf(out, "%p", v->as_other);
 }
 
@@ -338,7 +338,7 @@ const struct hc_type *HC_DSL_FUN() {
   static __thread struct hc_type t = {
     .name = "DSL/Fun",
     .copy = fun_copy,
-    .write = fun_write
+    .put = fun_put
   };
 
   return &t;
