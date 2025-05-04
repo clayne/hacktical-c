@@ -29,6 +29,24 @@ void hc_value_put(struct hc_value *v, struct hc_stream *out) {
   v->type->put(v, out);
 }
 
+static void bool_copy(struct hc_value *dst, struct hc_value *src) {
+  dst->as_bool = src->as_bool;
+}
+
+static void bool_put(const struct hc_value *v, struct hc_stream *out) {
+  _hc_stream_puts(out, v->as_bool ? "true" : "false");
+}
+
+const struct hc_type *HC_BOOL() {
+  static __thread struct hc_type t = {
+    .name = "Bool",
+    .copy = bool_copy,
+    .put = bool_put
+  };
+
+  return &t;
+}
+
 static void fix_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_fix = src->as_fix;
 }
@@ -74,7 +92,9 @@ static void string_deinit(struct hc_value *v) {
 }
 
 static void string_put(const struct hc_value *v, struct hc_stream *out) {
+  _hc_stream_putc(out, '"');
   _hc_stream_puts(out, v->as_string);
+  _hc_stream_putc(out, '"');
 }
 
 const struct hc_type *HC_STRING() {
