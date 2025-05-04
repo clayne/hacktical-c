@@ -3,7 +3,7 @@ Reflection is the ability of a program to examine and introspect its own structu
 
 A type contains a name and the operations we wan't to be able to perform polymorphically.
 
-```
+```C
 struct hc_type {
   const char *name;
   
@@ -15,7 +15,7 @@ struct hc_type {
 
 Values are implemented as tagged unions, with an option to store other kinds of values as `void *`.
 
-```
+```C
 struct hc_value {
   const struct hc_type *type;
   
@@ -32,7 +32,7 @@ struct hc_value {
 
 The standard types are provided as thread local constants.
 
-```
+```C
 static void bool_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_bool = src->as_bool;
 }
