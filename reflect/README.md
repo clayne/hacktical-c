@@ -52,14 +52,19 @@ void hc_value_deinit(struct hc_value *v) {
 }
 ```
 
-`copy` sets the type and calls the method.
+`copy` is optional and defaults to bit-wise.
 
 ```C
 struct hc_value *hc_value_copy(struct hc_value *dst, struct hc_value *src) {
   const struct hc_type *t = src->type;
-  assert(t->copy);
-  dst->type = t;
-  t->copy(dst, src);
+  
+  if (t->copy) {
+    dst->type = t;
+    t->copy(dst, src);
+  } else {
+    *dst = *src;
+  }
+
   return dst;
 }
 ```
@@ -79,49 +84,37 @@ void hc_value_print(struct hc_value *v, struct hc_stream *out) {
 The standard types are defined as constants.
 
 ```C
-static void bool_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_bool = src->as_bool;
-}
-
 static void bool_write(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_puts(out, v->as_bool ? "true" : "false");
 }
 
 const struct hc_type HC_BOOL = {
   .name = "Bool",
-  .copy = bool_copy,
+  .copy = NULL,
   .write = bool_write
 };
 ```
 
 ```C
-static void fix_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_fix = src->as_fix;
-}
-
 static void fix_write(const struct hc_value *v, struct hc_stream *out) {
   hc_fix_print(v->as_fix, out);
 }
 
 const struct hc_type HC_FIX = {
   .name = "Fix",
-  .copy = fix_copy,
+  .copy = NULL,
   .write = fix_write
 };
 ```
 
 ```C
-static void int_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_int = src->as_int;
-}
-
 static void int_write(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_printf(out, "%d", v->as_int);
 }
 
 const struct hc_type HC_INT = {
   .name = "Int",
-  .copy = int_copy,
+  .copy = NULL,
   .write = int_write
 };
 ```
@@ -152,17 +145,13 @@ const struct hc_type HC_STRING = {
 ```
 
 ```C
-static void time_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_time = src->as_time;
-}
-
 static void time_write(const struct hc_value *v, struct hc_stream *out) {
   hc_time_printf(&v->as_time, HC_TIME_FORMAT, out);
 }
 
 const struct hc_type HC_TIME = {
   .name = "Time",
-  .copy = time_copy,
+  .copy = NULL,
   .write = time_write
 };
 ```

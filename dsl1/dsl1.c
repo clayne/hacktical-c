@@ -326,17 +326,13 @@ const struct hc_op HC_STOP = (struct hc_op){
   .eval = stop_eval
 };
 
-static void fun_copy(struct hc_value *dst, struct hc_value *src) {
-  dst->as_other = src->as_other;
-}
-
 static void fun_print(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_printf(out, "%p", v->as_other);
 }
 
 const struct hc_type HC_DSL_FUN = {
   .name = "DSL/Fun",
-  .copy = fun_copy,
+  .copy = NULL,
   .print = fun_print
 };
 
