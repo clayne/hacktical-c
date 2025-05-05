@@ -10,7 +10,7 @@ This book assumes basic programming knowledge. We're not going to spend a lot of
 Keep in mind it's very much a work in progress, mind the gaps, and please report any issues you come across or suggestions for improvements in the repo.
 
 ## About the author
-You could say that there are three kinds of programmers, with very different motivations; academics, gold diggers and hackers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a change in the real world.
+You could say that there are three kinds of programmers, with very different motivations; academics, hackers and gold diggers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a positive change in the real world.
 
 I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
