@@ -158,14 +158,14 @@ static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
   struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
 
-  if (v->type == HC_DSL_FUN()) {
+  if (v->type == &HC_DSL_FUN) {
     hc_dsl_emit(dsl,
 		&HC_CALL,
 		&(struct hc_call_op){
 		  .target = v->as_other,
 		  .sloc = _f->sloc
 		});
-  } else if (v->type == HC_FIX()) {
+  } else if (v->type == &HC_FIX) {
     struct hc_push_op op;
     hc_value_copy(&op.value, v);
     hc_dsl_emit(dsl, &HC_PUSH, &op);
@@ -210,7 +210,7 @@ static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
-  hc_value_put(&f->value, out);
+  hc_value_write(&f->value, out);
 }
 
 void hc_literal_init(struct hc_literal *f,
@@ -330,16 +330,13 @@ static void fun_copy(struct hc_value *dst, struct hc_value *src) {
   dst->as_other = src->as_other;
 }
 
-static void fun_put(const struct hc_value *v, struct hc_stream *out) {
+static void fun_print(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_printf(out, "%p", v->as_other);
 }
 
-const struct hc_type *HC_DSL_FUN() {
-  static __thread struct hc_type t = {
-    .name = "DSL/Fun",
-    .copy = fun_copy,
-    .put = fun_put
-  };
+const struct hc_type HC_DSL_FUN = {
+  .name = "DSL/Fun",
+  .copy = fun_copy,
+  .print = fun_print
+};
 
-  return &t;
-}

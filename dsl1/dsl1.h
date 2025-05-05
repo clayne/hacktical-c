@@ -46,7 +46,7 @@ void hc_dsl_eval(struct hc_dsl *dsl, hc_pc start_pc, hc_pc end_pc);
 
 typedef void (*hc_dsl_fun_t)(struct hc_dsl *, struct hc_sloc);
 
-const struct hc_type *HC_DSL_FUN();
+extern const struct hc_type HC_DSL_FUN;
 
 struct hc_sloc {
   char source[32];

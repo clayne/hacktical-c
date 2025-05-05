@@ -87,25 +87,25 @@ static struct hc_value *field_init(struct hc_slog_field *f,
 
 struct hc_slog_field *hc_slog_bool(const char *name, const bool value) {
   struct hc_slog_field *f = malloc(sizeof(struct hc_slog_field));
-  field_init(f, name, HC_BOOL())->as_bool = value;
+  field_init(f, name, &HC_BOOL)->as_bool = value;
   return f;
 }
 
 struct hc_slog_field *hc_slog_int(const char *name, const int value) {
   struct hc_slog_field *f = malloc(sizeof(struct hc_slog_field));
-  field_init(f, name, HC_INT())->as_int = value;
+  field_init(f, name, &HC_INT)->as_int = value;
   return f;
 }
 
 struct hc_slog_field *hc_slog_string(const char *name, const char *value) {
   struct hc_slog_field *f = malloc(sizeof(struct hc_slog_field));
-  field_init(f, name, HC_STRING())->as_string = strdup(value);
+  field_init(f, name, &HC_STRING)->as_string = strdup(value);
   return f;
 }
 
 struct hc_slog_field *hc_slog_time(const char *name, const hc_time_t value) {
   struct hc_slog_field *f = malloc(sizeof(struct hc_slog_field));
-  field_init(f, name, HC_TIME())->as_time = value;
+  field_init(f, name, &HC_TIME)->as_time = value;
   return f;
 }
 ```
