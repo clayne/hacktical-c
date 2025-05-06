@@ -1,5 +1,5 @@
 ## Dynamic Compilation
-To implement dynamic compilation in C, we'll have to cast a few non-trivial Unix spells and sacrifice some portability. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
+To implement dynamic compilation, we'll have to cast a few non-trivial Unix spells and sacrifice some portability. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
 
 Example:
 ```C
@@ -34,12 +34,6 @@ struct hc_compile_opts {
       ##__VA_ARGS__						
     })
 
-static void free_cmd(char **in) {
-  for (char **s = in; *s; s++) {
-    free(*s);
-  }
-}
-
 void _hc_compile(const char *code,
 		 const char *out,
 		 const struct hc_compile_opts opts) {
@@ -70,11 +64,21 @@ void _hc_compile(const char *code,
   fputs(code, stdin);
   fclose(stdin);
 }
+
+void free_cmd(char **in) {
+  for (char **s = in; *s; s++) {
+    free(*s);
+  }
+}
 ```
 
-Starting an external process with a pipe attached to `stdin` gets a tiny bit involved, and non-trivial to refactor into smaller pieces; but goes someting like this.
+Starting an external process with a pipe attached to `stdin` gets a tiny bit involved, but goes someting like this:
 
-First we create a pipe using `pipe()`. Next we `fork()` a new process, attach one of the pipe ends to `stdin` using `dup2()` and execute the specified command using `execve()`. In the parent process we clean up the mess we made and initialize the struct. 
+First we create a pipe using `pipe()`, next we `fork()` a new process.
+
+In the child process, we close the writer, attach the reader `stdin` using `dup2()` and execute the specified command using `execve()`.
+
+In the parent we close the reader and initialize the result struct with the PID and writer. 
 
 ```C
 struct hc_proc {
