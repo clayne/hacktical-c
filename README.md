@@ -5,7 +5,7 @@ A practical hacker's guide to the C programming language.
 one of the greatest hackers this world has known.*
 
 ## About the book
-This book assumes basic programming knowledge. We're not going to spend a lot of time and space on explaining basic features, except where they behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility C offers.
+This book assumes basic programming knowledge. We're not going to spend a lot of time and space on explaining features that don't behave differently in important ways compared to other mainstream languages. Instead we're going to focus on practical techniques for making the most out of the power and flexibility C offers.
 
 Keep in mind it's very much a work in progress, mind the gaps, and please report any issues you come across or suggestions for improvements in the repo.
 
