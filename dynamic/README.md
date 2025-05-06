@@ -1,9 +1,4 @@
 ## Dynamic Compilation
-
-*Never put off till run-time what you can do at compile-time.*
-
-~ D. Gries
-
 To implement dynamic compilation in C, we'll have to cast a few non-trivial Unix spells and sacrifice some portability in the process. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
 
 Example:
@@ -24,10 +19,49 @@ Example:
 The star of the show is `hc_compile()` which allows dynamically creating shared libraries from source code.
 
 ```C
-void hc_compile(const char *code, const char *out) {
-  const char *cmd = "/usr/bin/gcc -shared -fpic -o %s -xc -";
+struct hc_compile_opts {
+  const char *cc;
+  const char **cflags;
+};
+
+#define hc_compile(code, out, ...)				
+  _hc_compile(code, out, (struct hc_compile_opts){		
+      .cc = "/usr/bin/gcc",					
+      .cflags = (const char *[]){NULL},				
+      ##__VA_ARGS__						
+    })
+
+static void free_cmd(char **in) {
+  for (char **s = in; *s; s++) {
+    free(*s);
+  }
+}
+
+void _hc_compile(const char *code,
+		 const char *out,
+		 const struct hc_compile_opts opts) {
+  hc_array(const char *, pre, 
+	   opts.cc, "-shared", "-fpic", "-o", out, "-xc");
+  
+  int n = pre_n + 2;
+  for (int i = 0; opts.cflags[i]; i++, n++);  
+  char *cmd[n];
+  int i = 0;
+
+  while (i < pre_n) {
+    cmd[i++] = strdup(pre_a[i]);
+  }
+  
+  for (; i <  n - 2; i++) {
+    cmd[i] = strdup(opts.cflags[i - pre_n]);
+  }
+
+  cmd[i++] = strdup("-");
+  cmd[i] = NULL;
+  hc_defer(free_cmd(cmd));
+  
   struct hc_proc child;
-  hc_proc_init(&child, cmd, out);
+  _hc_proc_init(&child, cmd);
   hc_defer(hc_proc_deinit(&child));
   FILE *stdin = fdopen(child.stdin, "w");
   fputs(code, stdin);
@@ -45,16 +79,10 @@ struct hc_proc {
   int stdin;
 };
 
-struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
-  va_list args;
-  va_start(args, cmd);
-  char *c = hc_vsprintf(cmd, args);
-  va_end(args);
+#define hc_proc_init(p, ...)			\
+  _hc_proc_init(p, {__VA_ARGS__, NULL})
 
-  char *i = strchr(c, ' ');
-  if (!i) { i = c + strlen(c); }
-  char *cp = strndup(c, i - c);
-  struct hc_vector cas = parse_args(i+1);
+struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
   int fds[2];
   pipe(fds);
   pid_t child_pid = fork();
@@ -63,36 +91,22 @@ struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...) {
   case 0: {
     close(fds[1]);
     dup2(fds[0], 0);
-    char **as = calloc(cas.length+2, sizeof(char *));
-    as[0] = cp;
-    
-    for (int i = 0; i < cas.length; i++) {
-      as[i+1] = *(char **)hc_vector_get(&cas, i);
-    }
-
-    as[cas.length+1] = NULL;
     char *const env[] = {"PATH=/bin:/sbin", NULL};
-      
-    if (execve(cp, as, env) == -1) {
-      hc_throw("Failed to exec '%s': %d", c, errno);
+
+    if (execve(cmd[0], cmd, env) == -1) {
+      hc_throw("Failed to exec '%s': %d", cmd[0], errno);
     }
-    
-    break;
   }
   case -1:
     hc_throw("Failed forking process: %d", errno);
   default:
     close(fds[0]);
-    free(cp);
-    
-    hc_vector_do(&cas, ca) {
-      free(*(char **)ca);
-    }
-    
-    hc_vector_deinit(&cas);
-    hc_release(c);
-    return (struct hc_proc){.pid = child_pid, .stdin = fds[1]};
+    p->pid = child_pid;
+    p->stdin = fds[1];
+    break;
   }
+
+  return p;
 }
 ```
 

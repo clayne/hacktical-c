@@ -9,10 +9,27 @@ struct hc_proc {
   int stdin;
 };
 
-struct hc_proc *hc_proc_init(struct hc_proc *proc, const char *cmd, ...);
-struct hc_proc *hc_proc_deinit(struct hc_proc *proc);
+#define hc_proc_init(p, ...)			\
+  _hc_proc_init(p, {__VA_ARGS__, NULL})
 
-void hc_compile(const char *code, const char *out);
+struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]);
+struct hc_proc *hc_proc_deinit(struct hc_proc *p);
+
+struct hc_compile_opts {
+  const char *cc;
+  const char **cflags;
+};
+
+#define hc_compile(code, out, ...)				\
+  _hc_compile(code, out, (struct hc_compile_opts){		\
+      .cc = "/usr/bin/gcc",					\
+      .cflags = (const char *[]){NULL},				\
+      ##__VA_ARGS__						\
+    })
+
+void _hc_compile(const char *code,
+		 const char *out,
+		 struct hc_compile_opts opts);
 
 struct hc_dlib {
   void *handle;
