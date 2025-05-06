@@ -74,9 +74,9 @@ void free_cmd(char **in) {
 
 Starting an external process with a pipe attached to `stdin` gets a tiny bit involved, but goes someting like this:
 
-First we create a pipe using `pipe()`, next we `fork()` a new process.
+We begin by creating a `pipe()` and `fork()`-ing a new process.
 
-In the child process, we close the writer, attach the reader `stdin` using `dup2()` and execute the specified command using `execve()`.
+In the child process, we close the writer, attach the reader to `stdin` using `dup2()` and execute the specified command using `execve()`.
 
 In the parent we close the reader and initialize the result struct with the PID and writer. 
 
