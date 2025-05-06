@@ -7,7 +7,10 @@ Example:
   
   hc_compile("#include <stdio.h>\n"
 	     "int test() { return 42; }",
-	     out);
+	     out,
+	     .cflags = (const char *[]){"-Wall",
+					"-fsanitize=undefined",
+					NULL});
 
   struct hc_dlib lib;
   hc_dlib_init(&lib, out);
