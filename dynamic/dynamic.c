@@ -62,8 +62,8 @@ void _hc_compile(const char *code,
   char *cmd[n];
   int i = 0;
 
-  while (i < pre_n) {
-    cmd[i++] = strdup(pre_a[i]);
+  for (; i < pre_n; i++) {
+    cmd[i] = strdup(pre_a[i]);
   }
   
   for (; i <  n - 2; i++) {

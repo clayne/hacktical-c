@@ -1,5 +1,5 @@
 ## Dynamic Compilation
-To implement dynamic compilation in C, we'll have to cast a few non-trivial Unix spells and sacrifice some portability in the process. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
+To implement dynamic compilation in C, we'll have to cast a few non-trivial Unix spells and sacrifice some portability. It's not that these features aren't available on other platforms; rather that they're implemented in slightly different ways, using different names.
 
 Example:
 ```C
@@ -51,8 +51,8 @@ void _hc_compile(const char *code,
   char *cmd[n];
   int i = 0;
 
-  while (i < pre_n) {
-    cmd[i++] = strdup(pre_a[i]);
+  for (; i < pre_n; i++) {
+    cmd[i] = strdup(pre_a[i]);
   }
   
   for (; i <  n - 2; i++) {
