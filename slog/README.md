@@ -110,13 +110,12 @@ struct hc_slog_field *hc_slog_time(const char *name, const hc_time_t value) {
 }
 ```
 
-The trick used in `hc_slog_write()` to convert a vararg into an array and a length is worth memorizing.
+`hc_slog_write()` converts its arguments to be passed as length/array to the function.
 
 ```C
 #define _hc_slog_write(s, ...) do {				
-    struct hc_slog_field *fs[] = {__VA_ARGS__};			
-    size_t n = sizeof(fs) / sizeof(struct hc_slog_field *);	
-    __hc_slog_write((s), n, fs);				
+    hc_array(struct hc_slog_field *, fs, ##__VA_ARGS__);	
+    __hc_slog_write((s), fs_n, fs_a);				
   } while (0)
 
 #define hc_slog_write(...)			
@@ -179,18 +178,23 @@ struct hc_slog_stream *hc_slog_stream_init(struct hc_slog_stream *s,
 Contexts are implemented as just another kind of log, which traps write calls and delegates them to the parent log prefixed with its fixed array of fields.
 
 ```C
-#define _hc_slog_context_do(_c, _n, _fs, ...)			
-  struct hc_slog_context _c;					
-  struct hc_slog_field *_fs[] = {__VA_ARGS__};			
-  size_t _n = sizeof(_fs) / sizeof(struct hc_slog_field *);	
-  hc_slog_context_init(&_c, _n, _fs);				
-  hc_defer(hc_slog_deinit(&_c));				
+#define __hc_slog_context_do(_c, _fs, _a, _n, ...)			
+  struct hc_slog_context _c;						
+  hc_array(struct hc_slog_field *, _fs, ##__VA_ARGS__);			
+  hc_slog_context_init(&_c, _n, _a);					
+  hc_defer(hc_slog_deinit(&_c));					
   hc_slog_do(&_c)
 
+#define _hc_slog_context_do(_c, _fs, ...)	
+  __hc_slog_context_do(_c,		
+		       _fs,			
+		       hc_id(_fs, _a),		
+		       hc_id(_fs, _n),		
+		       ##__VA_ARGS__)
+
 #define hc_slog_context_do(...)			
-  _hc_slog_context_do(hc_unique(slog_c),	
-		      hc_unique(slog_n),	
-		      hc_unique(slog_fs),	
+  _hc_slog_context_do(hc_unique(slog_c),
+		      hc_unique(slog_fs),
 		      ##__VA_ARGS__)
 
 struct hc_slog_context {

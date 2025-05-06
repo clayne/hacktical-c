@@ -9,6 +9,13 @@
       _x < 0 ? -x : x;				\
     })						\
 
+#define _hc_array(t, a, n, ...)			\
+  t a[] = { __VA_ARGS__ };			\
+  const size_t n = sizeof(a) / sizeof(t)		
+
+#define hc_array(t, p, ...)					\
+  _hc_array(t, hc_id(p, _a), hc_id(p, _n), ##__VA_ARGS__)
+
 #define hc_baseof(p, t, m) ({			\
       uint8_t *_p = (uint8_t *)p;		\
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\

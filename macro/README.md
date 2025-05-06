@@ -64,3 +64,14 @@ Example:
 ```C
 assert(hc_min(7, 42) == 7);
 ```
+
+Passing arrays as function arguments is slightly problematic in C due to the fact that the array decays into a pointer, which means the length is lost in the call. `hc_array` takes a type and a prefix, and defines the array and its length as `[prefix]_a`/`[prefix]_n`.
+
+```C
+#define _hc_array(t, a, n, ...)			
+  t a[] = { __VA_ARGS__ };			
+  const size_t n = sizeof(a) / sizeof(t)		
+
+#define hc_array(t, p, ...)					
+  _hc_array(t, hc_id(p, _a), hc_id(p, _n), ##__VA_ARGS__)
+```
