@@ -78,8 +78,8 @@ void _hc_compile(const char *code,
   _hc_proc_init(&child, cmd);
   hc_defer(hc_proc_deinit(&child));
   FILE *stdin = fdopen(child.stdin, "w");
+  hc_defer(fclose(stdin));
   fputs(code, stdin);
-  fclose(stdin);
 }
 
 struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
