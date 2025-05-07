@@ -13,13 +13,23 @@
 
 struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
   int fds[2];
-  pipe(fds);
+
+  if (pipe(fds) == -1) {
+    hc_throw("Failed creating pipe: %d", errno);
+  }
+  
   pid_t child_pid = fork();
 
   switch (child_pid) {
   case 0: {
-    close(fds[1]);
-    dup2(fds[0], 0);
+    if (close(fds[1]) == -1) {
+      hc_throw("Failed closing pipe writer: %d", errno);
+    }
+    
+    if (dup2(fds[0], 0) == -1) {
+      hc_throw("Failed rebinding stdin: %d", errno);
+    }
+    
     char *const env[] = {"PATH=/bin:/sbin", NULL};
 
     if (execve(cmd[0], cmd, env) == -1) {
@@ -29,7 +39,10 @@ struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
   case -1:
     hc_throw("Failed forking process: %d", errno);
   default:
-    close(fds[0]);
+    if (close(fds[0]) == -1) {
+      hc_throw("Failed closing pipe reader: %d", errno);
+    }
+    
     p->pid = child_pid;
     p->stdin = fds[1];
     break;
@@ -39,7 +52,10 @@ struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
 }
 
 struct hc_proc *hc_proc_deinit(struct hc_proc *p) {
-  close(p->stdin);
+  if (p->stdin != -1 && close(p->stdin) == -1) {
+    hc_throw("Failed closing stdin: %d", errno);
+  }
+  
   int status;
   waitpid(p->pid, &status, 0);
   return p;
@@ -78,8 +94,17 @@ void _hc_compile(const char *code,
   _hc_proc_init(&child, cmd);
   hc_defer(hc_proc_deinit(&child));
   FILE *stdin = fdopen(child.stdin, "w");
+
+  if (stdin == EOF) {
+    hc_throw("Failed opening stdin stream: %d", errno);
+  }
+  
+  child.stdin = -1;
   hc_defer(fclose(stdin));
-  fputs(code, stdin);
+
+  if (fputs(code, stdin) == EOF) {
+    hc_throw("Failed writing code: %d", errno);
+  }
 }
 
 struct hc_dlib *hc_dlib_init(struct hc_dlib *lib, const char *path) {
