@@ -26,7 +26,7 @@ assert(foobar == 42);
 
 Since it doesn't make much sense to generate unique identifiers that are never used, this macro is mostly used to generate arguments for macros where the generated id can be reused.
 
-`hc_defer()` is used to register scoped destructors, it uses `hc_unique()` to generate a name for the temporary variable to which the `__cleanup__` attribute is applied, as well as for the destructor trampoline. Registered destructors are executed in reverse order. `__VA__ARGS__` represents the argument list in macros that take a variable number of arguments. It is sometimes used as `##__VA_ARGS__`, which removes the preceding `,` when the argument list is empty.
+`hc_defer()` is used to register scoped destructors, it uses `hc_unique()` to generate a name for the temporary variable to which the `__cleanup__` attribute is applied, as well as for the destructor trampoline. Registered destructors are executed in reverse order. `__VA__ARGS__` represents the argument list in macros that take a variable number of arguments. It is sometimes written `##__VA_ARGS__`, which drops the preceding `,` if the argument list is empty.
 
 ```C
 #define _hc_defer(_d, _v, ...)			
@@ -48,7 +48,7 @@ int foo = 0;
 assert(foo == 2);
 ```
 
-A common foot gun that is best avoided in macro context is double expansion of macro arguments. What it means is that macros simply paste arguments as is; if the argument has an effect, the effect will be repeated for every expansion by default. That's the reason why we're assigning temporaries whenever we need to refer to a macro argument multiple times within the body.
+One common problem that is best avoided in macro context is double expansion of macro arguments. What it means is that macros simply paste arguments as is; if the argument has an effect, the effect will be repeated for every expansion by default. That's the reason why we're assigning temporaries whenever we need to refer to a macro argument multiple times within the body.
 
 `__auto_type` allows inferring types from macro arguments, this may be used to define generic macros such as `hc_min()`. Enclosing the macro body in `({`/`})` enables multi-line expressions.
 
