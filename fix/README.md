@@ -1,13 +1,17 @@
 ## Fixed-Point Arithmetic
-Fixed-point is a method of representing fractional values by storing a fixed number of digits of the fractional part; or, seen from another angle, by multiplying them with a fixed power of ten. This means they can be stored and processed as regular integers.
+Fixed-point is a method of representing fractional values by storing a fixed number of digits of the fractional part, accomplished by multiplying with a fixed power of ten. This means they can be stored and processed as regular integers.
 
-The reason one might wish to do o could be performance, but I feel correctness is the more important consideration. Floating point values are more complicated to implement and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
+The reason one might wish to do so could be performance or correctness. Floating point values are more complicated and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
 
-We'll use unsigned 64-bit integers to store fixed-point values; using 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
+Fixed-points are normally implemented by simply multiplying integers with a static power of ten. We'll add a tiny bit of flexibility and safety by remembering the exponent used to create the value and supporting operations on values with different exponents.
+
+We use unsigned 64-bit integers;x 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
 
 ```C
 #define HC_FIX_EXP 3
 #define HC_FIX_HDR (HC_FIX_EXP+1)
+
+#define HC_FIX_MAX_EXP 7
 
 typedef uint64_t hc_fix_t;
 ```
@@ -27,6 +31,25 @@ Example:
 const hc_fix_t x = hc_fix(2, -125);
 assert(hc_fix_exp(x) == 2);
 assert(hc_fix_val(x) == -125);
+```
+
+`hc_scale()` converts exponents to multipliers.
+
+```C
+uint32_t hc_scale(const uint8_t exp) {
+  static const uint32_t scale[HC_FIX_MAX_EXP+1] = {
+    1,
+    10,
+    100,
+    1000,
+    10000,
+    100000,
+    1000000,
+    10000000};
+
+  assert(exp <= HC_FIX_MAX_EXP);
+  return scale[exp];
+}
 ```
 
 `hc_fix_int()` and `hc_fix_frac()` returns signed integer and fractional parts respectively.
