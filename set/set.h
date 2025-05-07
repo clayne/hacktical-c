@@ -16,12 +16,12 @@ enum hc_order {HC_LT = -1, HC_EQ = 0, HC_GT = 1};
 
 typedef enum hc_order (*hc_cmp_t)(const void *, const void *);
 
-typedef const void *(*hc_set_key)(const void *); 
+typedef const void *(*hc_set_key_t)(const void *); 
 
 struct hc_set {
   struct hc_vector items;
   hc_cmp_t cmp;
-  hc_set_key key;
+  hc_set_key_t key;
 };
 
 struct hc_set *hc_set_init(struct hc_set *s,

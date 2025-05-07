@@ -1,13 +1,9 @@
 ## Ordered Sets and Maps
-Besides lists and vectors, some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched `struct hc_vector`s.
+Besides [lists](https://github.com/codr7/hacktical-c/tree/main/list) and [vectors](https://github.com/codr7/hacktical-c/tree/main/vector), some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched vectors.
 
-Most people would likely instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs.
+Most people would likely instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs. Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run unpredictable issues with values clustering on a minority of buckets in the general case.
 
-A binary searched vector is as simple as it gets and performs pretty well while being more predictable. Once nice advantage is that since they don't need any infrastructure, they're comparably cheap to create.
-
-The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to perform.
-
-Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run unpredictable issues with values clustering on a minority of buckets in the general case.
+A binary searched vector is as simple as it gets and performs pretty well while being more predictable, and since they don't need any infrastructure, they're comparably cheap to create. The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to perform.
 
 Besides, the natural dual to a lookup table is a list of pairs, and having an order strengthens that connection.
 
@@ -66,7 +62,7 @@ Besides a comparator for items, sets also feature an optional accessor for item 
 struct hc_set {
   struct hc_vector items;
   hc_cmp_t cmp;
-  hc_set_key key;
+  hc_set_key_t key;
 };
 
 struct hc_set *hc_set_init(struct hc_set *s,
@@ -115,7 +111,7 @@ size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
 }
 ```
 
-`hc_set_add()` adds an item with the specified key, provided it's not already in the set or the `force`-flag is `true`. A pointer to the item is returned for copying data.
+`hc_set_add()` adds an item with the specified key, provided it's not already in the set or the `force`-flag is `true`. A pointer to the added item is returned.
 
 ```C
 void *hc_set_add(struct hc_set *s, void *key, bool force) {
