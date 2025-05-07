@@ -1,5 +1,5 @@
 ## Lightweight Concurrent Tasks
-Concurrent tasks allows keeping the flow of control intact where it would otherwise get lost in the noise of a solution based on discrete events. Note that concurrent means interleaved, not parallel; which means that system threads would add a lot of complexity and overhead. C lacks built in support for coroutines, but the same effect can be achieved without breaking any rules.
+Concurrent tasks allows keeping the flow of control intact where it would otherwise get lost in the noise of a solution based on discrete events. Note that concurrent means interleaved, not parallel; system threads would add a lot of complexity and overhead in comparison. C lacks built in support for coroutines, but the same effect can be achieved without breaking any rules.
 
 We start by defining an abstraction to represent a task.
 
@@ -108,7 +108,7 @@ static void consumer(struct hc_task *task) {
 }
 ```
 
-`hc_task_yield()` is implemented as a macro that updates the task state and adds a matching `case`, `__LINE__` is a system macro that expands to the current source code line number.
+`hc_task_yield()` is implemented as a macro that updates the task state and adds a matching `case`. The `__LINE__` macro expands to the current source code line number.
 
 ```C
 #define hc_task_yield(task)			

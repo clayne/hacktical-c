@@ -186,7 +186,7 @@ struct slab *get_slab(struct hc_slab_alloc *a, const size_t size) {
 
 If no suitable slabs are found, a new one is added.
 
-```
+```C
 struct slab *add_slab(struct hc_slab_alloc *a, size_t size) {
   struct slab *s = _hc_acquire(a->source,
 			       sizeof(struct slab) +
@@ -224,7 +224,7 @@ void *slab_acquire(struct hc_malloc *a, const size_t size) {
 
 `release()` is a no op.
 
-```
+```C
 void slab_release(struct hc_malloc *a, void *p) {
   // Do nothing
 }
