@@ -1,11 +1,11 @@
 ## Fixed-Point Arithmetic
 Fixed-point is a method of representing fractional values by storing a fixed number of digits of the fractional part, accomplished by multiplying with a fixed power of ten. This means they can be stored and processed as regular integers.
 
-The reason one might wish to do so could be performance or correctness. Floating point values are more complicated and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
+Floating point values are more complicated and inconsistent to deal with. As a result it's often recommended to use fixed-points when dealing with numbers that need to be exact, for instance time and money.
 
 Fixed-points are normally implemented by simply multiplying integers with a static power of ten. We'll add a tiny bit of flexibility and safety by remembering the exponent used to create the value and supporting operations on values with different exponents.
 
-We use unsigned 64-bit integers;x 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
+We use unsigned 64-bit integers; 3 bits for the exponent (power of 10), 1 for sign and the remaining 60 bits for the value.
 
 ```C
 #define HC_FIX_EXP 3
