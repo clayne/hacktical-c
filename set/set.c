@@ -1,14 +1,11 @@
 #include <stdlib.h>
 #include "set.h"
 
-struct hc_set *hc_set_new(size_t item_size, hc_cmp_t cmp) {
-  return hc_set_init(malloc(sizeof(struct hc_set)), item_size, cmp);
-}
-
 struct hc_set *hc_set_init(struct hc_set *s,
+			   struct hc_malloc *malloc,
 			   const size_t item_size,
 			   hc_cmp_t cmp) {
-  hc_vector_init(&s->items, item_size);
+  hc_vector_init(&s->items, malloc, item_size);
   s->cmp = cmp;
   s->key = NULL;
   return s;

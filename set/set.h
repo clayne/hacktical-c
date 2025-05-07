@@ -10,6 +10,8 @@
       (_x < _y) ? HC_LT : ((_x > _y) ? HC_GT : HC_EQ);	\
     })
 
+struct hc_malloc;
+
 enum hc_order {HC_LT = -1, HC_EQ = 0, HC_GT = 1};
 
 typedef enum hc_order (*hc_cmp_t)(const void *, const void *);
@@ -22,8 +24,11 @@ struct hc_set {
   hc_set_key key;
 };
 
-struct hc_set *hc_set_new(size_t size, hc_cmp_t cmp);
-struct hc_set *hc_set_init(struct hc_set *s, size_t item_size, hc_cmp_t cmp);
+struct hc_set *hc_set_init(struct hc_set *s,
+			   struct hc_malloc *malloc,
+			   size_t item_size,
+			   hc_cmp_t cmp);
+
 void hc_set_deinit(struct hc_set *s);
 size_t hc_set_index(const struct hc_set *s, const void *key, bool *ok);
 size_t hc_set_length(const struct hc_set *s);

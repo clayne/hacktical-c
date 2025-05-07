@@ -29,7 +29,7 @@ const void *key(const void *x) {
 
 const int n = 10;
 struct hc_set s;
-hc_set_init(&s, sizeof(struct map_item), cmp);
+hc_set_init(&s, &hc_malloc_default, sizeof(struct map_item), cmp);
   
 for (int i = 0; i < n; i++) {
   struct map_item *it = hc_set_add(&s, &i, false);
@@ -69,8 +69,11 @@ struct hc_set {
   hc_set_key key;
 };
 
-struct hc_set *hc_set_init(struct hc_set *s, size_t item_size, hc_cmp_t cmp) {
-  hc_vector_init(&s->items, item_size);
+struct hc_set *hc_set_init(struct hc_set *s,
+                           struct hc_malloc *malloc,
+                           size_t item_size,
+			   hc_cmp_t cmp) {
+  hc_vector_init(&s->items, malloc, item_size);
   s->cmp = cmp;
   s->key = NULL;
   return s;

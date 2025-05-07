@@ -23,7 +23,7 @@ struct hc_dsl {
   struct hc_vector stack;
 };
 
-void hc_dsl_init(struct hc_dsl *dsl);
+void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc);
 void hc_dsl_deinit(struct hc_dsl *dsl);
 
 struct hc_value* hc_dsl_getenv(struct hc_dsl *dsl,
@@ -59,8 +59,8 @@ struct hc_sloc hc_sloc(const char *source, int row, int col);
 struct hc_form;
 
 struct hc_form_type {
-  void (*deinit)(struct hc_form *);
   void (*emit)(const struct hc_form *, struct hc_dsl *);
+  void (*free)(struct hc_form *);
   void (*print)(const struct hc_form *, struct hc_stream *);
 };
   
@@ -75,7 +75,7 @@ void hc_form_init(struct hc_form *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *list);
 
-void hc_form_deinit(struct hc_form *f);
+void hc_form_free(struct hc_form *f);
 
 struct hc_form_type *hc_id_form();
 

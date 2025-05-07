@@ -81,7 +81,10 @@ struct hc_memory_stream {
 };
 
 extern struct hc_stream hc_memory_stream;
-struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s);
+
+struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s,
+					       struct hc_malloc *malloc);
+
 const char *hc_memory_stream_string(struct hc_memory_stream *s);
 
 #endif

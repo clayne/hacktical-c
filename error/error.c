@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "error.h"
+#include "malloc1/malloc1.h"
 #include "vector/vector.h"
 
 __thread struct hc_error *hc_error = NULL;
@@ -12,7 +14,7 @@ static struct hc_vector *handlers() {
   static __thread struct hc_vector handlers;
 
   if (init) {
-    hc_vector_init(&handlers, sizeof(jmp_buf));
+    hc_vector_init(&handlers, &hc_malloc_default, sizeof(jmp_buf));
     init = false;
   }
   

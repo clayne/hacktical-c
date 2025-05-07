@@ -43,7 +43,7 @@ static struct hc_vector *handlers() {
   static __thread struct hc_vector handlers;
 
   if (init) {
-    hc_vector_init(&handlers, sizeof(jmp_buf));
+    hc_vector_init(&handlers, &hc_malloc_default, sizeof(jmp_buf));
     init = false;
   }
   

@@ -17,7 +17,7 @@ static const void *key(const void *x) {
 void set_tests() {
   int n = 10;
   struct hc_set s;
-  hc_set_init(&s, sizeof(struct map_item), cmp);
+  hc_set_init(&s, &hc_malloc_default, sizeof(struct map_item), cmp);
   s.key = key;
   
   for (int i = 0; i < n; i++) {

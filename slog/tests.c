@@ -2,10 +2,11 @@
 #include <string.h>
 
 #include "slog.h"
+#include "malloc1/malloc1.h"
 
 void slog_tests() {
   struct hc_memory_stream out;
-  hc_memory_stream_init(&out);
+  hc_memory_stream_init(&out, &hc_malloc_default);
   
   struct hc_slog_stream s;
   hc_slog_stream_init(&s, &out.stream, .close_out=true);

@@ -83,7 +83,7 @@ size_t _hc_stream_vprintf(struct hc_stream *s,
 			 const char *spec,
 			 va_list args) {
   char *data = hc_vsprintf(spec, args);
-  hc_defer(hc_release(data));
+  hc_defer(free(data));
   return _hc_stream_put(s, data, strlen(data));
 }
 ```
@@ -191,14 +191,15 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
   return n;
 }
 
-struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s) {
+struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s,
+                                               struct hc_malloc *malloc) {
   s->stream = (struct hc_stream){
     .deinit  = memory_deinit,
     .get     = memory_get,
     .put     = memory_put,
   };
 
-  hc_vector_init(&s->data, 1);
+  hc_vector_init(&s->data, malloc, 1);
   s->rpos = 0;
   return s;
 }

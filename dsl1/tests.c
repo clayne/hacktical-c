@@ -1,4 +1,6 @@
 #include <assert.h>
+#include <stdlib.h>
+
 #include "dsl1.h"
 #include "malloc2/malloc2.h"
 
@@ -13,16 +15,13 @@ static void read_tests() {
 
   struct hc_slab_alloc a;
   hc_slab_alloc_init(&a, hc_malloc(), 10*sizeof(struct hc_form));
-
-  hc_malloc_do(&a) {
-    assert(hc_read_form(&in, &out, &sloc));
-  }
+  assert(hc_read_form(&in, &out, &sloc));
   
   struct hc_form *f = hc_baseof(out.next, struct hc_form, list);
   assert(f->type == hc_id_form());
 
   hc_list_do(&out, f) {
-    hc_form_deinit(hc_baseof(f, struct hc_form, list));
+    hc_form_free(hc_baseof(f, struct hc_form, list));
   }
 
   hc_slab_alloc_deinit(&a);
@@ -30,7 +29,7 @@ static void read_tests() {
 
 static void emit_tests() {
   struct hc_dsl dsl;
-  hc_dsl_init(&dsl);
+  hc_dsl_init(&dsl, &hc_malloc_default);
   hc_defer(hc_dsl_deinit(&dsl));
   struct hc_push_op op;
   hc_value_init(&op.value, &HC_FIX)->as_fix = hc_fix(0, 42);

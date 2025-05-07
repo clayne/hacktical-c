@@ -4,7 +4,7 @@
 
 void vector_tests() {
   struct hc_vector v;
-  hc_vector_init(&v, sizeof(int));
+  hc_vector_init(&v, &hc_malloc_default, sizeof(int));
   const int n = 100;
   
   for (int i = 0; i < n; i++) {

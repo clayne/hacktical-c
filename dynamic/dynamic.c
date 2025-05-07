@@ -33,7 +33,7 @@ struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
     char *const env[] = {"PATH=/bin:/sbin", NULL};
 
     if (execve(cmd[0], cmd, env) == -1) {
-      hc_throw("Failed to exec '%s': %d", cmd[0], errno);
+      hc_throw("Failed to execve '%s': %d", cmd[0], errno);
     }
   }
   case -1:
@@ -95,7 +95,7 @@ void _hc_compile(const char *code,
   hc_defer(hc_proc_deinit(&child));
   FILE *stdin = fdopen(child.stdin, "w");
 
-  if (stdin == EOF) {
+  if (!stdin) {
     hc_throw("Failed opening stdin stream: %d", errno);
   }
   
@@ -148,7 +148,7 @@ char *hc_vsprintf(const char *format, va_list args) {
   }
 
   len++;
-  char *out = hc_acquire(len);
+  char *out = malloc(len);
   vsnprintf(out, len, format, args);
   return out;
 } 

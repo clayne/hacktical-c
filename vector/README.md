@@ -14,7 +14,7 @@ struct hc_vector {
 Example:
 ```C
 struct hc_vector v;
-hc_vector_init(&v, sizeof(int));
+hc_vector_init(&v, &hc_malloc_default, sizeof(int));
 hc_vector_grow(&v, 10);
   
 const int n = 10;

@@ -23,7 +23,10 @@ struct hc_vector {
   struct hc_malloc *malloc;
 };
 
-struct hc_vector *hc_vector_init(struct hc_vector *v, size_t item_size);
+struct hc_vector *hc_vector_init(struct hc_vector *v,
+				 struct hc_malloc *malloc,
+				 size_t item_size);
+
 void hc_vector_deinit(struct hc_vector *v);
 void hc_vector_grow(struct hc_vector *v, size_t capacity);
 void hc_vector_clear(struct hc_vector *v);

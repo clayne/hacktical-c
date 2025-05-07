@@ -1,10 +1,10 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "chrono.h"
 #include "error/error.h"
-#include "malloc1/malloc1.h"
 #include "stream1/stream1.h"
 
 hc_time_t hc_now() {
@@ -52,7 +52,7 @@ char *hc_time_sprintf(const hc_time_t *t, const char *spec) {
   struct tm tm;
   gmtime_r(&(t->value.tv_sec), &tm);
   size_t len = 8;
-  char *result = hc_acquire(len);
+  char *result = malloc(len);
 
   for (;;) {
     const size_t n = strftime(result, len, spec, &tm);
@@ -63,8 +63,8 @@ char *hc_time_sprintf(const hc_time_t *t, const char *spec) {
     }
     
     len *= 2;
-    hc_release(result);
-    result = hc_acquire(len);
+    free(result);
+    result = malloc(len);
   }
     
   return result;
@@ -75,7 +75,7 @@ void hc_time_printf(const hc_time_t *t,
 		    struct hc_stream *out) {
   char *s = hc_time_sprintf(t, "%Y-%m-%dT%H:%M:%S");
   _hc_stream_puts(out, s);
-  hc_release(s);
+  free(s);
 }
 
 uint64_t hc_sleep(uint64_t ns) {

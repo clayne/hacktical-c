@@ -27,15 +27,15 @@ static const void *env_key(const void *x) {
   return &((const struct env_item *)x)->key;
 }
 
-void hc_dsl_init(struct hc_dsl *dsl) {
-  hc_vector_init(&dsl->code, sizeof(hc_op_eval_t));
+void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc) {
+  hc_vector_init(&dsl->code, malloc, sizeof(hc_op_eval_t));
 
-  hc_set_init(&dsl->env, sizeof(struct env_item), env_cmp);
+  hc_set_init(&dsl->env, malloc, sizeof(struct env_item), env_cmp);
   dsl->env.key = env_key;
   
-  hc_vector_init(&dsl->ops, sizeof(const struct hc_op *));
-  hc_vector_init(&dsl->registers, sizeof(struct hc_value));
-  hc_vector_init(&dsl->stack, sizeof(struct hc_value));
+  hc_vector_init(&dsl->ops, malloc, sizeof(const struct hc_op *));
+  hc_vector_init(&dsl->registers, malloc, sizeof(struct hc_value));
+  hc_vector_init(&dsl->stack, malloc, sizeof(struct hc_value));
 }
 
 static size_t op_size(const struct hc_op *op, struct hc_dsl *dsl) {
@@ -144,16 +144,11 @@ void hc_form_init(struct hc_form *f,
   hc_list_push_back(list, &f->list);
 }
 
-void hc_form_deinit(struct hc_form *f) {
-  if (f->type->deinit) {
-    f->type->deinit(f);
-  }
+void hc_form_free(struct hc_form *f) {
+  assert(f->type->free);
+  f->type->free(f);
 }
 					
-static void id_deinit(struct hc_form *f) {
-  free(hc_baseof(f, struct hc_id, form)->name);
-}
-
 static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
   struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
@@ -174,6 +169,12 @@ static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   }
 }
 
+static void id_free(struct hc_form *_f) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  free(f->name);
+  free(f);
+}
+
 static void id_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
   _hc_stream_puts(out, f->name);
@@ -181,8 +182,8 @@ static void id_print(const struct hc_form *_f, struct hc_stream *out) {
 
 struct hc_form_type *hc_id_form() {
   static __thread struct hc_form_type t = {
-    .deinit = id_deinit,
     .emit = id_emit,
+    .free = id_free,
     .print = id_print
   };
 
@@ -197,15 +198,17 @@ void hc_id_init(struct hc_id *f,
   f->name = strdup(name);
 }
 
-static void literal_deinit(struct hc_form *f) {
-  hc_value_deinit(&hc_baseof(f, struct hc_literal, form)->value);
-}
-
 static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
   struct hc_push_op op;
   hc_value_copy(&op.value, &f->value);
   hc_dsl_emit(dsl, &HC_PUSH, &op);
+}
+
+static void literal_free(struct hc_form *_f) {
+  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
+  hc_value_deinit(&f->value);
+  free(f);
 }
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -218,8 +221,8 @@ void hc_literal_init(struct hc_literal *f,
 		     struct hc_list *list,
 		     struct hc_value *value) {
   static const struct hc_form_type type = {
-    .deinit = literal_deinit,
     .emit = literal_emit,
+    .free = literal_free,
     .print = literal_print
   };
   
@@ -249,7 +252,7 @@ bool hc_read_id(const char **in,
 		struct hc_sloc *sloc) {
   struct hc_sloc floc = *sloc;
   struct hc_memory_stream buf;
-  hc_memory_stream_init(&buf);
+  hc_memory_stream_init(&buf, &hc_malloc_default);
   char c = 0;
 
   while ((c = **in)) {
@@ -262,7 +265,7 @@ bool hc_read_id(const char **in,
     (*in)++;
   }
 
-  struct hc_id *f = hc_acquire(sizeof(struct hc_id));
+  struct hc_id *f = malloc(sizeof(struct hc_id));
   hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
   hc_stream_deinit(&buf);
   return true;

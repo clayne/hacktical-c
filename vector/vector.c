@@ -10,11 +10,12 @@ static void grow(struct hc_vector *v) {
 }
 
 struct hc_vector *hc_vector_init(struct hc_vector *v,
+				 struct hc_malloc *malloc,
 				 const size_t item_size) {
+  v->malloc = malloc;
   v->item_size = item_size;
   v->capacity = 0;
   v->length = 0;
-  v->malloc = hc_malloc();
   v->items = v->start = v->end = NULL;
   return v;
 }
