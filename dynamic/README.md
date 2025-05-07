@@ -67,6 +67,7 @@ void _hc_compile(const char *code,
   }
   
   child.stdin = -1;
+  hc_defer(hc_proc_wait(&child));
   hc_defer(fclose(stdin));
 
   if (fputs(code, stdin) == EOF) {

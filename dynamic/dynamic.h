@@ -13,7 +13,8 @@ struct hc_proc {
   _hc_proc_init(p, {__VA_ARGS__, NULL})
 
 struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]);
-struct hc_proc *hc_proc_deinit(struct hc_proc *p);
+void hc_proc_wait(struct hc_proc *p);
+void hc_proc_deinit(struct hc_proc *p);
 
 struct hc_compile_opts {
   const char *cc;
