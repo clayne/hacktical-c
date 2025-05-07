@@ -51,21 +51,22 @@ struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
   return p;
 }
 
-void hc_proc_wait(struct hc_proc *p) {
-  int status;
+static void close_stdin(struct hc_proc *p) {
+  if (p->stdin != -1 && close(p->stdin) == -1) {
+    hc_throw("Failed closing stdin: %d", errno);
+  }
+}
 
-  if (waitpid(p->pid, &status, 0) == -1) {
-    hc_throw("Failed waiting for child process to exit: %d (%d)",
-	     status, errno);
+void hc_proc_wait(struct hc_proc *p) {
+  close_stdin(p);
+
+  if (waitpid(p->pid, NULL, 0) == -1) {
+    hc_throw("Failed waiting for child process to exit: %d", errno);
   }
 }
 
 void hc_proc_deinit(struct hc_proc *p) {
-  if (p->stdin != -1 && close(p->stdin) == -1) {
-    hc_throw("Failed closing stdin: %d", errno);
-  }
-  
-  return p;
+  close_stdin(p);
 }
 
 static void free_cmd(char **in) {
