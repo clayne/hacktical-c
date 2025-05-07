@@ -97,9 +97,9 @@ struct hc_error {
 ```
 
 ### Vararg Functions
-From this point on we're going to be defining plenty of vararg functions. In C, they require a tiny bit more work and discipline than other common languages.
+From this point on we're going to be defining a fair amount of vararg functions. Like many other features, they require a tiny bit more discipline in C compared to other mainstream languages.
 
-`va_start` initializes a vararg, it expects the final non-vararg id. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this you cannot retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the vararg.
+`va_start` initializes a vararg, it expects the final argument in second position. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this it's not possible to retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the list.
 
 Back to errors. Calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
 
@@ -128,4 +128,4 @@ struct hc_error *hc_error_new(const char *message, ...) {
 ```
 
 ### Cleaning Up
-Keep in mind that code calling functions that throw exceptions has to use `hc_defer()` or similar to clean up.
+Keep in mind that any code that interacts with exceptions has to use `hc_defer()` or similar functionality to clean up properly.
