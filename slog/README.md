@@ -153,11 +153,7 @@ void stream_write(struct hc_slog *s,
 
   _hc_stream_putc(ss->out, '\n');
 }
-```
 
-A macro is provided to make the options more convenient.
-
-```C
 #define hc_slog_stream_init(s, out, ...)				
   _hc_slog_stream_init(s, out, (struct hc_slog_stream_opts){		
       .close_out = false,						
@@ -175,7 +171,7 @@ struct hc_slog_stream *hc_slog_stream_init(struct hc_slog_stream *s,
 }
 ```
 
-Contexts are implemented as just another kind of log, which traps write calls and delegates them to the parent log prefixed with its fixed array of fields.
+Contexts are implemented as just another kind of log, which traps write calls and delegate them to the parent log prefixed with its own fields.
 
 ```C
 #define __hc_slog_context_do(_c, _fs, _a, _n, ...)			
