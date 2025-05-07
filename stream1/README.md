@@ -14,7 +14,8 @@ We'll start with defining the interface for a stream.
 
 ```C
 struct hc_stream {
-  void   (*deinit)(struct hc_stream *);
+  void (*deinit)(struct hc_stream *);
+  
   size_t (*get)(struct hc_stream *, uint8_t *, size_t);
   size_t (*put)(struct hc_stream *, const uint8_t *, size_t);
 };
@@ -88,7 +89,7 @@ size_t _hc_stream_vprintf(struct hc_stream *s,
 }
 ```
 
-The first implementation is file streams, which simply delegate to `stdio`. If `opts.close_file` is `true`, the file is closed with the stream.
+The first implementation is file streams, which simply delegate to `stdio`. If `close_file` is `true`, the file is closed with the stream.
 
 ```C
 struct hc_file_stream_opts {

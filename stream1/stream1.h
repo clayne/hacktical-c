@@ -9,7 +9,8 @@
 #include "vector/vector.h"
 
 struct hc_stream {
-  void   (*deinit)(struct hc_stream *);
+  void (*deinit)(struct hc_stream *);
+  
   size_t (*get)(struct hc_stream *, uint8_t *, size_t);
   size_t (*put)(struct hc_stream *, const uint8_t *, size_t);
 };
@@ -61,10 +62,10 @@ struct hc_file_stream {
   struct hc_file_stream_opts opts;
 };
 
-#define hc_file_stream_init(s, f, ...)					\
-  _hc_file_stream_init(s, f, (struct hc_file_stream_opts){		\
-      .close_file = false,						\
-      ##__VA_ARGS__							\
+#define hc_file_stream_init(s, f, ...)				\
+  _hc_file_stream_init(s, f, (struct hc_file_stream_opts){	\
+      .close_file = false,					\
+      ##__VA_ARGS__						\
     })
 
 extern struct hc_stream hc_file_stream;

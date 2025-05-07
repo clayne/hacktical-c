@@ -80,9 +80,13 @@ static void string_deinit(struct hc_value *v) {
   free(v->as_string);
 }
 
+static void string_print(const struct hc_value *v, struct hc_stream *out) {
+  _hc_stream_puts(out, v->as_string);
+}
+
 static void string_write(const struct hc_value *v, struct hc_stream *out) {
   _hc_stream_putc(out, '"');
-  _hc_stream_puts(out, v->as_string);
+  string_print(v, out);
   _hc_stream_putc(out, '"');
 }
 
@@ -90,6 +94,7 @@ const struct hc_type HC_STRING = {
   .name = "String",
   .copy = string_copy,
   .deinit = string_deinit,
+  .print = string_print,
   .write = string_write
 };
 
