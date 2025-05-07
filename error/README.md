@@ -103,7 +103,7 @@ From this point on we're going to be defining a fair amount of vararg functions.
 
 Back to errors. Calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
 
-```
+```C
 struct hc_error *hc_error_new(const char *message, ...) {
   struct hc_error *e = malloc(sizeof(struct hc_error));
   va_list args;
