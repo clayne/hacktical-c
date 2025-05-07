@@ -41,7 +41,7 @@ These days; many programmers would recommend choosing a stricter language, regar
 
 Since the foundation of the digital revolution, including the Internet was built using C; it gets the blame for many problems that are more due to our immaturity in designing and building complicated software than about programming languages.
 
-The truth is that any reasonably complicated software system created by humans will have bugs, regardless of what technology was used to create it. Using a stricter language helps with reducing some classes of bugs, at the cost of reduced flexibility in expressing a solution and increased effort.
+The truth is that any reasonably complicated software system created by humans will have bugs, regardless of what technology was used to create it. Using a stricter language helps with reducing some classes of bugs, at the cost of reduced flexibility and increased effort in expressing a solution.
 
 Programmers like to say that you should pick 'the right tool for the job'; what many fail to grasp is that the only people who have the capability to decide which tools are right, are the people writing the code. Much effort has been wasted on arguing and bullying programmers into picking tools other people prefer.
 
