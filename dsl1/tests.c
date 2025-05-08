@@ -17,11 +17,11 @@ static void read_tests() {
   hc_slab_alloc_init(&a, hc_malloc(), 10*sizeof(struct hc_form));
   assert(hc_read_form(&in, &out, &sloc));
   
-  struct hc_form *f = hc_baseof(out.next, struct hc_form, list);
-  assert(f->type == hc_id_form());
+  struct hc_form *f = hc_baseof(out.next, struct hc_form, owner);
+  assert(f->type == &hc_id);
 
   hc_list_do(&out, f) {
-    hc_form_free(hc_baseof(f, struct hc_form, list));
+    hc_form_free(hc_baseof(f, struct hc_form, owner));
   }
 
   hc_slab_alloc_deinit(&a);

@@ -66,17 +66,31 @@ struct hc_form_type {
 struct hc_form {
   const struct hc_form_type *type;
   struct hc_sloc sloc;
-  struct hc_list list;
+  struct hc_list owner;
 };
 
 void hc_form_init(struct hc_form *f,
 		  const struct hc_form_type *type,
 		  struct hc_sloc sloc,
-		  struct hc_list *list);
+		  struct hc_list *owner);
 
+void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl);
+void hc_form_print(struct hc_form *f, struct hc_stream *out);
 void hc_form_free(struct hc_form *f);
 
-struct hc_form_type *hc_id_form();
+extern const struct hc_form_type hc_expr;
+
+struct hc_expr {
+  struct hc_form form;
+  struct hc_list forms;
+};
+
+void hc_expr_init(struct hc_expr *f,
+		  struct hc_sloc sloc,
+		  struct hc_list *owner,
+		  struct hc_list items);
+
+extern const struct hc_form_type hc_id;
 
 struct hc_id {
   struct hc_form form;
@@ -85,8 +99,10 @@ struct hc_id {
 
 void hc_id_init(struct hc_id *f,
 		struct hc_sloc sloc,
-		struct hc_list *list,
+		struct hc_list *owner,
 		const char *name);
+
+extern const struct hc_form_type hc_literal;
 
 struct hc_literal {
   struct hc_form form;
@@ -95,7 +111,7 @@ struct hc_literal {
 
 void hc_literal_init(struct hc_literal *f,
 		     struct hc_sloc sloc,
-		     struct hc_list *list,
+		     struct hc_list *owner,
 		     struct hc_value *value);
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc);

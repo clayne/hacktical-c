@@ -136,17 +136,74 @@ struct hc_sloc hc_sloc(const char *source, const int row, const int col) {
 void hc_form_init(struct hc_form *f,
 		  const struct hc_form_type *t,
 		  const struct hc_sloc sloc,
-		  struct hc_list *list) {
+		  struct hc_list *owner) {
   f->type = t;
   f->sloc = sloc;
-  hc_list_push_back(list, &f->list);
+  hc_list_push_back(owner, &f->owner);
+}
+
+void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl) {
+  assert(f->type->emit);
+  f->type->emit(f, dsl);
+}
+
+void hc_form_print(struct hc_form *f, struct hc_stream *out) {
+  assert(f->type->print);
+  f->type->print(f, out);
 }
 
 void hc_form_free(struct hc_form *f) {
   assert(f->type->free);
   f->type->free(f);
 }
-					
+
+static void expr_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form); 
+
+  hc_list_do(&f->forms, i) {
+    hc_form_emit(hc_baseof(i, struct hc_form, owner), dsl);
+  }
+}
+
+static void expr_free(struct hc_form *_f) {
+  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form);
+
+  hc_list_do(&f->forms, i) {
+    hc_form_free(hc_baseof(i, struct hc_form, owner));
+  }
+  
+  free(f);
+}
+
+static void expr_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form);
+  _hc_stream_putc(out, '(');
+
+  hc_list_do(&f->forms, i) {
+    if (i != f->forms.next) {
+      _hc_stream_putc(out, ' ');
+    }
+    
+    hc_form_print(hc_baseof(i, struct hc_form, owner), out);
+  }
+  
+  _hc_stream_putc(out, ')');
+}
+
+const struct hc_form_type hc_expr = {
+  .emit = expr_emit,
+  .free = expr_free,
+  .print = expr_print
+};
+
+void hc_expr_init(struct hc_expr *f,
+		  const struct hc_sloc sloc,
+		  struct hc_list *owner,
+		  const struct hc_list forms) {  
+  hc_form_init(&f->form, &hc_expr, sloc, owner);
+  f->forms = forms;
+}
+
 static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
   struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
@@ -176,21 +233,17 @@ static void id_print(const struct hc_form *_f, struct hc_stream *out) {
   _hc_stream_puts(out, f->name);
 }
 
-struct hc_form_type *hc_id_form() {
-  static __thread struct hc_form_type t = {
-    .emit = id_emit,
-    .free = id_free,
-    .print = id_print
-  };
-
-  return &t;
-}
+const struct hc_form_type hc_id = {
+  .emit = id_emit,
+  .free = id_free,
+  .print = id_print
+};
 
 void hc_id_init(struct hc_id *f,
 		const struct hc_sloc sloc,
-		struct hc_list *list,
+		struct hc_list *owner,
 		const char *name) {
-  hc_form_init(&f->form, hc_id_form(), sloc, list);
+  hc_form_init(&f->form, &hc_id, sloc, owner);
   f->name = strdup(name);
 }
 
@@ -212,17 +265,17 @@ static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
   hc_value_write(&f->value, out);
 }
 
+const struct hc_form_type hc_literal = {
+  .emit = literal_emit,
+  .free = literal_free,
+  .print = literal_print
+};
+
 void hc_literal_init(struct hc_literal *f,
 		     const struct hc_sloc sloc,
-		     struct hc_list *list,
-		     struct hc_value *value) {
-  static const struct hc_form_type type = {
-    .emit = literal_emit,
-    .free = literal_free,
-    .print = literal_print
-  };
-  
-  hc_form_init(&f->form, &type, sloc, list);
+		     struct hc_list *owner,
+		     struct hc_value *value) {  
+  hc_form_init(&f->form, &hc_literal, sloc, owner);
   hc_value_copy(&f->value, value);
 }
 
