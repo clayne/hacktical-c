@@ -18,7 +18,6 @@ enum hc_order hc_strcmp(const char *x, const char *y);
 struct hc_dsl {
   struct hc_vector code;
   struct hc_set env;
-  struct hc_vector registers;
   struct hc_vector ops;
   struct hc_vector stack;
 };

@@ -34,7 +34,6 @@ void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc) {
   dsl->env.key = env_key;
   
   hc_vector_init(&dsl->ops, malloc, sizeof(const struct hc_op *));
-  hc_vector_init(&dsl->registers, malloc, sizeof(struct hc_value));
   hc_vector_init(&dsl->stack, malloc, sizeof(struct hc_value));
 }
 
@@ -62,7 +61,6 @@ void hc_dsl_deinit(struct hc_dsl *dsl) {
   hc_vector_deinit(&dsl->code);
   hc_set_deinit(&dsl->env);
   hc_vector_deinit(&dsl->ops);
-  hc_vector_deinit(&dsl->registers);
   hc_vector_deinit(&dsl->stack);
 }
 
