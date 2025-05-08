@@ -59,8 +59,9 @@ struct hc_form;
 
 struct hc_form_type {
   void (*emit)(const struct hc_form *, struct hc_dsl *);
-  void (*free)(struct hc_form *);
   void (*print)(const struct hc_form *, struct hc_stream *);
+  struct hc_value *(*value)(const struct hc_form *, struct hc_dsl *);
+  void (*free)(struct hc_form *);
 };
   
 struct hc_form {
@@ -76,19 +77,22 @@ void hc_form_init(struct hc_form *f,
 
 void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl);
 void hc_form_print(struct hc_form *f, struct hc_stream *out);
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl);
 void hc_form_free(struct hc_form *f);
 
-extern const struct hc_form_type hc_expr;
+extern const struct hc_form_type hc_call;
 
-struct hc_expr {
+struct hc_call {
   struct hc_form form;
-  struct hc_list forms;
+  struct hc_form *target;
+  struct hc_list args;
 };
 
-void hc_expr_init(struct hc_expr *f,
+void hc_call_init(struct hc_call *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *owner,
-		  struct hc_list items);
+		  struct hc_form *target,
+		  struct hc_list args);
 
 extern const struct hc_form_type hc_id;
 

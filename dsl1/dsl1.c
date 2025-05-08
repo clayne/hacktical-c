@@ -152,74 +152,93 @@ void hc_form_print(struct hc_form *f, struct hc_stream *out) {
   f->type->print(f, out);
 }
 
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl) {
+  return f->type->value ? f->type->value(f, dsl) : NULL;
+}
+
 void hc_form_free(struct hc_form *f) {
   assert(f->type->free);
   f->type->free(f);
 }
 
-static void expr_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
-  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form); 
+static void call_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+  struct hc_call *f = hc_baseof(_f, struct hc_call, form);
+  struct hc_value *t = hc_form_value(f->target, dsl);
 
-  hc_list_do(&f->forms, i) {
-    hc_form_emit(hc_baseof(i, struct hc_form, owner), dsl);
+  if (!t) {
+    hc_throw("Missing call target");
   }
-}
 
-static void expr_free(struct hc_form *_f) {
-  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form);
-
-  hc_list_do(&f->forms, i) {
-    hc_form_free(hc_baseof(i, struct hc_form, owner));
+  if (t->type != &HC_DSL_FUN) {
+    hc_throw("Not callable: %s", t->type->name);
   }
   
-  free(f);
+  hc_dsl_emit(dsl,
+	      &HC_CALL,
+	      &(struct hc_call_op){
+		.target = t->as_other,
+		.sloc = _f->sloc
+	      });
 }
 
-static void expr_print(const struct hc_form *_f, struct hc_stream *out) {
-  struct hc_expr *f = hc_baseof(_f, struct hc_expr, form);
+static void call_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_call *f = hc_baseof(_f, struct hc_call, form);
   hc_putc(out, '(');
+  hc_form_print(f->target, out);
 
-  hc_list_do(&f->forms, i) {
-    if (i != f->forms.next) {
-      hc_putc(out, ' ');
-    }
-    
+  hc_list_do(&f->args, i) {
+    hc_putc(out, ' ');
     hc_form_print(hc_baseof(i, struct hc_form, owner), out);
   }
   
   hc_putc(out, ')');
 }
 
-const struct hc_form_type hc_expr = {
-  .emit = expr_emit,
-  .free = expr_free,
-  .print = expr_print
+static void call_free(struct hc_form *_f) {
+  struct hc_call *f = hc_baseof(_f, struct hc_call, form);
+  hc_form_free(f->target);
+  
+  hc_list_do(&f->args, i) {
+    hc_form_free(hc_baseof(i, struct hc_form, owner));
+  }
+  
+  free(f);
+}
+
+const struct hc_form_type hc_call = {
+  .emit = call_emit,
+  .print = call_print,
+  .value = NULL,
+  .free = call_free
 };
 
-void hc_expr_init(struct hc_expr *f,
+void hc_call_init(struct hc_call *f,
 		  const struct hc_sloc sloc,
 		  struct hc_list *owner,
-		  const struct hc_list forms) {  
-  hc_form_init(&f->form, &hc_expr, sloc, owner);
-  f->forms = forms;
+		  struct hc_form *target,
+		  const struct hc_list args) {  
+  hc_form_init(&f->form, &hc_call, sloc, owner);
+  f->target = target;
+  f->args = args;
 }
 
 static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
   struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
+  struct hc_push_op op;
+  hc_value_copy(&op.value, v);
+  hc_dsl_emit(dsl, &HC_PUSH, &op);
+}
 
-  if (v->type == &HC_DSL_FUN) {
-    hc_dsl_emit(dsl,
-		&HC_CALL,
-		&(struct hc_call_op){
-		  .target = v->as_other,
-		  .sloc = _f->sloc
-		});
-  } else {
-    struct hc_push_op op;
-    hc_value_copy(&op.value, v);
-    hc_dsl_emit(dsl, &HC_PUSH, &op);
-  }
+static void id_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  hc_puts(out, f->name);
+}
+
+static struct hc_value *id_value(const struct hc_form *_f,
+				 struct hc_dsl *dsl) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  return hc_dsl_getenv(dsl, f->name, _f->sloc);
 }
 
 static void id_free(struct hc_form *_f) {
@@ -228,15 +247,11 @@ static void id_free(struct hc_form *_f) {
   free(f);
 }
 
-static void id_print(const struct hc_form *_f, struct hc_stream *out) {
-  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  hc_puts(out, f->name);
-}
-
 const struct hc_form_type hc_id = {
   .emit = id_emit,
-  .free = id_free,
-  .print = id_print
+  .print = id_print,
+  .value = id_value,
+  .free = id_free
 };
 
 void hc_id_init(struct hc_id *f,
@@ -254,21 +269,28 @@ static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
   hc_dsl_emit(dsl, &HC_PUSH, &op);
 }
 
+static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
+  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
+  hc_value_write(&f->value, out);
+}
+
+static struct hc_value *literal_value(const struct hc_form *_f,
+				      struct hc_dsl *dsl) {
+  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
+  return &f->value;
+}
+
 static void literal_free(struct hc_form *_f) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
   hc_value_deinit(&f->value);
   free(f);
 }
 
-static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
-  struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
-  hc_value_write(&f->value, out);
-}
-
 const struct hc_form_type hc_literal = {
   .emit = literal_emit,
+  .print = literal_print,
+  .value = literal_value,
   .free = literal_free,
-  .print = literal_print
 };
 
 void hc_literal_init(struct hc_literal *f,
