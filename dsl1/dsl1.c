@@ -129,7 +129,7 @@ void hc_dsl_eval(struct hc_dsl *dsl,
        p = (*(hc_op_eval_t *)p)(dsl, p + dsl->code.item_size));
 }
 
-struct hc_sloc hc_sloc(const char *source, int row, int col) {
+struct hc_sloc hc_sloc(const char *source, const int row, const int col) {
   struct hc_sloc s = {.source = {0}, .row = row, .col = col};
   strncpy(s.source, source, sizeof(s.source)-1);
   return s;
@@ -160,12 +160,10 @@ static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
 		  .target = v->as_other,
 		  .sloc = _f->sloc
 		});
-  } else if (v->type == &HC_FIX) {
+  } else {
     struct hc_push_op op;
     hc_value_copy(&op.value, v);
     hc_dsl_emit(dsl, &HC_PUSH, &op);
-  } else {
-    hc_throw("Invald value: %d", v->type->name);
   }
 }
 
