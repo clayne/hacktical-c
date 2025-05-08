@@ -8,11 +8,10 @@
 
 #include "vector/vector.h"
 
-struct hc_stream {
-  void (*deinit)(struct hc_stream *);
-  
+struct hc_stream {  
   size_t (*read)(struct hc_stream *, uint8_t *, size_t);
   size_t (*write)(struct hc_stream *, const uint8_t *, size_t);
+  void (*deinit)(struct hc_stream *);
 };
 
 size_t hc_read(struct hc_stream *s, uint8_t *data, size_t n);
@@ -22,13 +21,13 @@ char hc_getc(struct hc_stream *s);
 size_t hc_putc(struct hc_stream *s, char data);
 size_t hc_puts(struct hc_stream *s, const char *data);
 
-void hc_stream_deinit(struct hc_stream *s);
-
 size_t hc_vprintf(struct hc_stream *s,
 		  const char *spec,
 		  va_list args);
 
 size_t hc_printf(struct hc_stream *s, const char *spec, ...);
+
+void hc_stream_deinit(struct hc_stream *s);
 
 struct hc_file_stream_opts {
   bool close_file;
@@ -47,6 +46,7 @@ struct hc_file_stream {
     })
 
 extern struct hc_stream hc_file_stream;
+
 struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
 					    FILE *file,
 					    struct hc_file_stream_opts opts);

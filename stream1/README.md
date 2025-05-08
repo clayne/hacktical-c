@@ -13,22 +13,16 @@ Example:
 We'll start with defining the interface for a stream.
 
 ```C
-struct hc_stream {
-  void (*deinit)(struct hc_stream *);
-  
+struct hc_stream {  
   size_t (*read)(struct hc_stream *, uint8_t *, size_t);
   size_t (*write)(struct hc_stream *, const uint8_t *, size_t);
+  void (*deinit)(struct hc_stream *);
 };
 ```
 
 `deinit`, `read` & `write` delegate to respective stored function pointer.
 
 ```C
-void hc_stream_deinit(struct hc_stream *s) {
-  assert(s->deinit);
-  s->deinit(s);
-}
-
 size_t hc_read(struct hc_stream *s, uint8_t *data, const size_t n) {
   assert(s->read);
   return s->read(s, data, n);
@@ -74,7 +68,14 @@ size_t hc_printf(struct hc_stream *s, const char *spec, ...) {
 }
 ```
 
-The first implementation is file streams, which simply delegate to `stdio`. If `close_file` is `true`, the file is closed with the stream.
+```C
+void hc_stream_deinit(struct hc_stream *s) {
+  assert(s->deinit);
+  s->deinit(s);
+}
+```
+
+The first implementation is file streams.
 
 ```C
 struct hc_file_stream_opts {
@@ -106,21 +107,11 @@ struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
   s->opts = opts;
   return s;
 };
+```
 
-void file_deinit(struct hc_stream *s) {
-  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+`read()`/`write()` delegate to `stdio`
 
-  if (fs->close) {
-    assert(fs->file);
-  
-    if (fclose(fs->file) == EOF) {
-      hc_throw(0, "Failed closing file");
-    }
-
-    fs->file = NULL;
-  }
-}
-
+```C
 size_t file_read(struct hc_stream *s, uint8_t *data, size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   return fread(data, n, 1, fs->file);
@@ -132,6 +123,24 @@ size_t file_write(struct hc_stream *s, const uint8_t *data, size_t n) {
 }
 ```
 
+If `close_file` is `true`, the file is closed with the stream.
+
+```C
+void file_deinit(struct hc_stream *s) {
+  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+
+  if (fs->close_file) {
+    assert(fs->file);
+  
+    if (fclose(fs->file) == EOF) {
+      hc_throw(0, "Failed closing file");
+    }
+
+    fs->file = NULL;
+  }
+}
+```
+
 Next up is implementing memory streams. We'll use a `struct hc_vector` to manage the stream data and track the current read position in `rpos`.
 
 ```C
@@ -140,11 +149,6 @@ struct hc_memory_stream {
   struct hc_vector data;
   size_t rpos;
 };
-
-void memory_deinit(struct hc_stream *s) {
-  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
-  hc_vector_deinit(&ms->data);
-}
 
 struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s,
                                                struct hc_malloc *malloc) {
@@ -184,5 +188,14 @@ size_t memory_write(struct hc_stream *s, const uint8_t *data, size_t n) {
   uint8_t *const dst = hc_vector_insert(&ms->data, ms->data.length, n);
   memcpy(dst, data, n);
   return n;
+}
+```
+
+The stream data is freed in `deinit()`.
+
+```C
+void memory_deinit(struct hc_stream *s) {
+  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
+  hc_vector_deinit(&ms->data);
 }
 ```

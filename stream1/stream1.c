@@ -9,11 +9,6 @@
 #include "macro/macro.h"
 #include "stream1.h"
 
-void hc_stream_deinit(struct hc_stream *s) {
-  assert(s->deinit);
-  s->deinit(s);
-}
-
 size_t hc_read(struct hc_stream *s, uint8_t *data, const size_t n) {
   assert(s->read);
   return s->read(s, data, n);
@@ -53,17 +48,9 @@ size_t hc_printf(struct hc_stream *s, const char *spec, ...) {
   return hc_vprintf(s, spec, args);
 }
 
-void file_deinit(struct hc_stream *s) {
-  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
-  assert(fs->file);
-
-  if (fs->opts.close_file) {  
-    if (fclose(fs->file) == EOF) {
-      hc_throw("Failed closing file");
-    }
-    
-    fs->file = NULL;
-  }
+void hc_stream_deinit(struct hc_stream *s) {
+  assert(s->deinit);
+  s->deinit(s);
 }
 
 size_t file_read(struct hc_stream *s, uint8_t *data, const size_t n) {
@@ -78,13 +65,27 @@ size_t file_write(struct hc_stream *s, const uint8_t *data, const size_t n) {
   return fwrite(data, n, 1, fs->file);
 }
 
+void file_deinit(struct hc_stream *s) {
+  struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
+
+  if (fs->opts.close_file) {
+    assert(fs->file);
+ 
+    if (fclose(fs->file) == EOF) {
+      hc_throw("Failed closing file");
+    }
+    
+    fs->file = NULL;
+  }
+}
+
 struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
 					    FILE *file,
 					    const struct hc_file_stream_opts opts) {
   s->stream = (struct hc_stream){
-    .deinit = file_deinit,
     .read   = file_read,
     .write  = file_write,
+    .deinit = file_deinit,
   };
   
   s->file = file;
@@ -102,11 +103,6 @@ struct hc_stream *hc_stdout() {
   }
 
   return &s.stream;
-}
-
-void memory_deinit(struct hc_stream *s) {
-  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
-  hc_vector_deinit(&ms->data);
 }
 
 size_t memory_read(struct hc_stream *s, uint8_t *data, size_t n) {
@@ -130,12 +126,17 @@ size_t memory_write(struct hc_stream *s,
   return n;
 }
 
+void memory_deinit(struct hc_stream *s) {
+  struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
+  hc_vector_deinit(&ms->data);
+}
+
 struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s,
 					       struct hc_malloc *malloc) {
   s->stream = (struct hc_stream){
-    .deinit = memory_deinit,
     .read   = memory_read,
     .write  = memory_write,
+    .deinit = memory_deinit,
   };
   
   hc_vector_init(&s->data, malloc, 1);
