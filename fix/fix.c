@@ -84,8 +84,8 @@ hc_fix_t hc_fix_div(const hc_fix_t x, const hc_fix_t y) {
 }
 
 void hc_fix_print(const hc_fix_t v, struct hc_stream *out) {
-  _hc_stream_printf(out,
-		    "%" PRId64 ".%" PRId64,
-		    hc_fix_int(v),
-		    hc_fix_frac(v));
+  hc_printf(out,
+	    "%" PRId64 ".%" PRId64,
+	    hc_fix_int(v),
+	    hc_fix_frac(v));
 }

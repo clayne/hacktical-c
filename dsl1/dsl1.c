@@ -177,17 +177,17 @@ static void expr_free(struct hc_form *_f) {
 
 static void expr_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_expr *f = hc_baseof(_f, struct hc_expr, form);
-  _hc_stream_putc(out, '(');
+  hc_putc(out, '(');
 
   hc_list_do(&f->forms, i) {
     if (i != f->forms.next) {
-      _hc_stream_putc(out, ' ');
+      hc_putc(out, ' ');
     }
     
     hc_form_print(hc_baseof(i, struct hc_form, owner), out);
   }
   
-  _hc_stream_putc(out, ')');
+  hc_putc(out, ')');
 }
 
 const struct hc_form_type hc_expr = {
@@ -230,7 +230,7 @@ static void id_free(struct hc_form *_f) {
 
 static void id_print(const struct hc_form *_f, struct hc_stream *out) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  _hc_stream_puts(out, f->name);
+  hc_puts(out, f->name);
 }
 
 const struct hc_form_type hc_id = {
@@ -309,14 +309,14 @@ bool hc_read_id(const char **in,
       break;
     }
   
-    hc_stream_putc(&buf, c);
+    hc_putc(&buf.stream, c);
     sloc->col++;
     (*in)++;
   }
 
   struct hc_id *f = malloc(sizeof(struct hc_id));
   hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
-  hc_stream_deinit(&buf);
+  hc_stream_deinit(&buf.stream);
   return true;
 }
 
@@ -379,7 +379,7 @@ const struct hc_op HC_STOP = (struct hc_op){
 };
 
 static void fun_print(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_printf(out, "%p", v->as_other);
+  hc_printf(out, "%p", v->as_other);
 }
 
 const struct hc_type HC_DSL_FUN = {

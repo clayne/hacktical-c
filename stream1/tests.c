@@ -5,7 +5,7 @@
 void stream1_tests() {
   struct hc_memory_stream s;
   hc_memory_stream_init(&s, &hc_malloc_default);
-  hc_defer(hc_stream_deinit(&s));
-  hc_stream_printf(&s, "%s%d", "foo", 42);
+  hc_defer(hc_stream_deinit(&s.stream));
+  hc_printf(&s.stream, "%s%d", "foo", 42);
   assert(strcmp("foo42", hc_memory_stream_string(&s)) == 0);
 }

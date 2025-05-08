@@ -43,7 +43,7 @@ void hc_value_write(struct hc_value *v, struct hc_stream *out) {
 }
 
 static void bool_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_puts(out, v->as_bool ? "true" : "false");
+  hc_puts(out, v->as_bool ? "true" : "false");
 }
 
 const struct hc_type HC_BOOL = {
@@ -63,7 +63,7 @@ const struct hc_type HC_FIX = {
 };
 
 static void int_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_printf(out, "%d", v->as_int);
+  hc_printf(out, "%d", v->as_int);
 }
 
 const struct hc_type HC_INT = {
@@ -81,13 +81,13 @@ static void string_deinit(struct hc_value *v) {
 }
 
 static void string_print(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_puts(out, v->as_string);
+  hc_puts(out, v->as_string);
 }
 
 static void string_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_putc(out, '"');
+  hc_putc(out, '"');
   string_print(v, out);
-  _hc_stream_putc(out, '"');
+  hc_putc(out, '"');
 }
 
 const struct hc_type HC_STRING = {

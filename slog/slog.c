@@ -90,12 +90,12 @@ struct hc_slog_field *hc_slog_time(const char *name, const hc_time_t value) {
 
 void stream_deinit(struct hc_slog *s) {
   struct hc_slog_stream *ss = hc_baseof(s, struct hc_slog_stream, slog);
-  if (ss->opts.close_out) { _hc_stream_deinit(ss->out); }
+  if (ss->opts.close_out) { hc_stream_deinit(ss->out); }
 }
 
 static void field_write(struct hc_slog_field *f, struct hc_stream *out) {
-  _hc_stream_puts(out, f->name);
-  _hc_stream_putc(out, '=');
+  hc_puts(out, f->name);
+  hc_putc(out, '=');
   hc_value_write(&f->value, out);
 }
 
@@ -106,11 +106,11 @@ static void stream_write(struct hc_slog *s,
 
   for(size_t i = 0; i < n; i++) {
     struct hc_slog_field *f = fields[i];
-    if (i) { _hc_stream_puts(ss->out, ", "); }
+    if (i) { hc_puts(ss->out, ", "); }
     field_write(f, ss->out);
   }
 
-  _hc_stream_putc(ss->out, '\n');
+  hc_putc(ss->out, '\n');
 }
 
 struct hc_slog_stream *_hc_slog_stream_init(struct hc_slog_stream *s,

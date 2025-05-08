@@ -74,7 +74,7 @@ void hc_time_printf(const hc_time_t *t,
 		    const char *spec,
 		    struct hc_stream *out) {
   char *s = hc_time_sprintf(t, "%Y-%m-%dT%H:%M:%S");
-  _hc_stream_puts(out, s);
+  hc_puts(out, s);
   free(s);
 }
 

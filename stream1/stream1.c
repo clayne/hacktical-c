@@ -9,50 +9,48 @@
 #include "macro/macro.h"
 #include "stream1.h"
 
-void _hc_stream_deinit(struct hc_stream *s) {
+void hc_stream_deinit(struct hc_stream *s) {
   assert(s->deinit);
   s->deinit(s);
 }
 
-size_t _hc_stream_get(struct hc_stream *s, uint8_t *data, const size_t n) {
-  assert(s->get);
-  return s->get(s, data, n);
+size_t hc_read(struct hc_stream *s, uint8_t *data, const size_t n) {
+  assert(s->read);
+  return s->read(s, data, n);
 }
 
-char _hc_stream_getc(struct hc_stream *s) {
+size_t hc_write(struct hc_stream *s, const uint8_t *data, const size_t n) {
+  assert(s->write);
+  return s->write(s, data, n);
+}
+
+char hc_getc(struct hc_stream *s) {
   char c = 0;
-  return _hc_stream_get(s, (uint8_t *)&c, 1) ? c : 0;
+  return hc_read(s, (uint8_t *)&c, 1) ? c : 0;
 }
 
-size_t _hc_stream_put(struct hc_stream *s,
-		      const uint8_t *data,
-		      const size_t n) {
-  assert(s->put);
-  return s->put(s, data, n);
-}
-
-size_t _hc_stream_putc(struct hc_stream *s, const char data) {
+size_t hc_putc(struct hc_stream *s, const char data) {
   const uint8_t d[2] = {data, 0};
-  return _hc_stream_put(s, d, 1);
+  return hc_write(s, d, 1);
 }
 
-size_t _hc_stream_puts(struct hc_stream *s, const char *data) {
-  return _hc_stream_put(s, (const uint8_t *)data, strlen(data));
+size_t hc_puts(struct hc_stream *s, const char *data) {
+  return hc_write(s, (const uint8_t *)data, strlen(data));
 }
 
-size_t _hc_stream_vprintf(struct hc_stream *s,
-			 const char *spec,
-			 va_list args) {
+size_t hc_vprintf(struct hc_stream *s,
+		  const char *spec,
+		  va_list args) {
   char *data = hc_vsprintf(spec, args);
   hc_defer(free(data));
-  return _hc_stream_put(s, (uint8_t *)data, strlen(data));
+  return hc_write(s, (uint8_t *)data, strlen(data));
 }
 
-size_t _hc_stream_printf(struct hc_stream *s, const char *spec, ...) {
+size_t hc_printf(struct hc_stream *s, const char *spec, ...) {
   va_list args;
   va_start(args, spec);
   hc_defer(va_end(args));
-  return _hc_stream_vprintf(s, spec, args);
+  return hc_vprintf(s, spec, args);
 }
 
 void file_deinit(struct hc_stream *s) {
@@ -68,13 +66,13 @@ void file_deinit(struct hc_stream *s) {
   }
 }
 
-size_t file_get(struct hc_stream *s, uint8_t *data, const size_t n) {
+size_t file_read(struct hc_stream *s, uint8_t *data, const size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   assert(fs->file);
   return fread(data, n, 1, fs->file);
 }
 
-size_t file_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
+size_t file_write(struct hc_stream *s, const uint8_t *data, const size_t n) {
   struct hc_file_stream *fs = hc_baseof(s, struct hc_file_stream, stream);
   assert(fs->file);
   return fwrite(data, n, 1, fs->file);
@@ -84,9 +82,9 @@ struct hc_file_stream *_hc_file_stream_init(struct hc_file_stream *s,
 					    FILE *file,
 					    const struct hc_file_stream_opts opts) {
   s->stream = (struct hc_stream){
-    .deinit  = file_deinit,
-    .get     = file_get,
-    .put     = file_put,
+    .deinit = file_deinit,
+    .read   = file_read,
+    .write  = file_write,
   };
   
   s->file = file;
@@ -111,7 +109,7 @@ void memory_deinit(struct hc_stream *s) {
   hc_vector_deinit(&ms->data);
 }
 
-size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
+size_t memory_read(struct hc_stream *s, uint8_t *data, size_t n) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
 
   if (ms->rpos + n > ms->data.length) {
@@ -123,7 +121,9 @@ size_t memory_get(struct hc_stream *s, uint8_t *data, size_t n) {
   return n;
 }
 
-size_t memory_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
+size_t memory_write(struct hc_stream *s,
+		    const uint8_t *data,
+		    const size_t n) {
   struct hc_memory_stream *ms = hc_baseof(s, struct hc_memory_stream, stream);
   uint8_t *const dst = hc_vector_insert(&ms->data, ms->data.length, n);
   memcpy(dst, data, n);
@@ -133,9 +133,9 @@ size_t memory_put(struct hc_stream *s, const uint8_t *data, const size_t n) {
 struct hc_memory_stream *hc_memory_stream_init(struct hc_memory_stream *s,
 					       struct hc_malloc *malloc) {
   s->stream = (struct hc_stream){
-    .deinit  = memory_deinit,
-    .get     = memory_get,
-    .put     = memory_put,
+    .deinit = memory_deinit,
+    .read   = memory_read,
+    .write  = memory_write,
   };
   
   hc_vector_init(&s->data, malloc, 1);
