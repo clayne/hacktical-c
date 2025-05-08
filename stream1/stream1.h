@@ -25,8 +25,8 @@ size_t hc_puts(struct hc_stream *s, const char *data);
 void hc_stream_deinit(struct hc_stream *s);
 
 size_t hc_vprintf(struct hc_stream *s,
-			 const char *spec,
-			 va_list args);
+		  const char *spec,
+		  va_list args);
 
 size_t hc_printf(struct hc_stream *s, const char *spec, ...);
 
