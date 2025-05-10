@@ -28,13 +28,12 @@ static const void *env_key(const void *x) {
 }
 
 void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc) {
-  hc_vector_init(&dsl->code, malloc, sizeof(hc_op_eval_t));
-
   hc_set_init(&dsl->env, malloc, sizeof(struct env_item), env_cmp);
   dsl->env.key = env_key;
-  
-  hc_vector_init(&dsl->ops, malloc, sizeof(const struct hc_op *));
+
   hc_vector_init(&dsl->stack, malloc, sizeof(struct hc_value));
+  hc_vector_init(&dsl->ops, malloc, sizeof(const struct hc_op *));
+  hc_vector_init(&dsl->code, malloc, sizeof(hc_op_eval_t));
 }
 
 static size_t op_size(const struct hc_op *op, struct hc_dsl *dsl) {
@@ -54,14 +53,15 @@ static void deinit_ops(struct hc_dsl *dsl) {
 
     p += op_size(op, dsl);
   }
+
+  hc_vector_deinit(&dsl->ops);
 }
 
 void hc_dsl_deinit(struct hc_dsl *dsl) {  
+  hc_set_deinit(&dsl->env);
+  hc_vector_deinit(&dsl->stack);
   deinit_ops(dsl);
   hc_vector_deinit(&dsl->code);
-  hc_set_deinit(&dsl->env);
-  hc_vector_deinit(&dsl->ops);
-  hc_vector_deinit(&dsl->stack);
 }
 
 struct hc_value *hc_dsl_getenv(struct hc_dsl *dsl,
@@ -157,6 +157,7 @@ struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl) {
 }
 
 void hc_form_free(struct hc_form *f) {
+  hc_list_delete(&f->owner);
   assert(f->type->free);
   f->type->free(f);
 }
@@ -186,7 +187,7 @@ static void call_print(const struct hc_form *_f, struct hc_stream *out) {
   hc_putc(out, '(');
   hc_form_print(f->target, out);
 
-  hc_list_do(&f->args, i) {
+  hc_list_do(f->args, i) {
     hc_putc(out, ' ');
     hc_form_print(hc_baseof(i, struct hc_form, owner), out);
   }
@@ -196,12 +197,13 @@ static void call_print(const struct hc_form *_f, struct hc_stream *out) {
 
 static void call_free(struct hc_form *_f) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
-  hc_form_free(f->target);
-  
-  hc_list_do(&f->args, i) {
+  hc_form_free(f->target);  
+
+  hc_list_do(f->args, i) {
     hc_form_free(hc_baseof(i, struct hc_form, owner));
   }
-  
+
+  free(f->args);
   free(f);
 }
 
@@ -216,7 +218,7 @@ void hc_call_init(struct hc_call *f,
 		  const struct hc_sloc sloc,
 		  struct hc_list *owner,
 		  struct hc_form *target,
-		  const struct hc_list args) {  
+		  struct hc_list *args) {  
   hc_form_init(&f->form, &hc_call, sloc, owner);
   f->target = target;
   f->args = args;
@@ -318,12 +320,55 @@ void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
   }
 }
 
-bool hc_read_id(const char **in,
+void hc_read_call(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+  assert(**in == '(');
+  (*in)++;
+
+  if (!hc_read_form(in, out, sloc)) {
+    hc_throw("Missing call target");
+  }
+
+  struct hc_form *t = hc_baseof(hc_list_pop_back(out),
+				struct hc_form,
+				owner);
+  
+  hc_list_init(&t->owner);
+  struct hc_list *args = malloc(sizeof(struct hc_list));
+  hc_list_init(args);
+  
+  for (bool done = false; !done;) {
+    hc_skip_ws(in, sloc);
+    
+    switch (**in) {
+    case 0:
+      hc_throw("Open call form");
+    case ')':
+      (*in)++;
+      done = true;
+      continue;
+    default:
+      break;
+    }
+
+    if (!hc_read_form(in, args, sloc)) {
+      hc_throw("Invalid call syntax");
+    }
+  }
+
+  struct hc_call *f = malloc(sizeof(struct hc_call));
+  hc_call_init(f, floc, out, t, args);
+}
+
+void hc_read_id(const char **in,
 		struct hc_list *out,
 		struct hc_sloc *sloc) {
   struct hc_sloc floc = *sloc;
   struct hc_memory_stream buf;
   hc_memory_stream_init(&buf, &hc_malloc_default);
+  hc_defer(hc_stream_deinit(&buf.stream));
   char c = 0;
 
   while ((c = **in)) {
@@ -338,8 +383,6 @@ bool hc_read_id(const char **in,
 
   struct hc_id *f = malloc(sizeof(struct hc_id));
   hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
-  hc_stream_deinit(&buf.stream);
-  return true;
 }
 
 bool hc_read_form(const char **in,
@@ -349,9 +392,13 @@ bool hc_read_form(const char **in,
   const char c = **in;
   
   switch (c) {
+  case '(':
+    hc_read_call(in, out, sloc);
+    return true;
   default:
     if (isalpha(c)) {
-      return hc_read_id(in, out, sloc);
+      hc_read_id(in, out, sloc);
+      return true;
     }
 
     break;

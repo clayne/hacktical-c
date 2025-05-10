@@ -4,27 +4,45 @@
 #include "dsl1.h"
 #include "malloc2/malloc2.h"
 
-static void read_tests() {
-  struct hc_sloc sloc = hc_sloc("read_tests", 0, 0);
+static void read_call_tests() {
+  struct hc_sloc sloc = hc_sloc("read_call_tests", 0, 0);
+  
+  struct hc_list out;
+  hc_list_init(&out);
+
+  const char *s = "( foo bar )";
+  const char *in = s;
+  assert(hc_read_form(&in, &out, &sloc));
+  
+  struct hc_form *f = hc_baseof(out.next, struct hc_form, owner);
+  assert(f->type == &hc_call);
+
+  hc_list_do(&out, i) {
+    hc_form_free(hc_baseof(i, struct hc_form, owner));
+  }
+}
+
+static void read_id_tests() {
+  struct hc_sloc sloc = hc_sloc("read_id_tests", 0, 0);
   
   struct hc_list out;
   hc_list_init(&out);
 
   const char *s = " foo";
   const char *in = s;
-
-  struct hc_slab_alloc a;
-  hc_slab_alloc_init(&a, hc_malloc(), 10*sizeof(struct hc_form));
   assert(hc_read_form(&in, &out, &sloc));
   
   struct hc_form *f = hc_baseof(out.next, struct hc_form, owner);
   assert(f->type == &hc_id);
 
-  hc_list_do(&out, f) {
-    hc_form_free(hc_baseof(f, struct hc_form, owner));
+  hc_list_do(&out, i) {
+    hc_form_free(hc_baseof(i, struct hc_form, owner));
   }
+}
 
-  hc_slab_alloc_deinit(&a);
+static void read_tests() {
+  read_id_tests();
+  read_call_tests();
 }
 
 static void emit_tests() {

@@ -16,10 +16,11 @@ typedef size_t hc_pc;
 enum hc_order hc_strcmp(const char *x, const char *y);
 
 struct hc_dsl {
-  struct hc_vector code;
   struct hc_set env;
-  struct hc_vector ops;
   struct hc_vector stack;
+  
+  struct hc_vector ops;
+  struct hc_vector code;
 };
 
 void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc);
@@ -85,14 +86,14 @@ extern const struct hc_form_type hc_call;
 struct hc_call {
   struct hc_form form;
   struct hc_form *target;
-  struct hc_list args;
+  struct hc_list *args;
 };
 
 void hc_call_init(struct hc_call *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *owner,
 		  struct hc_form *target,
-		  struct hc_list args);
+		  struct hc_list *args);
 
 extern const struct hc_form_type hc_id;
 
@@ -120,7 +121,11 @@ void hc_literal_init(struct hc_literal *f,
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc);
 
-bool hc_read_id(const char **in,
+void hc_read_call(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc);
+
+void hc_read_id(const char **in,
 		struct hc_list *out,
 		struct hc_sloc *sloc);
 

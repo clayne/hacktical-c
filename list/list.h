@@ -4,13 +4,14 @@
 #include <stdbool.h>
 #include "../macro/macro.h"
 
-#define _hc_list_do(l, i, _next)				\
-  for (struct hc_list *i = (l)->next, *_next = i->next;		\
-       i != (l);						\
+#define _hc_list_do(l, i, _list, _next)				\
+  __auto_type _list = l;					\
+  for (struct hc_list *i = _list->next, *_next = i->next;	\
+       i != _list;						\
        i = _next, _next = i->next)
 
-#define hc_list_do(l, i)			\
-  _hc_list_do(l, i, hc_unique(next))
+#define hc_list_do(l, i)				\
+  _hc_list_do(l, i, hc_unique(list), hc_unique(next))
 
 struct hc_list {
   struct hc_list *prev, *next;
