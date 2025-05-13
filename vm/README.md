@@ -76,3 +76,5 @@ void hc_vm_eval(struct hc_vm *vm,
 ```C
 typedef uint8_t *(*hc_op_eval_t)(struct hc_vm *, uint8_t *);
 ```
+
+To be continued...
