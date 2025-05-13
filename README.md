@@ -14,7 +14,7 @@ You could say that there are three kinds of programmers, with very different mot
 
 I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
-I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Forth, Haskell, SmallTalk, Go, C#, Swift.
+I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Erlang, Forth, Haskell, SmallTalk, Go, C#, Swift.
 
 For a long time, I didn't pay much attention to C; the language felt primitive, especially compared to C++. But gradually over time, I realized that the worst enemy in software is complexity, and started taking C more seriously.
 
@@ -31,11 +31,11 @@ But I also believe in compensation for creators; and the less economic pressure 
 The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
 
 ## Why C?
-The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler language, offering similar levels of freedom.
+The reason I believe C is and always will be important is that it stands in a class of its own as a mostly portable assembler, offering similar levels of freedom.
 
 C doesn't try very hard to prevent you from making mistakes. It has few opinions about your code and happily assumes that you know exactly what you're doing. Freedom with responsibility.
 
-These days; many programmers would recommend choosing a stricter language, regardless of the problem being solved. Most of those programmers wouldn't trust themselves with the kind of freedom C offers, and many haven't even bothered to learn the language properly.
+These days; many programmers would recommend choosing a stricter language, regardless of the problem being solved. Most of those programmers wouldn't trust themselves with the kind of freedom C offers, and many haven't bothered to learn the language properly.
 
 Since the foundation of the digital revolution, including the Internet was built using C; it gets the blame for many problems that are more due to our immaturity in designing and building complicated software than about programming languages.
 
