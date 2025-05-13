@@ -9,12 +9,12 @@
       _x < 0 ? -x : x;				\
     })						\
 
-#define hc_align(base, size) ({						\
-      __auto_type _base = base;						\
-      __auto_type _size = hc_alignof(size);				\
-      __auto_type _rest = (ptrdiff_t)_base % _size;			\
-      (_rest) ? _base + _size - _rest : _base;				\
-    })									\
+#define hc_align(base, size) ({				\
+      __auto_type _base = base;				\
+      __auto_type _size = hc_alignof(size);		\
+      __auto_type _rest = (ptrdiff_t)_base % _size;	\
+      (_rest) ? _base + _size - _rest : _base;		\
+    })							\
 
 size_t hc_alignof(size_t size);
 
@@ -32,6 +32,11 @@ size_t hc_alignof(size_t size);
 
 #define hc_bitmask(v, bc)			\
   (v & ((1 << bc) - 1))
+
+#define hc_const(x) ({						\
+      sizeof(int) ==						\
+      sizeof(*(8 ? ((void *)((long)(x) * 0l)) : (int *)8))	\
+    })
 
 #define _hc_defer(_d, _v, ...)			\
   void _d(int *) { __VA_ARGS__; }		\
