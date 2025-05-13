@@ -59,7 +59,7 @@ struct hc_op {
 };
 ```
 
-The evaluation loop is by far the most performance critical part of a virtual machine, since it executes code for each and every operation. The followin implementation has the added advantage of not statically limiting the set of available operations, which makes it extendable from user code.
+The evaluation loop is by far the most performance critical part of a virtual machine, since it executes code for each and every operation. The following implementation has the added advantage of not statically limiting the set of available operations, which enables extending the machine from user code.
 
 ```C
 void hc_vm_eval(struct hc_vm *vm,
@@ -75,7 +75,7 @@ void hc_vm_eval(struct hc_vm *vm,
 }
 ```
 
-This brings us back to the question of why we store evaluated code separately. The evaluation loop is very dependent on memory locality, which means we want to store the minimum amount of data that's absolutely needed to evaluate an operation. This allows the CPU to cache larger chunks of the code in one go.
+This brings us back to the question of why we store evaluated code separately. The evaluation loop is very dependent on memory locality, which means we want to store the minimum amount of data that's absolutely needed to evaluate an operation quickly. This allows the CPU to cache larger chunks of the code in one go.
 
 The `call` operation is used to call C functions.
 
@@ -104,7 +104,7 @@ const struct hc_op HC_CALL = (struct hc_op){
 
 Calls include the source location where the call was made to enable better error reporting.
 
-```
+```C
 struct hc_sloc {
   char source[32];
   char out[64];
@@ -127,7 +127,7 @@ const char *hc_sloc_string(struct hc_sloc *sloc) {
 
 The `push` operation pushes a [value](https://github.com/codr7/hacktical-c/tree/main/reflect) on the stack.
 
-```
+```C
 struct hc_push_op {
   struct hc_value value;
 };
