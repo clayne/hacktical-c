@@ -1,14 +1,14 @@
-#ifndef HACKTICAL_DSL2_H
-#define HACKTICAL_DSL2_H
+#ifndef HACKTICAL_DSL_H
+#define HACKTICAL_DSL_H
 
-#include "dsl1/dsl1.h"
+#include "vm/vm.h"
 
 struct hc_form;
 
 struct hc_form_type {
-  void (*emit)(struct hc_form *, struct hc_dsl *);
+  void (*emit)(struct hc_form *, struct hc_vm *);
   void (*print)(const struct hc_form *, struct hc_stream *);
-  struct hc_value *(*value)(const struct hc_form *, struct hc_dsl *);
+  struct hc_value *(*value)(const struct hc_form *, struct hc_vm *);
   void (*free)(struct hc_form *);
 };
   
@@ -23,9 +23,9 @@ void hc_form_init(struct hc_form *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *owner);
 
-void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl);
+void hc_form_emit(struct hc_form *f, struct hc_vm *vm);
 void hc_form_print(struct hc_form *f, struct hc_stream *out);
-struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl);
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_vm *vm);
 void hc_form_free(struct hc_form *f);
 
 extern const struct hc_form_type hc_call;
@@ -87,8 +87,8 @@ bool hc_read_text(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc);
 
-void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl);
+void hc_forms_emit(struct hc_list *in, struct hc_vm *vm);
 void hc_forms_free(struct hc_list *in);
-void hc_dsl_evals(struct hc_dsl *dsl, const char *in);
+void hc_dsl_eval(struct hc_vm *vm, const char *in);
 
 #endif

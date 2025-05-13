@@ -1,8 +1,7 @@
 #include "error/error.h"
 
 #include "chrono/tests.c"
-#include "dsl1/tests.c"
-#include "dsl2/tests.c"
+#include "dsl/tests.c"
 #include "dynamic/tests.c"
 #include "error/tests.c"
 #include "fix/tests.c"
@@ -16,11 +15,11 @@
 #include "stream1/tests.c"
 #include "task/tests.c"
 #include "vector/tests.c"
+#include "vm/tests.c"
 
 int main() {
   chrono_tests();
-  dsl1_tests();
-  dsl2_tests();
+  dsl_tests();
   dynamic_tests();
   error_tests();
   fix_tests();
@@ -34,6 +33,7 @@ int main() {
   stream1_tests();
   task_tests();
   vector_tests();
+  vm_tests();
 
   hc_errors_deinit();
   return 0;

@@ -1,5 +1,5 @@
 #include <assert.h>
-#include "dsl2.h"
+#include "dsl.h"
 
 static void read_call_tests() {
   struct hc_sloc sloc = hc_sloc("read_call_tests", 0, 0);
@@ -32,13 +32,13 @@ static void read_id_tests() {
 }
 
 static void eval_tests() {
-  struct hc_dsl dsl;
-  hc_dsl_init(&dsl, &hc_malloc_default);
-  hc_defer(hc_dsl_deinit(&dsl));
-  hc_dsl_evals(&dsl, "abc $(print foo) def");
+  struct hc_vm vm;
+  hc_vm_init(&vm, &hc_malloc_default);
+  hc_defer(hc_vm_deinit(&vm));
+  hc_dsl_eval(&vm, "abc $(print foo) def");
 }
 
-void dsl2_tests() {
+void dsl_tests() {
   read_id_tests();
   read_call_tests();
   eval_tests();

@@ -3,9 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "dsl2.h"
+#include "dsl.h"
 #include "error/error.h"
-#include "malloc1/malloc1.h"
 
 void hc_form_init(struct hc_form *f,
 		  const struct hc_form_type *t,
@@ -16,9 +15,9 @@ void hc_form_init(struct hc_form *f,
   hc_list_push_back(owner, &f->owner);
 }
 
-void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl) {
+void hc_form_emit(struct hc_form *f, struct hc_vm *vm) {
   assert(f->type->emit);
-  f->type->emit(f, dsl);
+  f->type->emit(f, vm);
 }
 
 void hc_form_print(struct hc_form *f, struct hc_stream *out) {
@@ -26,8 +25,8 @@ void hc_form_print(struct hc_form *f, struct hc_stream *out) {
   f->type->print(f, out);
 }
 
-struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl) {
-  return f->type->value ? f->type->value(f, dsl) : NULL;
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_vm *vm) {
+  return f->type->value ? f->type->value(f, vm) : NULL;
 }
 
 void hc_form_free(struct hc_form *f) {
@@ -36,22 +35,22 @@ void hc_form_free(struct hc_form *f) {
   f->type->free(f);
 }
 
-static void call_emit(struct hc_form *_f, struct hc_dsl *dsl) {
+static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
-  struct hc_value *t = hc_form_value(f->target, dsl);
+  struct hc_value *t = hc_form_value(f->target, vm);
 
   if (!t) {
     hc_throw("Error in '%s': Missing call target",
 	     hc_sloc_string(&_f->sloc));
   }
 
-  if (t->type != &HC_DSL_FUN) {
+  if (t->type != &HC_VM_FUN) {
     hc_throw("Error in '%s': '%s' isn't callable",
 	     hc_sloc_string(&_f->sloc),
 	     t->type->name);
   }
   
-  hc_dsl_emit(dsl,
+  hc_vm_emit(vm,
 	      &HC_CALL,
 	      &(struct hc_call_op){
 		.target = t->as_other,
@@ -101,9 +100,9 @@ void hc_call_init(struct hc_call *f,
   f->args = args;
 }
 
-static void id_emit(struct hc_form *_f, struct hc_dsl *dsl) {
+static void id_emit(struct hc_form *_f, struct hc_vm *vm) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  struct hc_value *v = hc_dsl_getenv(dsl, f->name);
+  struct hc_value *v = hc_vm_getenv(vm, f->name);
 
   if (!v) {
     hc_throw("Error in %s: Unknown identifier '%s'",
@@ -112,7 +111,7 @@ static void id_emit(struct hc_form *_f, struct hc_dsl *dsl) {
 
   struct hc_push_op op;
   hc_value_copy(&op.value, v);
-  hc_dsl_emit(dsl, &HC_PUSH, &op);
+  hc_vm_emit(vm, &HC_PUSH, &op);
 }
 
 static void id_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -121,9 +120,9 @@ static void id_print(const struct hc_form *_f, struct hc_stream *out) {
 }
 
 static struct hc_value *id_value(const struct hc_form *_f,
-				 struct hc_dsl *dsl) {
+				 struct hc_vm *vm) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  return hc_dsl_getenv(dsl, f->name);
+  return hc_vm_getenv(vm, f->name);
 }
 
 static void id_free(struct hc_form *_f) {
@@ -147,11 +146,11 @@ void hc_id_init(struct hc_id *f,
   f->name = strdup(name);
 }
 
-static void literal_emit(struct hc_form *_f, struct hc_dsl *dsl) {
+static void literal_emit(struct hc_form *_f, struct hc_vm *vm) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
   struct hc_push_op op;
   hc_value_copy(&op.value, &f->value);
-  hc_dsl_emit(dsl, &HC_PUSH, &op);
+  hc_vm_emit(vm, &HC_PUSH, &op);
 }
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -160,7 +159,7 @@ static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
 }
 
 static struct hc_value *literal_value(const struct hc_form *_f,
-				      struct hc_dsl *dsl) {
+				      struct hc_vm *vm) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
   return &f->value;
 }
@@ -348,19 +347,19 @@ void hc_forms_free(struct hc_list *in) {
   } 
 }
 
-void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl) {
+void hc_forms_emit(struct hc_list *in, struct hc_vm *vm) {
   hc_list_do(in, i) {
-    hc_form_emit(hc_baseof(i, struct hc_form, owner), dsl);
+    hc_form_emit(hc_baseof(i, struct hc_form, owner), vm);
   } 
 }
 
-void hc_dsl_evals(struct hc_dsl *dsl, const char *in) {
+void hc_dsl_eval(struct hc_vm *vm, const char *in) {
   struct hc_list forms;
   hc_list_init(&forms);
   hc_defer(hc_forms_free(&forms));
   struct hc_sloc sloc = hc_sloc("evals", 0, 0);
   while (hc_read_next(&in, &forms, &sloc));
-  const hc_pc pc = dsl->code.length;
-  hc_forms_emit(&forms, dsl);
-  hc_dsl_eval(dsl, pc, -1);
+  const size_t pc = vm->code.length;
+  hc_forms_emit(&forms, vm);
+  hc_vm_eval(vm, pc, -1);
 }

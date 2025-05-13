@@ -87,5 +87,6 @@ The content is arranged to form a natural progression, where later chapters buil
 - [Extensible Streams - Part 1](https://github.com/codr7/hacktical-c/tree/main/stream1)
 - [Reflection](https://github.com/codr7/hacktical-c/tree/main/reflect)
 - [Structured Logs](https://github.com/codr7/hacktical-c/tree/main/slog)
+- [Virtual Machines](https://github.com/codr7/hacktical-c/tree/main/vm)
 
 The entire book may be exported in `ePub`-format by following these [instructions](./epub/README.md).
