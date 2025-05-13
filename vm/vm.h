@@ -63,17 +63,17 @@ struct hc_op {
   void (*deinit)(uint8_t *);
 };
 
-extern const struct hc_op HC_CALL;
-
 struct hc_call_op {
   hc_vm_fun_t target;
   struct hc_sloc sloc;
 };
 
-extern const struct hc_op HC_PUSH;
+extern const struct hc_op HC_CALL;
 
 struct hc_push_op {
   struct hc_value value;
 };
+
+extern const struct hc_op HC_PUSH;
 
 #endif
