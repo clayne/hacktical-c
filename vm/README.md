@@ -1,9 +1,9 @@
 ## Virtual Machines
 A virtual machine (VM) is a machine emulated using software; commonly used to implement programming languages and emulators.
 
-Machines come in two main flavors; stack based like Forth, Java or Python; and register based like Lua or Erlang.
+Virtual machines come in two main flavors; stack based like Forth, Java or Python; and register based like Lua or Erlang.
 
-Stack based machines use smaller instructions, since the stack takes care of addressing; on the other hand they require evaluating more operations to reorder the stack. Register based machines keep values in slots and use wider instructions that contain the addresses they operate on.
+Stack based machines use smaller instructions, since the stack takes care of addressing; on the other hand they require evaluating more operations to reorder values on the stack. Register based machines keep values in slots and use wider instructions that contain the addresses they operate on.
 
 Here we will build a simple stack based machine. Our machine consists of an environment, a stack and the code. For reasons that will be explained shortly, we'll store the operations and the code to be evaluated separately.
 
@@ -57,7 +57,7 @@ struct hc_op {
 };
 ```
 
-The evaluation loop is by far the most performance critical part of a virtual machine, since it executes each and every operation.
+The evaluation loop is by far the most performance critical part of a virtual machine, since it executes code for each and every operation.
 
 ```C
 void hc_vm_eval(struct hc_vm *vm,
