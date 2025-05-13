@@ -6,7 +6,7 @@
 
 struct hc_proc {
   int pid;
-  int stdin;
+  int in;
 };
 
 #define hc_proc_init(p, ...)			\

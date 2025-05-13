@@ -26,9 +26,7 @@ The content of this book is openly licensed via [CC BY-NC-ND 4.0](https://creati
 ## Support
 I've decided to release the book using an open license to benefit as many as possible, because I believe knowledge should be shared freely.
 
-But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. 
-
-Please take a moment to consider chipping in if you like the idea. Nothing is free in this world, your contribution could make a huge difference.
+But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. Please take a moment to consider chipping in if you like the idea. Nothing is free in this world, your contribution could make a big difference.
 
 The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
 

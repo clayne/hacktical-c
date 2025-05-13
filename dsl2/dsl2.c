@@ -36,16 +36,19 @@ void hc_form_free(struct hc_form *f) {
   f->type->free(f);
 }
 
-static void call_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+static void call_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
   struct hc_value *t = hc_form_value(f->target, dsl);
 
   if (!t) {
-    hc_throw("Missing call target");
+    hc_throw("Error in '%s': Missing call target",
+	     hc_sloc_string(&_f->sloc));
   }
 
   if (t->type != &HC_DSL_FUN) {
-    hc_throw("Not callable: %s", t->type->name);
+    hc_throw("Error in '%s': '%s' isn't callable",
+	     hc_sloc_string(&_f->sloc),
+	     t->type->name);
   }
   
   hc_dsl_emit(dsl,
@@ -98,9 +101,15 @@ void hc_call_init(struct hc_call *f,
   f->args = args;
 }
 
-static void id_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+static void id_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  struct hc_value *v = hc_dsl_getenv(dsl, f->name, _f->sloc);
+  struct hc_value *v = hc_dsl_getenv(dsl, f->name);
+
+  if (!v) {
+    hc_throw("Error in %s: Unknown identifier '%s'",
+	     hc_sloc_string(&_f->sloc), f->name);
+  }
+
   struct hc_push_op op;
   hc_value_copy(&op.value, v);
   hc_dsl_emit(dsl, &HC_PUSH, &op);
@@ -114,7 +123,7 @@ static void id_print(const struct hc_form *_f, struct hc_stream *out) {
 static struct hc_value *id_value(const struct hc_form *_f,
 				 struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  return hc_dsl_getenv(dsl, f->name, _f->sloc);
+  return hc_dsl_getenv(dsl, f->name);
 }
 
 static void id_free(struct hc_form *_f) {
@@ -138,7 +147,7 @@ void hc_id_init(struct hc_id *f,
   f->name = strdup(name);
 }
 
-static void literal_emit(const struct hc_form *_f, struct hc_dsl *dsl) {
+static void literal_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
   struct hc_push_op op;
   hc_value_copy(&op.value, &f->value);
@@ -171,10 +180,8 @@ const struct hc_form_type hc_literal = {
 
 void hc_literal_init(struct hc_literal *f,
 		     const struct hc_sloc sloc,
-		     struct hc_list *owner,
-		     struct hc_value *value) {  
+		     struct hc_list *owner) {  
   hc_form_init(&f->form, &hc_literal, sloc, owner);
-  hc_value_copy(&f->value, value);
 }
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
@@ -197,12 +204,19 @@ void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
 void hc_read_call(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc) {
-  struct hc_sloc floc = *sloc;
-  assert(**in == '(');
-  (*in)++;
+  if (**in != '(') {
+    hc_throw("Error in '%s': Invalid call syntax",
+	     hc_sloc_string(sloc));
+  }
 
-  if (!hc_read_form(in, out, sloc)) {
-    hc_throw("Missing call target");
+  struct hc_sloc floc = *sloc;
+  (*in)++;
+  sloc->col++;
+  hc_skip_ws(in, sloc);
+  
+  if (!hc_read_expr(in, out, sloc)) {
+    hc_throw("Error in '%s': Missing call target",
+	     hc_sloc_string(sloc));
   }
 
   struct hc_form *t = hc_baseof(hc_list_pop_back(out),
@@ -218,17 +232,20 @@ void hc_read_call(const char **in,
     
     switch (**in) {
     case 0:
-      hc_throw("Open call form");
+      hc_throw("Error in '%s': Open call form",
+	       hc_sloc_string(sloc));
     case ')':
       (*in)++;
+      sloc->col++;
       done = true;
       continue;
     default:
       break;
     }
 
-    if (!hc_read_form(in, args, sloc)) {
-      hc_throw("Invalid call syntax");
+    if (!hc_read_expr(in, args, sloc)) {
+      hc_throw("Error in '%s': Invalid call syntax",
+	       hc_sloc_string(sloc));
     }
   }
 
@@ -236,33 +253,9 @@ void hc_read_call(const char **in,
   hc_call_init(f, floc, out, t, args);
 }
 
-void hc_read_id(const char **in,
-		struct hc_list *out,
-		struct hc_sloc *sloc) {
-  struct hc_sloc floc = *sloc;
-  struct hc_memory_stream buf;
-  hc_memory_stream_init(&buf, &hc_malloc_default);
-  hc_defer(hc_stream_deinit(&buf.stream));
-  char c = 0;
-
-  while ((c = **in)) {
-    if (isspace(c)) {
-      break;
-    }
-  
-    hc_putc(&buf.stream, c);
-    sloc->col++;
-    (*in)++;
-  }
-
-  struct hc_id *f = malloc(sizeof(struct hc_id));
-  hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
-}
-
-bool hc_read_form(const char **in,
+bool hc_read_expr(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc) {
-  hc_skip_ws(in, sloc);
   const char c = **in;
   
   switch (c) {
@@ -281,13 +274,93 @@ bool hc_read_form(const char **in,
   return false;
 }
 
-static void fun_print(const struct hc_value *v, struct hc_stream *out) {
-  hc_printf(out, "%p", v->as_other);
+void hc_read_id(const char **in,
+		struct hc_list *out,
+		struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+  struct hc_memory_stream buf;
+  hc_memory_stream_init(&buf, &hc_malloc_default);
+  hc_defer(hc_stream_deinit(&buf.stream));
+  char c = 0;
+
+  while ((c = **in)) {
+    if (isspace(c) || c == '(' || c == ')') {
+      break;
+    }
+  
+    hc_putc(&buf.stream, c);
+    sloc->col++;
+    (*in)++;
+  }
+
+  struct hc_id *f = malloc(sizeof(struct hc_id));
+  hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
 }
 
-const struct hc_type HC_DSL_FUN = {
-  .name = "DSL/Fun",
-  .copy = NULL,
-  .print = fun_print
-};
+bool hc_read_next(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  if (**in == '$') {
+    (*in)++;
+    hc_read_call(in, out, sloc);
+    return true;
+  }
+  
+  return hc_read_text(in, out, sloc);
+}
 
+bool hc_read_text(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+  const char *start = *in;
+  
+  while (**in && **in != '$') {
+    if (**in == '\n') {
+      sloc->row++;
+    } else {
+      sloc->col++;
+    }
+
+    (*in)++;
+  }
+
+  size_t n = *in - start;
+  
+  if (n) {
+    struct hc_literal *f = malloc(sizeof(struct hc_literal));
+    hc_literal_init(f, floc, out);
+
+    hc_value_init(&f->value, &HC_STRING);
+    f->value.as_string = malloc(n + 1);
+    strncpy(f->value.as_string, start, n);
+    f->value.as_string[n] = 0;
+
+    return true;
+  }
+
+  return false;
+}
+
+void hc_forms_free(struct hc_list *in) {
+  hc_list_do(in, i) {
+    hc_form_free(hc_baseof(i, struct hc_form, owner));
+  } 
+}
+
+void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl) {
+  hc_list_do(in, i) {
+    hc_form_emit(hc_baseof(i, struct hc_form, owner), dsl);
+  } 
+}
+
+void hc_dsl_evals(struct hc_dsl *dsl, const char *in) {
+  struct hc_list forms;
+  hc_list_init(&forms);
+  hc_defer(hc_forms_free(&forms));
+  struct hc_sloc sloc = hc_sloc("evals", 0, 0);
+  while (hc_read_next(&in, &forms, &sloc));
+  const hc_pc pc = dsl->code.length;
+  hc_forms_emit(&forms, dsl);
+  hc_dsl_eval(dsl, pc, -1);
+}

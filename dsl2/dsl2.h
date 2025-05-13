@@ -6,7 +6,7 @@
 struct hc_form;
 
 struct hc_form_type {
-  void (*emit)(const struct hc_form *, struct hc_dsl *);
+  void (*emit)(struct hc_form *, struct hc_dsl *);
   void (*print)(const struct hc_form *, struct hc_stream *);
   struct hc_value *(*value)(const struct hc_form *, struct hc_dsl *);
   void (*free)(struct hc_form *);
@@ -63,8 +63,7 @@ struct hc_literal {
 
 void hc_literal_init(struct hc_literal *f,
 		     struct hc_sloc sloc,
-		     struct hc_list *owner,
-		     struct hc_value *value);
+		     struct hc_list *owner);
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc);
 
@@ -72,14 +71,24 @@ void hc_read_call(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc);
 
+bool hc_read_expr(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc);
+
 void hc_read_id(const char **in,
 		struct hc_list *out,
 		struct hc_sloc *sloc);
 
-bool hc_read_form(const char **in,
+bool hc_read_next(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc);
 
-extern const struct hc_type HC_DSL_FUN;
+bool hc_read_text(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc);
+
+void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl);
+void hc_forms_free(struct hc_list *in);
+void hc_dsl_evals(struct hc_dsl *dsl, const char *in);
 
 #endif

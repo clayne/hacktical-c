@@ -47,13 +47,14 @@ We can now allocate as many items as we need in one block, and add them to a max
 Iterating a list means starting from the head and stepping through the links until we reach the head again. Since this is something we'll likely do a lot, extracting the pattern as a macro makes sense. Note that simply switching links form `next` to `prev` allows iterating the list in reverse, which is sometimes useful.
 
 ```C
-#define _hc_list_do(l, i, _next)			
-  for (struct hc_list *i = (l)->next, *_next = i->next;
-       i != (l);						
+#define _hc_list_do(l, i, _list, _next)				
+  __auto_type _list = 
+  for (struct hc_list *i = _list->next, *_next = i->next;	
+       i != _list;						
        i = _next, _next = i->next)
 
-#define hc_list_do(l, i)
-  _hc_list_do(l, i, hc_unique(next))
+#define hc_list_do(l, i)				
+  _hc_list_do(l, i, hc_unique(list), hc_unique(next))
 ```
 
 Example:

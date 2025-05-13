@@ -9,6 +9,15 @@
       _x < 0 ? -x : x;				\
     })						\
 
+#define hc_align(base, size) ({						\
+      __auto_type _base = base;						\
+      __auto_type _size = hc_alignof(size);				\
+      __auto_type _rest = (ptrdiff_t)_base % _size;			\
+      (_rest) ? _base + _size - _rest : _base;				\
+    })									\
+
+size_t hc_alignof(size_t size);
+
 #define _hc_array(t, a, n, ...)			\
   t a[] = { __VA_ARGS__ };			\
   const size_t n = sizeof(a) / sizeof(t)		

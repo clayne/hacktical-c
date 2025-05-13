@@ -44,21 +44,21 @@ struct hc_proc *_hc_proc_init(struct hc_proc *p, char *cmd[]) {
     }
     
     p->pid = child_pid;
-    p->stdin = fds[1];
+    p->in = fds[1];
     break;
   }
 
   return p;
 }
 
-static void close_stdin(struct hc_proc *p) {
-  if (p->stdin != -1 && close(p->stdin) == -1) {
+static void close_in(struct hc_proc *p) {
+  if (p->in != -1 && close(p->in) == -1) {
     hc_throw("Failed closing stdin: %d", errno);
   }
 }
 
 void hc_proc_wait(struct hc_proc *p) {
-  close_stdin(p);
+  close_in(p);
 
   if (waitpid(p->pid, NULL, 0) == -1) {
     hc_throw("Failed waiting for child process to exit: %d", errno);
@@ -66,7 +66,7 @@ void hc_proc_wait(struct hc_proc *p) {
 }
 
 void hc_proc_deinit(struct hc_proc *p) {
-  close_stdin(p);
+  close_in(p);
 }
 
 static void free_cmd(char **in) {
@@ -101,17 +101,17 @@ void _hc_compile(const char *code,
   struct hc_proc child;
   _hc_proc_init(&child, cmd);
   hc_defer(hc_proc_deinit(&child));
-  FILE *stdin = fdopen(child.stdin, "w");
+  FILE *in = fdopen(child.in, "w");
 
-  if (!stdin) {
+  if (!in) {
     hc_throw("Failed opening stdin stream: %d", errno);
   }
   
-  child.stdin = -1;
+  child.in = -1;
   hc_defer(hc_proc_wait(&child));
-  hc_defer(fclose(stdin));
+  hc_defer(fclose(in));
 
-  if (fputs(code, stdin) == EOF) {
+  if (fputs(code, in) == EOF) {
     hc_throw("Failed writing code: %d", errno);
   }
 }
