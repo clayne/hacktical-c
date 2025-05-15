@@ -3,6 +3,8 @@
 
 #include "vm/vm.h"
 
+void hc_dsl_init(struct hc_vm *vm);
+
 struct hc_form;
 
 struct hc_form_type {
@@ -33,14 +35,13 @@ extern const struct hc_form_type hc_call;
 struct hc_call {
   struct hc_form form;
   struct hc_form *target;
-  struct hc_list *args;
+  struct hc_list args;
 };
 
 void hc_call_init(struct hc_call *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *owner,
-		  struct hc_form *target,
-		  struct hc_list *args);
+		  struct hc_form *target);
 
 extern const struct hc_form_type hc_id;
 

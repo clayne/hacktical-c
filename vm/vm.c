@@ -38,10 +38,6 @@ static const void *env_key(const void *x) {
   return &((const struct env_item *)x)->key;
 }
 
-static void lib_print(struct hc_vm *vm, struct hc_sloc) {
-  printf("PRINT\n");
-}
-
 void hc_vm_init(struct hc_vm *vm, struct hc_malloc *malloc) {
   hc_set_init(&vm->env, malloc, sizeof(struct env_item), env_cmp);
   vm->env.key = env_key;
@@ -49,8 +45,6 @@ void hc_vm_init(struct hc_vm *vm, struct hc_malloc *malloc) {
   hc_vector_init(&vm->stack, malloc, sizeof(struct hc_value));
   hc_vector_init(&vm->ops, malloc, sizeof(const struct hc_op *));
   hc_vector_init(&vm->code, malloc, sizeof(hc_op_eval_t));
-
-  hc_vm_setenv(vm, "print", &HC_VM_FUN)->as_other = lib_print;
 }
 
 static size_t op_items(const struct hc_op *op,

@@ -5,6 +5,18 @@
 
 #include "dsl.h"
 #include "error/error.h"
+#include "list/list.h"
+
+static void lib_print(struct hc_vm *vm, struct hc_sloc) {
+  struct hc_value *v = hc_vm_pop(vm);
+  hc_value_print(v, vm->out);
+  hc_value_deinit(v);
+}
+
+void hc_dsl_init(struct hc_vm *vm) {
+  hc_vm_init(vm, &hc_malloc_default);
+  hc_vm_setenv(vm, "print", &HC_VM_FUN)->as_other = lib_print;
+}
 
 void hc_form_init(struct hc_form *f,
 		  const struct hc_form_type *t,
@@ -12,7 +24,12 @@ void hc_form_init(struct hc_form *f,
 		  struct hc_list *owner) {
   f->type = t;
   f->sloc = sloc;
-  hc_list_push_back(owner, &f->owner);
+
+  if (owner) {
+    hc_list_push_back(owner, &f->owner);
+  } else {
+    hc_list_init(&f->owner);
+  }
 }
 
 void hc_form_emit(struct hc_form *f, struct hc_vm *vm) {
@@ -49,6 +66,10 @@ static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
 	     hc_sloc_string(&_f->sloc),
 	     t->type->name);
   }
+
+  hc_list_do(&f->args, a) {
+    hc_form_emit(hc_baseof(a, struct hc_form, owner), vm);
+  }
   
   hc_vm_emit(vm,
 	      &HC_CALL,
@@ -63,7 +84,7 @@ static void call_print(const struct hc_form *_f, struct hc_stream *out) {
   hc_putc(out, '(');
   hc_form_print(f->target, out);
 
-  hc_list_do(f->args, i) {
+  hc_list_do(&f->args, i) {
     hc_putc(out, ' ');
     hc_form_print(hc_baseof(i, struct hc_form, owner), out);
   }
@@ -75,11 +96,10 @@ static void call_free(struct hc_form *_f) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
   hc_form_free(f->target);  
 
-  hc_list_do(f->args, i) {
+  hc_list_do(&f->args, i) {
     hc_form_free(hc_baseof(i, struct hc_form, owner));
   }
 
-  free(f->args);
   free(f);
 }
 
@@ -93,11 +113,10 @@ const struct hc_form_type hc_call = {
 void hc_call_init(struct hc_call *f,
 		  const struct hc_sloc sloc,
 		  struct hc_list *owner,
-		  struct hc_form *target,
-		  struct hc_list *args) {  
+		  struct hc_form *target) {  
   hc_form_init(&f->form, &hc_call, sloc, owner);
   f->target = target;
-  f->args = args;
+  hc_list_init(&f->args);
 }
 
 static void id_emit(struct hc_form *_f, struct hc_vm *vm) {
@@ -218,13 +237,13 @@ void hc_read_call(const char **in,
 	     hc_sloc_string(sloc));
   }
 
+  struct hc_call *f = malloc(sizeof(struct hc_call));
   struct hc_form *t = hc_baseof(hc_list_pop_back(out),
 				struct hc_form,
 				owner);
   
   hc_list_init(&t->owner);
-  struct hc_list *args = malloc(sizeof(struct hc_list));
-  hc_list_init(args);
+  hc_call_init(f, floc, out, t);
   
   for (bool done = false; !done;) {
     hc_skip_ws(in, sloc);
@@ -242,14 +261,11 @@ void hc_read_call(const char **in,
       break;
     }
 
-    if (!hc_read_expr(in, args, sloc)) {
+    if (!hc_read_expr(in, &f->args, sloc)) {
       hc_throw("Error in '%s': Invalid call syntax",
 	       hc_sloc_string(sloc));
     }
   }
-
-  struct hc_call *f = malloc(sizeof(struct hc_call));
-  hc_call_init(f, floc, out, t, args);
 }
 
 bool hc_read_expr(const char **in,
@@ -327,14 +343,15 @@ bool hc_read_text(const char **in,
   size_t n = *in - start;
   
   if (n) {
-    struct hc_literal *f = malloc(sizeof(struct hc_literal));
-    hc_literal_init(f, floc, out);
-
-    hc_value_init(&f->value, &HC_STRING);
-    f->value.as_string = malloc(n + 1);
-    strncpy(f->value.as_string, start, n);
-    f->value.as_string[n] = 0;
-
+    struct hc_value v;
+    hc_value_init(&v, &HC_STRING)->as_string = strndup(start, n);    
+    struct hc_literal *vf = malloc(sizeof(struct hc_literal));
+    hc_literal_init(vf, floc, out);
+    vf->value = v;
+    struct hc_id *t = malloc(sizeof(struct hc_literal));
+    hc_id_init(t, floc, NULL, "print");
+    struct hc_call *c = malloc(sizeof(struct hc_call));
+    hc_call_init(c, floc, out, &t->form);
     return true;
   }
 

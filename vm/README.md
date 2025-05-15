@@ -5,12 +5,13 @@ Virtual machines come in two main flavors; stack based like Forth, Java or Pytho
 
 Stack based machines use smaller instructions, since the stack takes care of addressing; on the other hand they require evaluating more operations to reorder values on the stack. Register based machines keep values in slots and use wider instructions that contain the addresses they operate on.
 
-Here we will build a simple stack based machine. Our machine consists of an environment, a stack and the code. For reasons that will be explained shortly, we'll store the operations and the code to be evaluated separately.
+Here we will build a simple stack based machine. Our machine consists of an environment, a stack, a stream for output and the code. For reasons that will be explained shortly, we'll store the operations and the code to be evaluated separately.
 
 ```C
 struct hc_vm {
   struct hc_set env;
   struct hc_vector stack;  
+  struct hc_stream *out;
   struct hc_vector ops;
   struct hc_vector code;
 };
@@ -40,6 +41,7 @@ void hc_vm_init(struct hc_vm *vm, struct hc_malloc *malloc) {
   hc_vector_init(&vm->stack, malloc, sizeof(struct hc_value));
   hc_vector_init(&vm->ops, malloc, sizeof(const struct hc_op *));
   hc_vector_init(&vm->code, malloc, sizeof(hc_op_eval_t));
+  vm->out = hc_stdout();
 }
 ```
 
@@ -76,6 +78,25 @@ void hc_vm_eval(struct hc_vm *vm,
 ```
 
 This brings us back to the question of why we store evaluated code separately. The evaluation loop is very dependent on memory locality, which means we want to store the minimum amount of data that's absolutely needed to evaluate an operation quickly. This allows the CPU to cache larger chunks of the code in one go.
+
+`hc_vm_emit()` adds additional operations to `ops` and `code`, aligning the `code`-part separately (`code` itself is aligned by `sizeof(hc_eval_fn_t)`).
+
+```C
+size_t hc_vm_emit(struct hc_vm *vm,
+		  struct hc_op *op,
+		  void *data) {
+  *(struct hc_op **)hc_vector_push(&vm->ops) = op;
+  size_t pc = vm->code.length;
+  *(hc_op_eval_t *)hc_vector_push(&vm->code) = op->eval;
+  
+  uint8_t *p = hc_vector_insert(&vm->code,
+	     			vm->code.length,
+				op_items(op, vm->code.end, vm));
+  
+  memcpy(hc_align(p, op->align), data, op->size);
+  return pc;
+}
+```
 
 The `call` operation is used to call C functions.
 

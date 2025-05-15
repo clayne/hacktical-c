@@ -22,7 +22,8 @@ const char *hc_sloc_string(struct hc_sloc *sloc);
 
 struct hc_vm {
   struct hc_set env;
-  struct hc_vector stack;  
+  struct hc_vector stack;
+  struct hc_stream *out;
   struct hc_vector ops;
   struct hc_vector code;
 };
