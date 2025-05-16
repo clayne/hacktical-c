@@ -20,7 +20,7 @@ struct hc_sloc hc_sloc(const char *source, const int row, const int col) {
 }
 
 const char *hc_sloc_string(struct hc_sloc *sloc) {
-  sprintf(sloc->out, "'%s'; row %d, column %d",
+  snprintf(sloc->out, sizeof(sloc->out)-1, "'%s'; row %d, column %d",
 	  sloc->source, sloc->row, sloc->col);
   return sloc->out;
 }
