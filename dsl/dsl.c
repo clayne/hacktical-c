@@ -100,11 +100,11 @@ void hc_dsl_set_string(struct hc_dsl *dsl, const char *key, const char *val) {
   hc_dsl_setenv(dsl, key, &HC_STRING)->as_string = strdup(val);
 }
 
-void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
+ void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
   struct hc_list forms;
   hc_list_init(&forms);
   hc_defer(hc_forms_free(&forms));
-  struct hc_sloc sloc = hc_sloc("evals", 0, 0);
+  struct hc_sloc sloc = hc_sloc("eval", 0, 0);
   while (hc_read_next(&in, &forms, &sloc));
   const size_t pc = dsl->vm.code.length;
   hc_forms_emit(&forms, dsl);

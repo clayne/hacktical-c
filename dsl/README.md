@@ -81,30 +81,38 @@ char *hc_upcase(char *s) {
 }
 ```
 
-The only missing pieces at this point are reading template code and emitting [VM](https://github.com/codr7/hacktical-c/tree/main/vm) operations.
-
-First of all we need a way to skip whitespace.
+The only missing piec at this point is reading transforming template code into [VM](https://github.com/codr7/hacktical-c/tree/main/vm) operations, aka. syntax.
 
 ```C
-void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
-  for (;; (*in)++) {
-    switch (**in) {
-    case ' ':
-    case '\t':
-      sloc->col++;
-      break;
-    case '\n':
-      sloc->row++;
-      sloc->col = 0;
-      break;
-    default:
-      return;
-    }
-  }
+void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
+  struct hc_list forms;
+  hc_list_init(&forms);
+  hc_defer(hc_forms_free(&forms));
+  struct hc_sloc sloc = hc_sloc("eval", 0, 0);
+  while (hc_read_next(&in, &forms, &sloc));
+  const size_t pc = dsl->vm.code.length;
+  hc_forms_emit(&forms, dsl);
+  hc_vm_eval(&dsl->vm, pc, -1);
 }
 ```
 
-Next up is a parser for calls; which first reads a call target and then the arguments.
+The top layer of our parser simply checks for `$` and uses that decide what do next.
+
+```C
+bool hc_read_next(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  if (**in == '$') {
+    (*in)++;
+    hc_read_call(in, out, sloc);
+    return true;
+  }
+  
+  return hc_read_text(in, out, sloc);
+}
+```
+
+A call consists of a target and optional arguments.
 
 ```C
 void hc_read_call(const char **in,
@@ -162,6 +170,8 @@ void hc_read_call(const char **in,
 }
 ```
 
+When emitted, calls get the value of the target and emits arguments if any followed by a `HC_CALL``-operation.
+
 ```C
 static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
@@ -189,37 +199,133 @@ static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
 		.sloc = _f->sloc
 	      });
 }
-
-static void call_print(const struct hc_form *_f, struct hc_stream *out) {
-  struct hc_call *f = hc_baseof(_f, struct hc_call, form);
-  hc_putc(out, '(');
-  hc_form_print(f->target, out);
-
-  hc_list_do(&f->args, i) {
-    hc_putc(out, ' ');
-    hc_form_print(hc_baseof(i, struct hc_form, owner), out);
-  }
-  
-  hc_putc(out, ')');
-}
-
-static void call_free(struct hc_form *_f) {
-  struct hc_call *f = hc_baseof(_f, struct hc_call, form);
-  hc_form_free(f->target);  
-
-  hc_list_do(&f->args, i) {
-    hc_form_free(hc_baseof(i, struct hc_form, owner));
-  }
-
-  free(f);
-}
-
-const struct hc_form_type hc_call = {
-  .emit = call_emit,
-  .print = call_print,
-  .value = NULL,
-  .free = call_free
-};
 ```
 
-To be continued...
+`hc_skip_ws()` simply skips forward as long as the current char is some kind of whitespace.
+
+```C
+void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
+  for (;; (*in)++) {
+    switch (**in) {
+    case ' ':
+    case '\t':
+      sloc->col++;
+      break;
+    case '\n':
+      sloc->row++;
+      sloc->col = 0;
+      break;
+    default:
+      return;
+    }
+  }
+}
+```
+
+`hc_read_expr()` handles anything that's allowed inside `$()`, which means another call or an identifier.
+
+```C
+bool hc_read_expr(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  const char c = **in;
+  
+  switch (c) {
+  case '(':
+    hc_read_call(in, out, sloc);
+    return true;
+  default:
+    if (isalpha(c)) {
+      hc_read_id(in, out, sloc);
+      return true;
+    }
+
+    break;
+  }
+
+  return false;
+}
+```
+
+Identifiers are required to start with an alphabetic char; following that, anything except whitespace and parens is allowed.
+
+```C
+void hc_read_id(const char **in,
+		struct hc_list *out,
+		struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+  struct hc_memory_stream buf;
+  hc_memory_stream_init(&buf, &hc_malloc_default);
+  hc_defer(hc_stream_deinit(&buf.stream));
+  char c = 0;
+
+  while ((c = **in)) {
+    if (isspace(c) || c == '(' || c == ')') {
+      break;
+    }
+  
+    hc_putc(&buf.stream, c);
+    sloc->col++;
+    (*in)++;
+  }
+
+  struct hc_id *f = malloc(sizeof(struct hc_id));
+  hc_id_init(f, floc, out, hc_memory_stream_string(&buf));
+}
+```
+
+Identifiers get their values from `dsl.env` and emit an operation to push it on the stack.
+
+```C
+void id_emit(struct hc_form *_f, struct hc_dsl *dsl) {
+  struct hc_id *f = hc_baseof(_f, struct hc_id, form);
+  struct hc_value *v = hc_dsl_getenv(dsl, f->name);
+
+  if (!v) {
+    hc_throw("Error in %s: Unknown identifier '%s'",
+	     hc_sloc_string(&_f->sloc), f->name);
+  }
+
+  struct hc_push_op op;
+  hc_value_copy(&op.value, v);
+  hc_vm_emit(&dsl->vm, &HC_PUSH, &op);
+}
+```
+
+The text parser keeps going until a `$` is found or until it reaches the end of the string, it then constructs a `print` call with the text as argument.
+
+```C
+bool hc_read_text(const char **in,
+		  struct hc_list *out,
+		  struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+  const char *start = *in;
+  
+  while (**in && **in != '$') {
+    if (**in == '\n') {
+      sloc->row++;
+    } else {
+      sloc->col++;
+    }
+
+    (*in)++;
+  }
+
+  size_t n = *in - start;
+  
+  if (n) {
+    struct hc_value v;
+    hc_value_init(&v, &HC_STRING)->as_string = strndup(start, n);    
+    struct hc_literal *vf = malloc(sizeof(struct hc_literal));
+    hc_literal_init(vf, floc, out);
+    vf->value = v;
+    struct hc_id *t = malloc(sizeof(struct hc_literal));
+    hc_id_init(t, floc, NULL, "print");
+    struct hc_call *c = malloc(sizeof(struct hc_call));
+    hc_call_init(c, floc, out, &t->form);
+    return true;
+  }
+
+  return false;
+}
+```
