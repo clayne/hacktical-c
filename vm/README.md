@@ -72,6 +72,13 @@ size_t hc_vm_emit(struct hc_vm *vm,
   memcpy(hc_align(p, op->align), data, op->size);
   return pc;
 }
+
+size_t op_items(const struct hc_op *op,
+		       uint8_t *p,
+		       struct hc_vm *vm) {
+  const size_t s = op->size + hc_align(p, op->align) - p;
+  return ceil(s / (double)vm->code.item_size);
+}
 ```
 
 The `call` operation is used to call C functions.
@@ -150,5 +157,3 @@ const struct hc_op HC_PUSH = (struct hc_op){
   .deinit = push_deinit
 };
 ```
-
-To be continued...
