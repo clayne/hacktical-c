@@ -7,15 +7,40 @@
 #include "error/error.h"
 #include "list/list.h"
 
-static void lib_print(struct hc_vm *vm, struct hc_sloc) {
+char *hc_upcase(char *s) {
+  while (*s) {
+    *s = toupper(*s);
+    s++;
+  }
+
+  return s;
+}
+
+static void lib_print(struct hc_vm *vm, struct hc_sloc sloc) {
   struct hc_value *v = hc_vm_pop(vm);
   hc_value_print(v, vm->out);
   hc_value_deinit(v);
 }
 
+static void lib_upcase(struct hc_vm *vm, struct hc_sloc sloc) {
+  struct hc_value *v = hc_vm_peek(vm);
+
+  if (v->type != &HC_STRING) {
+    hc_throw("Error in %s: Expected string (%s)",
+	     hc_sloc_string(&sloc), v->type->name);
+  }
+
+  hc_upcase(v->as_string);
+}
+
 void hc_dsl_init(struct hc_vm *vm) {
   hc_vm_init(vm, &hc_malloc_default);
-  hc_vm_setenv(vm, "print", &HC_VM_FUN)->as_other = lib_print;
+  hc_dsl_set_fun(vm, "print", lib_print);
+  hc_dsl_set_fun(vm, "upcase", lib_upcase);
+}
+
+void hc_dsl_set_fun(struct hc_vm *vm, const char *key, hc_vm_fun_t val) {
+  hc_vm_setenv(vm, key, &HC_VM_FUN)->as_other = val;
 }
 
 void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val) {
@@ -61,12 +86,12 @@ static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
   struct hc_value *t = hc_form_value(f->target, vm);
 
   if (!t) {
-    hc_throw("Error in '%s': Missing call target",
+    hc_throw("Error in %s: Missing call target",
 	     hc_sloc_string(&_f->sloc));
   }
 
   if (t->type != &HC_VM_FUN) {
-    hc_throw("Error in '%s': '%s' isn't callable",
+    hc_throw("Error in %s: '%s' isn't callable",
 	     hc_sloc_string(&_f->sloc),
 	     t->type->name);
   }
@@ -226,26 +251,27 @@ void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
 void hc_read_call(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc) {
+  struct hc_sloc floc = *sloc;
+
   if (**in != '(') {
-    hc_throw("Error in '%s': Invalid call syntax",
+    hc_throw("Error in %s: Invalid call syntax",
 	     hc_sloc_string(sloc));
   }
 
-  struct hc_sloc floc = *sloc;
   (*in)++;
   sloc->col++;
   hc_skip_ws(in, sloc);
   
   if (!hc_read_expr(in, out, sloc)) {
-    hc_throw("Error in '%s': Missing call target",
+    hc_throw("Error in %s: Missing call target",
 	     hc_sloc_string(sloc));
   }
 
-  struct hc_call *f = malloc(sizeof(struct hc_call));
   struct hc_form *t = hc_baseof(hc_list_pop_back(out),
 				struct hc_form,
 				owner);
-  
+
+  struct hc_call *f = malloc(sizeof(struct hc_call));
   hc_list_init(&t->owner);
   hc_call_init(f, floc, out, t);
   
@@ -254,7 +280,9 @@ void hc_read_call(const char **in,
     
     switch (**in) {
     case 0:
-      hc_throw("Error in '%s': Open call form",
+      hc_form_free(&f->form);
+
+      hc_throw("Error in %s: Open call form",
 	       hc_sloc_string(sloc));
     case ')':
       (*in)++;
@@ -266,7 +294,9 @@ void hc_read_call(const char **in,
     }
 
     if (!hc_read_expr(in, &f->args, sloc)) {
-      hc_throw("Error in '%s': Invalid call syntax",
+      hc_form_free(&f->form);
+      
+      hc_throw("Error in %s: Invalid call syntax",
 	       hc_sloc_string(sloc));
     }
   }

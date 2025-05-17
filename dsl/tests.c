@@ -41,8 +41,8 @@ static void eval_tests() {
   hc_defer(hc_stream_deinit(&out.stream));
   vm.out = &out.stream;
   hc_dsl_set_string(&vm, "foo", "ghi");
-  hc_dsl_eval(&vm, "abc $(print foo) def");
-  assert(strcmp("abc ghi def", hc_memory_stream_string(&out)) == 0);
+  hc_dsl_eval(&vm, "abc $(print (upcase foo)) def");
+  assert(strcmp("abc GHI def", hc_memory_stream_string(&out)) == 0);
 }
 
 void dsl_tests() {

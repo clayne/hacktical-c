@@ -3,7 +3,10 @@
 
 #include "vm/vm.h"
 
+char *hc_upcase(char *s);
+
 void hc_dsl_init(struct hc_vm *vm);
+void hc_dsl_set_fun(struct hc_vm *vm, const char *key, hc_vm_fun_t val);
 void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val);
 
 struct hc_form;
