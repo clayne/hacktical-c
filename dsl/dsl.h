@@ -4,6 +4,7 @@
 #include "vm/vm.h"
 
 void hc_dsl_init(struct hc_vm *vm);
+void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val);
 
 struct hc_form;
 

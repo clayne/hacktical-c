@@ -18,6 +18,10 @@ void hc_dsl_init(struct hc_vm *vm) {
   hc_vm_setenv(vm, "print", &HC_VM_FUN)->as_other = lib_print;
 }
 
+void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val) {
+  hc_vm_setenv(vm, key, &HC_STRING)->as_string = strdup(val);
+}
+
 void hc_form_init(struct hc_form *f,
 		  const struct hc_form_type *t,
 		  const struct hc_sloc sloc,
