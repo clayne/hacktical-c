@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <math.h>
 #include <stdalign.h>
 #include <stdlib.h>
@@ -15,12 +16,13 @@ enum hc_order hc_strcmp(const char *x, const char *y) {
 
 struct hc_sloc hc_sloc(const char *source, const int row, const int col) {
   struct hc_sloc s = {.source = {0}, .row = row, .col = col};
-  strncpy(s.source, source, sizeof(s.source)-1);
+  assert(strlen(source) < sizeof(s.source));
+  strcpy(s.source, source);
   return s;
 }
 
 const char *hc_sloc_string(struct hc_sloc *sloc) {
-  snprintf(sloc->out, sizeof(sloc->out)-1, "'%s'; row %d, column %d",
+  snprintf(sloc->out, sizeof(sloc->out), "'%s'; row %d, column %d",
 	  sloc->source, sloc->row, sloc->col);
   return sloc->out;
 }

@@ -3,7 +3,7 @@ A virtual machine (VM) is a machine emulated using software; commonly used to im
 
 Virtual machines come in two main flavors; stack based like Forth, Java or Python; and register based like Lua or Erlang.
 
-Stack based machines use smaller instructions, since the stack takes care of addressing; on the other hand they require evaluating more operations to reorder values on the stack. Register based machines keep values in slots and use wider instructions that contain the addresses they operate on.
+Stack based machines use smaller instructions, since the stack takes care of addressing; on the other hand they require evaluating more operations to reorder values on the stack. Register based machines keep values in slots and use wider instructions that contain the addresses they operate on, on the other hand they need to allocate registers.
 
 Here we will build a simple stack based machine. Our machine consists of an environment, a stack, a stream for output and the code. For reasons that will be explained shortly, we'll store the operations and the code to be evaluated separately.
 
