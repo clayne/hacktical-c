@@ -81,7 +81,7 @@ char *hc_upcase(char *s) {
 }
 ```
 
-The only missing piec at this point is reading transforming template code into [VM](https://github.com/codr7/hacktical-c/tree/main/vm) operations, aka. syntax.
+The only missing piece of the puzzle at this point is transforming template code into [VM](https://github.com/codr7/hacktical-c/tree/main/vm) operations, aka. syntax.
 
 ```C
 void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
@@ -222,7 +222,7 @@ void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
 }
 ```
 
-`hc_read_expr()` handles anything that's allowed inside `$()`, which means another call or an identifier.
+`hc_read_expr()` handles anything allowed inside `$()`, which means another call or an identifier.
 
 ```C
 bool hc_read_expr(const char **in,
