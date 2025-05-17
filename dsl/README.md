@@ -5,25 +5,44 @@ We're going to build a template engine that allows splicing runtime evaluated ex
 
 Example:
 ```C
-struct hc_vm vm;
-hc_dsl_init(&vm);
-hc_defer(hc_vm_deinit(&vm));
+struct hc_dsl dsl;
+hc_dsl_init(&dsl, &hc_malloc_default);
+hc_defer(hc_dsl_deinit(&dsl));
 struct hc_memory_stream out;
 hc_memory_stream_init(&out, hc_malloc());
 hc_defer(hc_stream_deinit(&out->stream));
-vm.out = &out.stream;
-hc_dsl_set_string(&vm, "foo", "ghi");
-hc_dsl_eval(&vm, "abc $(print (upcase foo)) def");
+dsl.out = &out.stream;
+hc_dsl_set_string(&dsl, "foo", "ghi");
+hc_dsl_eval(&dsl, "abc $(print (upcase foo)) def");
 assert(strcmp("abc GHI def", hc_memory_stream_string(&out)) == 0);
 ```
 
-Our DSL is represented by a [vm](https://github.com/codr7/hacktical-c/tree/main/vm), configured with the functions we want to support.
+Our DSL consists of an environment, a standard output and a [vm](https://github.com/codr7/hacktical-c/tree/main/vm).
 
 ```C
-void hc_dsl_init(struct hc_vm *vm) {
+struct hc_dsl {
+  struct hc_set env;
+  struct hc_stream *out;
+
+  struct hc_vm vm;
+};
+
+void hc_dsl_init(struct hc_dsl *dsl) {
+  hc_set_init(&dsl->env, malloc, sizeof(struct env_item), env_cmp);
+  dsl->env.key = env_key;
+  dsl->out = hc_stdout();
+  
   hc_vm_init(vm, &hc_malloc_default);
   hc_dsl_set_fun(vm, "print", lib_print);
   hc_dsl_set_fun(vm, "upcase", lib_upcase);
+}
+
+enum hc_order env_cmp(const void *x, const void *y) {
+  return hc_strcmp(*(const char **)x, *(const char **)y);
+}
+
+const void *env_key(const void *x) {
+  return &((const struct env_item *)x)->key;
 }
 ```
 
@@ -32,7 +51,8 @@ void hc_dsl_init(struct hc_vm *vm) {
 ```C
 void lib_print(struct hc_vm *vm, const struct hc_sloc sloc) {
   struct hc_value *v = hc_vm_pop(vm);
-  hc_value_print(v, vm->out);
+  struct hc_dsl *dsl = hc_baseof(vm, struct hc_dsl, vm);
+  hc_value_print(v, dsl->out);
   hc_value_deinit(v);
 }
 ```

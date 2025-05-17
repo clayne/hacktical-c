@@ -8,8 +8,6 @@
 #include "stream1/stream1.h"
 #include "vector/vector.h"
 
-enum hc_order hc_strcmp(const char *x, const char *y);
-
 struct hc_sloc {
   char source[32];
   char out[64];
@@ -21,21 +19,13 @@ struct hc_sloc hc_sloc(const char *source, int row, int col);
 const char *hc_sloc_string(struct hc_sloc *sloc);
 
 struct hc_vm {
-  struct hc_set env;
   struct hc_vector stack;
-  struct hc_stream *out;
   struct hc_vector ops;
   struct hc_vector code;
 };
 
 void hc_vm_init(struct hc_vm *vm, struct hc_malloc *malloc);
 void hc_vm_deinit(struct hc_vm *vm);
-
-struct hc_value* hc_vm_getenv(struct hc_vm *vm, const char *key);
-
-struct hc_value *hc_vm_setenv(struct hc_vm *vm,
-			      const char *key,
-			      const struct hc_type *type);
 
 struct hc_value *hc_vm_push(struct hc_vm *vm);
 struct hc_value *hc_vm_peek(struct hc_vm *vm);

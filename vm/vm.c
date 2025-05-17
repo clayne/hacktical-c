@@ -8,12 +8,6 @@
 #include "macro/macro.h"
 #include "vm.h"
 
-enum hc_order hc_strcmp(const char *x, const char *y) {
-  const int result = strcmp(x, y);
-  if (!result) { return HC_EQ; }
-  return (result < 0) ? HC_LT : HC_GT;
-}
-
 struct hc_sloc hc_sloc(const char *source, const int row, const int col) {
   struct hc_sloc s = {.source = {0}, .row = row, .col = col};
   assert(strlen(source) < sizeof(s.source));
@@ -27,23 +21,8 @@ const char *hc_sloc_string(struct hc_sloc *sloc) {
   return sloc->out;
 }
 
-struct env_item {
-  char *key;
-  struct hc_value value;
-};
-
-static enum hc_order env_cmp(const void *x, const void *y) {
-  return hc_strcmp(*(const char **)x, *(const char **)y);
-}
-
-static const void *env_key(const void *x) {
-  return &((const struct env_item *)x)->key;
-}
 
 void hc_vm_init(struct hc_vm *vm, struct hc_malloc *malloc) {
-  hc_set_init(&vm->env, malloc, sizeof(struct env_item), env_cmp);
-  vm->env.key = env_key;
-
   hc_vector_init(&vm->stack, malloc, sizeof(struct hc_value));
   hc_vector_init(&vm->ops, malloc, sizeof(const struct hc_op *));
   hc_vector_init(&vm->code, malloc, sizeof(hc_op_eval_t));
@@ -54,16 +33,6 @@ static size_t op_items(const struct hc_op *op,
 		       struct hc_vm *vm) {
   const size_t s = op->size + hc_align(p, op->align) - p;
   return ceil(s / (double)vm->code.item_size);
-}
-
-static void deinit_env(struct hc_vm *vm) {
-  hc_vector_do(&vm->env.items, _it) {
-    struct env_item *it = _it;
-    free(it->key);
-    hc_value_deinit(&it->value);
-  }
-  
-  hc_set_deinit(&vm->env);
 }
 
 static void deinit_stack(struct hc_vm *vm) {
@@ -92,24 +61,9 @@ static void deinit_ops(struct hc_vm *vm) {
 }
 
 void hc_vm_deinit(struct hc_vm *vm) {  
-  deinit_env(vm);
   deinit_stack(vm);
   deinit_ops(vm);
   hc_vector_deinit(&vm->code);
-}
-
-struct hc_value *hc_vm_getenv(struct hc_vm *vm, const char *key) {
-  struct env_item *it = hc_set_find(&vm->env, &key);  
-  return it ? &it->value : NULL;
-}
-
-struct hc_value *hc_vm_setenv(struct hc_vm *vm,
-			      const char *key,
-			      const struct hc_type *type) {
-  struct env_item *it = hc_set_add(&vm->env, &key, false);
-  it->key = strdup(key);
-  hc_value_init(&it->value, type);
-  return &it->value;
 }
 
 struct hc_value *hc_vm_push(struct hc_vm *vm) {

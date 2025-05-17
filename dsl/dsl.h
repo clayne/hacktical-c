@@ -3,18 +3,35 @@
 
 #include "vm/vm.h"
 
+enum hc_order hc_strcmp(const char *x, const char *y);
 char *hc_upcase(char *s);
 
-void hc_dsl_init(struct hc_vm *vm);
-void hc_dsl_set_fun(struct hc_vm *vm, const char *key, hc_vm_fun_t val);
-void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val);
+struct hc_dsl {
+  struct hc_set env;
+  struct hc_stream *out;
+
+  struct hc_vm vm;
+};
+
+void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc);
+void hc_dsl_deinit(struct hc_dsl *dsl);
+
+struct hc_value* hc_dsl_getenv(struct hc_dsl *dsl, const char *key);
+
+struct hc_value *hc_dsl_setenv(struct hc_dsl *dsl,
+			       const char *key,
+			       const struct hc_type *type);
+
+void hc_dsl_set_fun(struct hc_dsl *dsl, const char *key, hc_vm_fun_t val);
+void hc_dsl_set_string(struct hc_dsl *dsl, const char *key, const char *val);
+void hc_dsl_eval(struct hc_dsl *dsl, const char *in);
 
 struct hc_form;
 
 struct hc_form_type {
-  void (*emit)(struct hc_form *, struct hc_vm *);
+  void (*emit)(struct hc_form *, struct hc_dsl *);
   void (*print)(const struct hc_form *, struct hc_stream *);
-  struct hc_value *(*value)(const struct hc_form *, struct hc_vm *);
+  struct hc_value *(*value)(const struct hc_form *, struct hc_dsl *);
   void (*free)(struct hc_form *);
 };
   
@@ -29,9 +46,9 @@ void hc_form_init(struct hc_form *f,
 		  struct hc_sloc sloc,
 		  struct hc_list *owner);
 
-void hc_form_emit(struct hc_form *f, struct hc_vm *vm);
+void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl);
 void hc_form_print(struct hc_form *f, struct hc_stream *out);
-struct hc_value *hc_form_value(const struct hc_form *f, struct hc_vm *vm);
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl);
 void hc_form_free(struct hc_form *f);
 
 extern const struct hc_form_type hc_call;
@@ -92,8 +109,7 @@ bool hc_read_text(const char **in,
 		  struct hc_list *out,
 		  struct hc_sloc *sloc);
 
-void hc_forms_emit(struct hc_list *in, struct hc_vm *vm);
+void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl);
 void hc_forms_free(struct hc_list *in);
-void hc_dsl_eval(struct hc_vm *vm, const char *in);
 
 #endif

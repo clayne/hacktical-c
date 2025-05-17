@@ -33,15 +33,15 @@ static void read_id_tests() {
 }
 
 static void eval_tests() {
-  struct hc_vm vm;
-  hc_dsl_init(&vm);
-  hc_defer(hc_vm_deinit(&vm));
+  struct hc_dsl dsl;
+  hc_dsl_init(&dsl, &hc_malloc_default);
+  hc_defer(hc_dsl_deinit(&dsl));
   struct hc_memory_stream out;
   hc_memory_stream_init(&out, hc_malloc());
   hc_defer(hc_stream_deinit(&out.stream));
-  vm.out = &out.stream;
-  hc_dsl_set_string(&vm, "foo", "ghi");
-  hc_dsl_eval(&vm, "abc $(print (upcase foo)) def");
+  dsl.out = &out.stream;
+  hc_dsl_set_string(&dsl, "foo", "ghi");
+  hc_dsl_eval(&dsl, "abc $(print (upcase foo)) def");
   assert(strcmp("abc GHI def", hc_memory_stream_string(&out)) == 0);
 }
 

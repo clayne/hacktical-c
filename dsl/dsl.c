@@ -7,6 +7,12 @@
 #include "error/error.h"
 #include "list/list.h"
 
+enum hc_order hc_strcmp(const char *x, const char *y) {
+  const int result = strcmp(x, y);
+  if (!result) { return HC_EQ; }
+  return (result < 0) ? HC_LT : HC_GT;
+}
+
 char *hc_upcase(char *s) {
   while (*s) {
     *s = toupper(*s);
@@ -18,7 +24,8 @@ char *hc_upcase(char *s) {
 
 static void lib_print(struct hc_vm *vm, struct hc_sloc sloc) {
   struct hc_value *v = hc_vm_pop(vm);
-  hc_value_print(v, vm->out);
+  struct hc_dsl *dsl = hc_baseof(vm, struct hc_dsl, vm);
+  hc_value_print(v, dsl->out);
   hc_value_deinit(v);
 }
 
@@ -33,18 +40,75 @@ static void lib_upcase(struct hc_vm *vm, struct hc_sloc sloc) {
   hc_upcase(v->as_string);
 }
 
-void hc_dsl_init(struct hc_vm *vm) {
-  hc_vm_init(vm, &hc_malloc_default);
-  hc_dsl_set_fun(vm, "print", lib_print);
-  hc_dsl_set_fun(vm, "upcase", lib_upcase);
+struct env_item {
+  char *key;
+  struct hc_value value;
+};
+
+static enum hc_order env_cmp(const void *x, const void *y) {
+  return hc_strcmp(*(const char **)x, *(const char **)y);
 }
 
-void hc_dsl_set_fun(struct hc_vm *vm, const char *key, hc_vm_fun_t val) {
-  hc_vm_setenv(vm, key, &HC_VM_FUN)->as_other = val;
+static const void *env_key(const void *x) {
+  return &((const struct env_item *)x)->key;
 }
 
-void hc_dsl_set_string(struct hc_vm *vm, const char *key, const char *val) {
-  hc_vm_setenv(vm, key, &HC_STRING)->as_string = strdup(val);
+void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc) {
+  hc_set_init(&dsl->env, malloc, sizeof(struct env_item), env_cmp);
+  dsl->env.key = env_key;
+  dsl->out = hc_stdout();
+  
+  hc_vm_init(&dsl->vm, &hc_malloc_default);
+  hc_dsl_set_fun(dsl, "print", lib_print);
+  hc_dsl_set_fun(dsl, "upcase", lib_upcase);
+}
+
+static void deinit_env(struct hc_set *env) {
+  hc_vector_do(&env->items, _it) {
+    struct env_item *it = _it;
+    free(it->key);
+    hc_value_deinit(&it->value);
+  }
+  
+  hc_set_deinit(env);
+}
+
+void hc_dsl_deinit(struct hc_dsl *dsl) {
+  deinit_env(&dsl->env);
+  hc_vm_deinit(&dsl->vm);
+}
+
+struct hc_value *hc_dsl_getenv(struct hc_dsl *dsl, const char *key) {
+  struct env_item *it = hc_set_find(&dsl->env, &key);  
+  return it ? &it->value : NULL;
+}
+
+struct hc_value *hc_dsl_setenv(struct hc_dsl *dsl,
+			       const char *key,
+			       const struct hc_type *type) {
+  struct env_item *it = hc_set_add(&dsl->env, &key, false);
+  it->key = strdup(key);
+  hc_value_init(&it->value, type);
+  return &it->value;
+}
+
+void hc_dsl_set_fun(struct hc_dsl *dsl, const char *key, hc_vm_fun_t val) {
+  hc_dsl_setenv(dsl, key, &HC_VM_FUN)->as_other = val;
+}
+
+void hc_dsl_set_string(struct hc_dsl *dsl, const char *key, const char *val) {
+  hc_dsl_setenv(dsl, key, &HC_STRING)->as_string = strdup(val);
+}
+
+void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
+  struct hc_list forms;
+  hc_list_init(&forms);
+  hc_defer(hc_forms_free(&forms));
+  struct hc_sloc sloc = hc_sloc("evals", 0, 0);
+  while (hc_read_next(&in, &forms, &sloc));
+  const size_t pc = dsl->vm.code.length;
+  hc_forms_emit(&forms, dsl);
+  hc_vm_eval(&dsl->vm, pc, -1);
 }
 
 void hc_form_init(struct hc_form *f,
@@ -61,9 +125,9 @@ void hc_form_init(struct hc_form *f,
   }
 }
 
-void hc_form_emit(struct hc_form *f, struct hc_vm *vm) {
+void hc_form_emit(struct hc_form *f, struct hc_dsl *dsl) {
   assert(f->type->emit);
-  f->type->emit(f, vm);
+  f->type->emit(f, dsl);
 }
 
 void hc_form_print(struct hc_form *f, struct hc_stream *out) {
@@ -71,8 +135,8 @@ void hc_form_print(struct hc_form *f, struct hc_stream *out) {
   f->type->print(f, out);
 }
 
-struct hc_value *hc_form_value(const struct hc_form *f, struct hc_vm *vm) {
-  return f->type->value ? f->type->value(f, vm) : NULL;
+struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl) {
+  return f->type->value ? f->type->value(f, dsl) : NULL;
 }
 
 void hc_form_free(struct hc_form *f) {
@@ -81,9 +145,9 @@ void hc_form_free(struct hc_form *f) {
   f->type->free(f);
 }
 
-static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
+static void call_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_call *f = hc_baseof(_f, struct hc_call, form);
-  struct hc_value *t = hc_form_value(f->target, vm);
+  struct hc_value *t = hc_form_value(f->target, dsl);
 
   if (!t) {
     hc_throw("Error in %s: Missing call target",
@@ -97,15 +161,15 @@ static void call_emit(struct hc_form *_f, struct hc_vm *vm) {
   }
 
   hc_list_do(&f->args, a) {
-    hc_form_emit(hc_baseof(a, struct hc_form, owner), vm);
+    hc_form_emit(hc_baseof(a, struct hc_form, owner), dsl);
   }
   
-  hc_vm_emit(vm,
-	      &HC_CALL,
-	      &(struct hc_call_op){
-		.target = t->as_other,
-		.sloc = _f->sloc
-	      });
+  hc_vm_emit(&dsl->vm,
+	     &HC_CALL,
+	     &(struct hc_call_op){
+	       .target = t->as_other,
+	       .sloc = _f->sloc
+	     });
 }
 
 static void call_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -148,9 +212,9 @@ void hc_call_init(struct hc_call *f,
   hc_list_init(&f->args);
 }
 
-static void id_emit(struct hc_form *_f, struct hc_vm *vm) {
+static void id_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  struct hc_value *v = hc_vm_getenv(vm, f->name);
+  struct hc_value *v = hc_dsl_getenv(dsl, f->name);
 
   if (!v) {
     hc_throw("Error in %s: Unknown identifier '%s'",
@@ -159,7 +223,7 @@ static void id_emit(struct hc_form *_f, struct hc_vm *vm) {
 
   struct hc_push_op op;
   hc_value_copy(&op.value, v);
-  hc_vm_emit(vm, &HC_PUSH, &op);
+  hc_vm_emit(&dsl->vm, &HC_PUSH, &op);
 }
 
 static void id_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -168,9 +232,9 @@ static void id_print(const struct hc_form *_f, struct hc_stream *out) {
 }
 
 static struct hc_value *id_value(const struct hc_form *_f,
-				 struct hc_vm *vm) {
+				 struct hc_dsl *dsl) {
   struct hc_id *f = hc_baseof(_f, struct hc_id, form);
-  return hc_vm_getenv(vm, f->name);
+  return hc_dsl_getenv(dsl, f->name);
 }
 
 static void id_free(struct hc_form *_f) {
@@ -194,11 +258,11 @@ void hc_id_init(struct hc_id *f,
   f->name = strdup(name);
 }
 
-static void literal_emit(struct hc_form *_f, struct hc_vm *vm) {
+static void literal_emit(struct hc_form *_f, struct hc_dsl *dsl) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form); 
   struct hc_push_op op;
   hc_value_copy(&op.value, &f->value);
-  hc_vm_emit(vm, &HC_PUSH, &op);
+  hc_vm_emit(&dsl->vm, &HC_PUSH, &op);
 }
 
 static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
@@ -207,7 +271,7 @@ static void literal_print(const struct hc_form *_f, struct hc_stream *out) {
 }
 
 static struct hc_value *literal_value(const struct hc_form *_f,
-				      struct hc_vm *vm) {
+				      struct hc_dsl *dsl) {
   struct hc_literal *f = hc_baseof(_f, struct hc_literal, form);
   return &f->value;
 }
@@ -398,19 +462,8 @@ void hc_forms_free(struct hc_list *in) {
   } 
 }
 
-void hc_forms_emit(struct hc_list *in, struct hc_vm *vm) {
+void hc_forms_emit(struct hc_list *in, struct hc_dsl *dsl) {
   hc_list_do(in, i) {
-    hc_form_emit(hc_baseof(i, struct hc_form, owner), vm);
+    hc_form_emit(hc_baseof(i, struct hc_form, owner), dsl);
   } 
-}
-
-void hc_dsl_eval(struct hc_vm *vm, const char *in) {
-  struct hc_list forms;
-  hc_list_init(&forms);
-  hc_defer(hc_forms_free(&forms));
-  struct hc_sloc sloc = hc_sloc("evals", 0, 0);
-  while (hc_read_next(&in, &forms, &sloc));
-  const size_t pc = vm->code.length;
-  hc_forms_emit(&forms, vm);
-  hc_vm_eval(vm, pc, -1);
 }
