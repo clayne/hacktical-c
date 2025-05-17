@@ -55,7 +55,7 @@ void hc_vm_eval(struct hc_vm *vm,
 
 This brings us back to the question of why we store evaluated code separately. The evaluation loop is very dependent on memory locality, which means we want to store the minimum amount of data that's absolutely needed to evaluate an operation quickly. This allows the CPU to cache larger chunks of the code in one go.
 
-`hc_vm_emit()` adds additional operations to `ops` and `code`, aligning the `code`-part separately (`code` itself is aligned by `sizeof(hc_eval_fn_t)`).
+`hc_vm_emit()` adds operations to `ops` and `code`, aligning the `code`-part separately (`code` itself is aligned by `sizeof(hc_eval_fn_t)`).
 
 ```C
 size_t hc_vm_emit(struct hc_vm *vm,
@@ -79,6 +79,33 @@ size_t op_items(const struct hc_op *op,
   const size_t s = op->size + hc_align(p, op->align) - p;
   return ceil(s / (double)vm->code.item_size);
 }
+```
+
+The `push` operation pushes a [value](https://github.com/codr7/hacktical-c/tree/main/reflect) on the stack.
+
+```C
+struct hc_push_op {
+  struct hc_value value;
+};
+
+static void push_deinit(uint8_t *data) {
+  struct hc_push_op *op = (void *)data;
+  hc_value_deinit(&op->value);
+}
+
+static uint8_t *push_eval(struct hc_vm *vm, uint8_t *data) {
+  struct hc_push_op *op = (void *)hc_align(data, alignof(struct hc_push_op));
+  hc_value_copy(hc_vm_push(vm), &op->value);
+  return (uint8_t *)op + sizeof(struct hc_push_op);
+}
+
+const struct hc_op HC_PUSH = (struct hc_op){
+  .name = "push",
+  .align = alignof(struct hc_push_op),
+  .size = sizeof(struct hc_push_op),
+  .eval = push_eval,
+  .deinit = push_deinit
+};
 ```
 
 The `call` operation is used to call C functions.
@@ -129,31 +156,4 @@ const char *hc_sloc_string(struct hc_sloc *sloc) {
 	  
   return sloc->out;
 }
-```
-
-The `push` operation pushes a [value](https://github.com/codr7/hacktical-c/tree/main/reflect) on the stack.
-
-```C
-struct hc_push_op {
-  struct hc_value value;
-};
-
-static void push_deinit(uint8_t *data) {
-  struct hc_push_op *op = (void *)data;
-  hc_value_deinit(&op->value);
-}
-
-static uint8_t *push_eval(struct hc_vm *vm, uint8_t *data) {
-  struct hc_push_op *op = (void *)hc_align(data, alignof(struct hc_push_op));
-  hc_value_copy(hc_vm_push(vm), &op->value);
-  return (uint8_t *)op + sizeof(struct hc_push_op);
-}
-
-const struct hc_op HC_PUSH = (struct hc_op){
-  .name = "push",
-  .align = alignof(struct hc_push_op),
-  .size = sizeof(struct hc_push_op),
-  .eval = push_eval,
-  .deinit = push_deinit
-};
 ```
