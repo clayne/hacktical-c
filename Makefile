@@ -2,7 +2,7 @@ export CC=ccache gcc
 export CFLAGS=-g -O0 -flto -Wall -Wno-override-init-side-effects -fsanitize=bounds,undefined -I. -lm
 export LDFLAGS=
 
-CHAPTERS=build/chrono.o build/dsl.o build/dynamic.o build/error.o build/fix.o build/list.o build/macro.o build/malloc1.o build/malloc2.o build/reflect.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o build/vm.o
+CHAPTERS=build/chrono.o build/dsl.o build/dynamic.o build/error.o build/fix.o build/list.o build/macro.o build/malloc1.o build/malloc2.o build/parse.o build/reflect.o build/set.o build/slog.o build/stream1.o build/task.o build/vector.o build/vm.o
 
 all: clean build/test build/benchmark
 
@@ -37,6 +37,9 @@ build/malloc1.o:
 
 build/malloc2.o:
 	$(MAKE) -C malloc2
+
+build/parse.o:
+	$(MAKE) -C parse
 
 build/reflect.o:
 	$(MAKE) -C reflect

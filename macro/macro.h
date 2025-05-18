@@ -25,10 +25,13 @@ size_t hc_alignof(size_t size);
 #define hc_array(t, p, ...)					\
   _hc_array(t, hc_id(p, _a), hc_id(p, _n), ##__VA_ARGS__)
 
-#define hc_baseof(p, t, m) ({			\
-      uint8_t *_p = (uint8_t *)p;		\
+#define _hc_baseof(p, t, m, _p) ({		\
+      uint8_t *_p = (uint8_t *)(p);		\
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\
     })
+
+#define hc_baseof(p, t, m)			\
+  _hc_baseof(p, t, m, hc_unique(pointer))
 
 #define hc_bitmask(v, bc)			\
   (v & ((1 << bc) - 1))

@@ -48,7 +48,7 @@ Iterating a list means starting from the head and stepping through the links unt
 
 ```C
 #define _hc_list_do(l, i, _list, _next)				
-  __auto_type _list = 
+  __auto_type _list = l;
   for (struct hc_list *i = _list->next, *_next = i->next;	
        i != _list;						
        i = _next, _next = i->next)
@@ -68,10 +68,13 @@ Example:
 We use the following macro to reach out from `struct hc_list` to its `struct my_item`-container.
 
 ```C
-#define hc_baseof(p, t, m) ({			
-      uint8_t *_p = (uint8_t *)p;		
+#define _hc_baseof(p, t, m, _p) ({		
+      uint8_t *_p = (uint8_t *)(p);		
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;
     })
+
+#define hc_baseof(p, t, m)			
+  _hc_baseof(p, t, m, hc_unique(pointer))
 ```
 
 To remove an item from a list; we don't even need access to the list root, just the item is enough.
