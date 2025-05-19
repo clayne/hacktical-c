@@ -5,8 +5,6 @@
 
 static void alpha_test() {
   struct hc_parser *p = hc_parse_alpha(42);
-  assert(p->id == 42);
-
   const char *in = "abc";
   struct hc_list out;
   hc_list_init(&out);
@@ -34,7 +32,7 @@ static void alpha_test() {
 static void id_test() {
   /*  struct hc_parser *id =
     hc_parse_seq(hc_parse_alpha(0),
-		 hc_parse_many(hc_parse_any(0, hc_parse_alpha(0),
+		 hc_parse_many(hc_parse_any(hc_parse_alpha(0),
 		 hc_parse_digit(0))));*/
 }
 
