@@ -22,7 +22,7 @@ struct hc_parsed {
   size_t end;
 };
 
-struct hc_parser *hc_parse_ws();
+struct hc_parser *hc_parse_space();
 struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));
 
 struct hc_parser *hc_parse_alpha(int id);
@@ -32,6 +32,11 @@ struct hc_parser *hc_parse_digit(int id);
   _hc_parse_any((struct hc_parser *[]){__VA_ARGS__, NULL})
 
 struct hc_parser *_hc_parse_any(struct hc_parser *alts[]);
+
+#define hc_parse_all(id, ...)					\
+  _hc_parse_all(id, (struct hc_parser *[]){__VA_ARGS__, NULL})
+
+struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]);
 
 size_t hc_parse(struct hc_parser *p,
 		const char *in,

@@ -15,6 +15,11 @@ struct hc_parse_any {
   struct hc_list alts;
 };
 
+struct hc_parse_all {
+  struct hc_parser parser;
+  struct hc_list parts;
+};
+
 static bool parse_once(struct hc_parser *p,
 		       const char *in,
 		       size_t *i,
@@ -36,7 +41,7 @@ static struct hc_parsed *push_result(struct hc_list *parent,
   return r;
 }
 
-static bool ws_parse(struct hc_parser *p,
+static bool space_parse(struct hc_parser *p,
 		     const char *in,
 		     size_t *i,
 		     struct hc_list *out) {
@@ -44,17 +49,17 @@ static bool ws_parse(struct hc_parser *p,
     (*i)++;
   }
 
-  return false;
+  return true;
 }
 
-static void ws_free(struct hc_parser *p) {
+static void space_free(struct hc_parser *p) {
   //Do nothing
 }
 
-struct hc_parser *hc_parse_ws() {
+struct hc_parser *hc_parse_space() {
   static struct hc_parser p = (struct hc_parser){
-    .parse = ws_parse,
-    .free = ws_free
+    .parse = space_parse,
+    .free = space_free
   };
   
   return &p;
@@ -153,6 +158,62 @@ struct hc_parser *_hc_parse_any(struct hc_parser *alts[]) {
 
   return &p->parser;
   
+}								   
+
+static bool all_parse(struct hc_parser *_p,
+		      const char *in,
+		      size_t *i,
+		      struct hc_list *out) {
+  struct hc_parse_all *p = hc_baseof(_p, struct hc_parse_all, parser);
+
+  size_t start = *i;
+  struct hc_list ps;
+  hc_list_init(&ps);
+  
+  hc_list_do(&p->parts, pp) {
+    if (!parse_once(hc_baseof(pp, struct hc_parser, parent), in, i, &ps)) {
+      *i = start;
+
+      hc_list_do(&ps, pp) {
+	hc_parser_free(hc_baseof(pp, struct hc_parser, parent));
+      }
+      
+      return false;
+    }
+  }
+
+  hc_list_do(&ps, pp) {
+    hc_list_push_back(out, pp);
+  }
+
+  return true;
+}
+
+static void all_free(struct hc_parser *_p) {
+  struct hc_parse_all *p = hc_baseof(_p, struct hc_parse_all, parser);
+
+  hc_list_do(&p->parts, pp) {
+    hc_parser_free(hc_baseof(pp, struct hc_parser, parent));
+  }
+  
+  free(p);
+}
+
+struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]) {
+  struct hc_parse_all *p = malloc(sizeof(struct hc_parse_all));
+
+  p->parser = (struct hc_parser){
+    .parse = all_parse,
+    .free = all_free
+  };
+
+  hc_list_init(&p->parts);
+
+  for (struct hc_parser **pp = parts; *pp; pp++) {
+    hc_list_push_back(&p->parts, &(*pp)->parent);
+  }
+
+  return &p->parser;
 }								   
 
 size_t hc_parse(struct hc_parser *p,
