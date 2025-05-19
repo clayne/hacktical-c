@@ -36,6 +36,30 @@ static struct hc_parsed *push_result(struct hc_list *parent,
   return r;
 }
 
+static bool ws_parse(struct hc_parser *p,
+		     const char *in,
+		     size_t *i,
+		     struct hc_list *out) {
+  while (isspace(*(in + *i))) {
+    (*i)++;
+  }
+
+  return false;
+}
+
+static void ws_free(struct hc_parser *p) {
+  //Do nothing
+}
+
+struct hc_parser *hc_parse_ws() {
+  static struct hc_parser p = (struct hc_parser){
+    .parse = ws_parse,
+    .free = ws_free
+  };
+  
+  return &p;
+}
+
 static bool if_parse(struct hc_parser *_p,
 		     const char *in,
 		     size_t *i,

@@ -22,6 +22,7 @@ struct hc_parsed {
   size_t end;
 };
 
+struct hc_parser *hc_parse_ws();
 struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));
 
 struct hc_parser *hc_parse_alpha(int id);

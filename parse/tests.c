@@ -31,7 +31,8 @@ static void alpha_test() {
 
 static void id_test() {
   /*  struct hc_parser *id =
-    hc_parse_seq(hc_parse_alpha(0),
+    hc_parse_all(42,
+                 hc_parse_alpha(0),
 		 hc_parse_many(hc_parse_any(hc_parse_alpha(0),
 		 hc_parse_digit(0))));*/
 }
