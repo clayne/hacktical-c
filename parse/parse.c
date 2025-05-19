@@ -4,17 +4,36 @@
 
 #include "parse.h"
 
+struct hc_parse_if {
+  struct hc_parser parser;
+  int id;
+  bool (*predicate)(char);
+};
+
+struct hc_parse_any {
+  struct hc_parser parser;
+  struct hc_list alts;
+};
+
+static bool parse_once(struct hc_parser *p,
+		       const char *in,
+		       size_t *i,
+		       struct hc_list *out) {
+  assert(p->parse);
+  return p->parse(p, in, i, out);
+}
+
 static struct hc_parsed *push_result(struct hc_list *parent,
 				     int id,
 				     size_t start,
 				     size_t end) {
-      struct hc_parsed *r = malloc(sizeof(struct hc_parsed));
-      hc_list_push_back(parent, &r->parent);
-      hc_list_init(&r->children);
-      r->id = id;
-      r->start = start;
-      r->end = end;
-      return r;
+  struct hc_parsed *r = malloc(sizeof(struct hc_parsed));
+  hc_list_push_back(parent, &r->parent);
+  hc_list_init(&r->children);
+  r->id = id;
+  r->start = start;
+  r->end = end;
+  return r;
 }
 
 static bool if_parse(struct hc_parser *_p,
@@ -70,13 +89,13 @@ struct hc_parser *hc_parse_digit(int id) {
 }
 
 static bool any_parse(struct hc_parser *_p,
-		     const char *in,
-		     size_t *i,
-		     struct hc_list *out) {
+		      const char *in,
+		      size_t *i,
+		      struct hc_list *out) {
   struct hc_parse_any *p = hc_baseof(_p, struct hc_parse_any, parser);
 
   hc_list_do(&p->alts, a) {
-    if (_hc_parse(hc_baseof(a, struct hc_parser, parent), in, i, out)) {
+    if (parse_once(hc_baseof(a, struct hc_parser, parent), in, i, out)) {
       return true;
     }
   }
@@ -116,16 +135,8 @@ size_t hc_parse(struct hc_parser *p,
 		const char *in,
 		struct hc_list *out) {
   size_t i = 0;
-  while (_hc_parse(p, in, &i, out));
+  while (parse_once(p, in, &i, out));
   return i;
-}
-
-bool _hc_parse(struct hc_parser *p,
-	       const char *in,
-	       size_t *i,
-	       struct hc_list *out) {
-  assert(p->parse);
-  return p->parse(p, in, i, out);
 }
 
 void hc_parser_free(struct hc_parser *p) {
