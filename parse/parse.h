@@ -23,6 +23,7 @@ struct hc_parsed {
   size_t end;
 };
 
+struct hc_parser *hc_parse_any();
 struct hc_parser *hc_parse_space();
 struct hc_parser *hc_parse_char(int id, char ch);
 struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));

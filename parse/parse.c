@@ -27,6 +27,34 @@ static struct hc_parsed *push_result(struct hc_list *parent,
   return r;
 }
 
+static struct hc_parser *any_parse(struct hc_parser *_p,
+				     struct hc_parser *pn,
+				     const char *in,
+				     size_t *i,
+				     struct hc_list *out) {
+  if (*(in + *i)) {
+    (*i)++;
+    return _p;
+  }
+
+  return NULL;
+}
+
+static void any_free(struct hc_parser *p) {
+  free(p);
+}
+
+struct hc_parser *hc_parse_any() {
+  struct hc_parser *p = malloc(sizeof(struct hc_parser));
+
+  *p = (struct hc_parser) {
+    .parse = any_parse,
+    .free = any_free
+  };
+
+  return p;
+}
+
 struct hc_parse_space {
   struct hc_parser parser;
   int id;
