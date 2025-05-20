@@ -34,10 +34,10 @@ struct hc_parser *hc_parse_digit(int id);
 
 struct hc_parser *_hc_parse_any(struct hc_parser *alts[]);
 
-#define hc_parse_all(id, ...)					\
-  _hc_parse_all(id, (struct hc_parser *[]){__VA_ARGS__, NULL})
+#define hc_parse_and(id, ...)					\
+  _hc_parse_and(id, (struct hc_parser *[]){__VA_ARGS__, NULL})
 
-struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]);
+struct hc_parser *_hc_parse_and(int id, struct hc_parser *parts[]);
 
 struct hc_parser *hc_parse_many(struct hc_parser *part);
 

@@ -29,8 +29,8 @@ static void alpha_test() {
   hc_parsed_free(&out);
 }
 
-static void all_test() {
-  struct hc_parser *p = hc_parse_all(0,
+static void and_test() {
+  struct hc_parser *p = hc_parse_and(0,
 				     hc_parse_space(0),
 				     hc_parse_alpha(42));
   const char *in = " a bc";
@@ -59,14 +59,14 @@ static void all_test() {
 
 static void id_test() {
   /*  struct hc_parser *id =
-    hc_parse_all(42,
+    hc_parse_and(42,
                  hc_parse_alpha(0),
 		 hc_parse_many(hc_parse_any(hc_parse_alpha(0),
-		 hc_parse_digit(0))));*/
+		                            hc_parse_digit(0))));*/
 }
 
 void parse_tests() {
   alpha_test();
-  all_test();
+  and_test();
   id_test();
 }

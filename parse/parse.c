@@ -212,16 +212,16 @@ struct hc_parser *_hc_parse_any(struct hc_parser *alts[]) {
   
 }								   
 
-struct hc_parse_all {
+struct hc_parse_and {
   struct hc_parser parser;
   struct hc_list parts;
 };
 
-static bool all_parse(struct hc_parser *_p,
+static bool and_parse(struct hc_parser *_p,
 		      const char *in,
 		      size_t *i,
 		      struct hc_list *out) {
-  struct hc_parse_all *p = hc_baseof(_p, struct hc_parse_all, parser);
+  struct hc_parse_and *p = hc_baseof(_p, struct hc_parse_and, parser);
 
   size_t start = *i;
   struct hc_list ps;
@@ -246,8 +246,8 @@ static bool all_parse(struct hc_parser *_p,
   return true;
 }
 
-static void all_free(struct hc_parser *_p) {
-  struct hc_parse_all *p = hc_baseof(_p, struct hc_parse_all, parser);
+static void and_free(struct hc_parser *_p) {
+  struct hc_parse_and *p = hc_baseof(_p, struct hc_parse_and, parser);
 
   hc_list_do(&p->parts, pp) {
     hc_parser_free(hc_baseof(pp, struct hc_parser, parent));
@@ -256,12 +256,12 @@ static void all_free(struct hc_parser *_p) {
   free(p);
 }
 
-struct hc_parser *_hc_parse_all(const int id, struct hc_parser *parts[]) {
-  struct hc_parse_all *p = malloc(sizeof(struct hc_parse_all));
+struct hc_parser *_hc_parse_and(const int id, struct hc_parser *parts[]) {
+  struct hc_parse_and *p = malloc(sizeof(struct hc_parse_and));
 
   p->parser = (struct hc_parser){
-    .parse = all_parse,
-    .free = all_free
+    .parse = and_parse,
+    .free = and_free
   };
 
   hc_list_init(&p->parts);
