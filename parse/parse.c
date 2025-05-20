@@ -5,12 +5,13 @@
 
 #include "parse.h"
 
-static bool parse_once(struct hc_parser *p,
-		       const char *in,
-		       size_t *i,
-		       struct hc_list *out) {
+static struct hc_parser *parse_once(struct hc_parser *p,
+				    struct hc_parser *pn,
+				    const char *in,
+				    size_t *i,
+				    struct hc_list *out) {
   assert(p->parse);
-  return p->parse(p, in, i, out);
+  return p->parse(p, pn, in, i, out);
 }
 
 static struct hc_parsed *push_result(struct hc_list *parent,
@@ -31,10 +32,11 @@ struct hc_parse_space {
   int id;
 };
 
-static bool space_parse(struct hc_parser *_p,
-			const char *in,
-			size_t *i,
-			struct hc_list *out) {
+static struct hc_parser *space_parse(struct hc_parser *_p,
+				     struct hc_parser *pn,
+				     const char *in,
+				     size_t *i,
+				     struct hc_list *out) {
   struct hc_parse_space *p = hc_baseof(_p, struct hc_parse_space, parser);
   size_t start = *i;
   
@@ -46,7 +48,7 @@ static bool space_parse(struct hc_parser *_p,
     push_result(out, p->id, start, *i);
   }
   
-  return true;
+  return _p;
 }
 
 static void space_free(struct hc_parser *p) {
@@ -72,10 +74,11 @@ struct hc_parse_char {
   char ch;
 };
 
-static bool char_parse(struct hc_parser *_p,
-		       const char *in,
-		       size_t *i,
-		       struct hc_list *out) {
+static struct hc_parser *char_parse(struct hc_parser *_p,
+				    struct hc_parser *pn,
+				    const char *in,
+				    size_t *i,
+				    struct hc_list *out) {
   struct hc_parse_char *p = hc_baseof(_p, struct hc_parse_char, parser);
 
   if (*(in + *i) == p->ch) {
@@ -84,10 +87,10 @@ static bool char_parse(struct hc_parser *_p,
     }
 
     (*i)++;
-    return true;
+    return _p;
   }
 
-  return false;
+  return NULL;
 }
 
 static void char_free(struct hc_parser *p) {
@@ -113,10 +116,11 @@ struct hc_parse_if {
   bool (*predicate)(char);
 };
 
-static bool if_parse(struct hc_parser *_p,
-		     const char *in,
-		     size_t *i,
-		     struct hc_list *out) {
+static struct hc_parser *if_parse(struct hc_parser *_p,
+				  struct hc_parser *pn,
+				  const char *in,
+				  size_t *i,
+				  struct hc_list *out) {
   struct hc_parse_if *p = hc_baseof(_p, struct hc_parse_if, parser);
   char c = *(in + *i);
   
@@ -126,10 +130,10 @@ static bool if_parse(struct hc_parser *_p,
     }
     
     (*i)++;
-    return true;
+    return _p;
   }
 
-  return false;
+  return NULL;
 }
 
 static void if_free(struct hc_parser *p) {
@@ -170,19 +174,22 @@ struct hc_parse_or {
   struct hc_list parts;
 };
 
-static bool or_parse(struct hc_parser *_p,
-		      const char *in,
-		      size_t *i,
-		      struct hc_list *out) {
+static struct hc_parser *or_parse(struct hc_parser *_p,
+				  struct hc_parser *pn,
+				  const char *in,
+				  size_t *i,
+				  struct hc_list *out) {
   struct hc_parse_or *p = hc_baseof(_p, struct hc_parse_or, parser);
 
-  hc_list_do(&p->parts, pp) {
-    if (parse_once(hc_baseof(pp, struct hc_parser, parent), in, i, out)) {
-      return true;
+  hc_list_do(&p->parts, _pp) {
+    struct hc_parser *pp = hc_baseof(_pp, struct hc_parser, parent);
+    
+    if (parse_once(pp, NULL, in, i, out)) {
+      return pp;
     }
   }
 
-  return false;
+  return NULL;
 }
 
 static void or_free(struct hc_parser *_p) {
@@ -219,20 +226,35 @@ struct hc_parse_and {
   struct hc_list parts;
 };
 
-static bool and_parse(struct hc_parser *_p,
-		      const char *in,
-		      size_t *i,
-		      struct hc_list *out) {
+static struct hc_parser *and_parse(struct hc_parser *_p,
+				   struct hc_parser *pn,
+				   const char *in,
+				   size_t *i,
+				   struct hc_list *out) {
   struct hc_parse_and *p = hc_baseof(_p, struct hc_parse_and, parser);
 
   size_t start = *i;
   struct hc_list ps;
   hc_list_init(&ps);
   
-  hc_list_do(&p->parts, pp) {
-    if (!parse_once(hc_baseof(pp, struct hc_parser, parent), in, i, &ps)) {
+  for (struct hc_list *_pp = p->parts.next;
+       _pp != &p->parts;
+       _pp = _pp->next) {
+    struct hc_parser *pp = hc_baseof(_pp, struct hc_parser, parent);
+    
+    struct hc_parser *pn = (_pp->next == &p->parts)
+      ? NULL
+      : hc_baseof(_pp->next, struct hc_parser, parent);
+
+    struct hc_parser *pr = parse_once(pp, pn, in, i, &ps);
+
+    if (!pr) {
       *i = start;
-      return false;
+      return NULL;
+    }
+
+    if (pr == pn) {
+      _pp = _pp->next;
     }
   }
 
@@ -244,7 +266,7 @@ static bool and_parse(struct hc_parser *_p,
     hc_list_push_back(out, pp);
   }
 
-  return true;
+  return _p;
 }
 
 static void and_free(struct hc_parser *_p) {
@@ -281,27 +303,39 @@ struct hc_parse_many {
   struct hc_parser *part;
 };
 
-static bool many_parse(struct hc_parser *_p,
-		       const char *in,
-		       size_t *i,
-		       struct hc_list *out) {
+static struct hc_parser *many_parse(struct hc_parser *_p,
+				    struct hc_parser *pn,
+				    const char *in,
+				    size_t *i,
+				    struct hc_list *out) {
   struct hc_parse_many *p = hc_baseof(_p, struct hc_parse_many, parser);
 
   struct hc_list ps;
   hc_list_init(&ps);
   size_t start = *i;
+  size_t end = start;
+  struct hc_parser *pr = _p;
   
-  while (parse_once(p->part, in, i, &ps));
+  while (parse_once(p->part, NULL, in, i, &ps)) {
+    end = *i;
+    struct hc_list *po = out->prev;
+    
+    if (pn && parse_once(pn, NULL, in, i, out)) {
+      pr = pn;
+      out = po;
+      break;
+    }
+  }
 
-  if (p->id && *i != start) {
-    out = &push_result(out, p->id, start, *i)->children;
+  if (p->id && start != end) {
+    out = &push_result(out, p->id, start, end)->children;
   }
 
   hc_list_do(&ps, pp) {
     hc_list_push_back(out, pp);
   }
 
-  return true;
+  return pr;
 }
 
 static void many_free(struct hc_parser *_p) {
@@ -327,7 +361,7 @@ size_t hc_parse(struct hc_parser *p,
 		const char *in,
 		struct hc_list *out) {
   size_t i = 0;
-  while (parse_once(p, in, &i, out));
+  while (parse_once(p, NULL, in, &i, out));
   return i;
 }
 

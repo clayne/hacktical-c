@@ -6,10 +6,11 @@
 struct hc_parser {
   struct hc_list parent;
   
-  bool (*parse)(struct hc_parser *p,
-		const char *in,
-		size_t *i,
-		struct hc_list *out);
+  struct hc_parser *(*parse)(struct hc_parser *p,
+			     struct hc_parser *pn,
+			     const char *in,
+			     size_t *i,
+			     struct hc_list *out);
 
   void (*free)(struct hc_parser *);
 };
