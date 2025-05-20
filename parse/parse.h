@@ -38,6 +38,8 @@ struct hc_parser *_hc_parse_any(struct hc_parser *alts[]);
 
 struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]);
 
+struct hc_parser *hc_parse_many(struct hc_parser *part);
+
 size_t hc_parse(struct hc_parser *p,
 		const char *in,
 		struct hc_list *out);

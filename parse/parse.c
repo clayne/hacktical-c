@@ -4,22 +4,6 @@
 
 #include "parse.h"
 
-struct hc_parse_if {
-  struct hc_parser parser;
-  int id;
-  bool (*predicate)(char);
-};
-
-struct hc_parse_any {
-  struct hc_parser parser;
-  struct hc_list alts;
-};
-
-struct hc_parse_all {
-  struct hc_parser parser;
-  struct hc_list parts;
-};
-
 static bool parse_once(struct hc_parser *p,
 		       const char *in,
 		       size_t *i,
@@ -64,6 +48,12 @@ struct hc_parser *hc_parse_space() {
   
   return &p;
 }
+
+struct hc_parse_if {
+  struct hc_parser parser;
+  int id;
+  bool (*predicate)(char);
+};
 
 static bool if_parse(struct hc_parser *_p,
 		     const char *in,
@@ -117,6 +107,11 @@ struct hc_parser *hc_parse_digit(int id) {
   return hc_parse_if(id, digit_p);
 }
 
+struct hc_parse_any {
+  struct hc_parser parser;
+  struct hc_list alts;
+};
+
 static bool any_parse(struct hc_parser *_p,
 		      const char *in,
 		      size_t *i,
@@ -159,6 +154,11 @@ struct hc_parser *_hc_parse_any(struct hc_parser *alts[]) {
   return &p->parser;
   
 }								   
+
+struct hc_parse_all {
+  struct hc_parser parser;
+  struct hc_list parts;
+};
 
 static bool all_parse(struct hc_parser *_p,
 		      const char *in,
@@ -215,6 +215,43 @@ struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]) {
 
   return &p->parser;
 }								   
+
+struct hc_parse_many {
+  struct hc_parser parser;
+  struct hc_parser *part;
+};
+
+static bool many_parse(struct hc_parser *_p,
+		       const char *in,
+		       size_t *i,
+		       struct hc_list *out) {
+  struct hc_parse_many *p = hc_baseof(_p, struct hc_parse_many, parser);
+  bool result = false;
+  
+  while (parse_once(p->part, in, i, out)) {
+    result = true;
+  }
+
+  return result;
+}
+
+static void many_free(struct hc_parser *_p) {
+  struct hc_parse_many *p = hc_baseof(_p, struct hc_parse_many, parser);
+  hc_parser_free(p->part);
+  free(p);
+}
+
+struct hc_parser *hc_parse_many(struct hc_parser *part) {
+  struct hc_parse_many *p = malloc(sizeof (struct hc_parse_many));
+
+  p->parser = (struct hc_parser){
+    .parse = many_parse,
+    .free = many_free
+  };
+
+  p->part = part;
+  return &p->parser;
+}
 
 size_t hc_parse(struct hc_parser *p,
 		const char *in,
