@@ -29,10 +29,10 @@ struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));
 struct hc_parser *hc_parse_alpha(int id);
 struct hc_parser *hc_parse_digit(int id);
 
-#define hc_parse_any(...)					\
-  _hc_parse_any((struct hc_parser *[]){__VA_ARGS__, NULL})
+#define hc_parse_or(...)					\
+  _hc_parse_or((struct hc_parser *[]){__VA_ARGS__, NULL})
 
-struct hc_parser *_hc_parse_any(struct hc_parser *alts[]);
+struct hc_parser *_hc_parse_or(struct hc_parser *alts[]);
 
 #define hc_parse_and(id, ...)					\
   _hc_parse_and(id, (struct hc_parser *[]){__VA_ARGS__, NULL})

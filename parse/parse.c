@@ -164,19 +164,19 @@ struct hc_parser *hc_parse_digit(const int id) {
   return hc_parse_if(id, digit_p);
 }
 
-struct hc_parse_any {
+struct hc_parse_or {
   struct hc_parser parser;
-  struct hc_list alts;
+  struct hc_list parts;
 };
 
-static bool any_parse(struct hc_parser *_p,
+static bool or_parse(struct hc_parser *_p,
 		      const char *in,
 		      size_t *i,
 		      struct hc_list *out) {
-  struct hc_parse_any *p = hc_baseof(_p, struct hc_parse_any, parser);
+  struct hc_parse_or *p = hc_baseof(_p, struct hc_parse_or, parser);
 
-  hc_list_do(&p->alts, a) {
-    if (parse_once(hc_baseof(a, struct hc_parser, parent), in, i, out)) {
+  hc_list_do(&p->parts, pp) {
+    if (parse_once(hc_baseof(pp, struct hc_parser, parent), in, i, out)) {
       return true;
     }
   }
@@ -184,28 +184,28 @@ static bool any_parse(struct hc_parser *_p,
   return false;
 }
 
-static void any_free(struct hc_parser *_p) {
-  struct hc_parse_any *p = hc_baseof(_p, struct hc_parse_any, parser);
+static void or_free(struct hc_parser *_p) {
+  struct hc_parse_or *p = hc_baseof(_p, struct hc_parse_or, parser);
 
-  hc_list_do(&p->alts, a) {
-    hc_parser_free(hc_baseof(a, struct hc_parser, parent));
+  hc_list_do(&p->parts, pp) {
+    hc_parser_free(hc_baseof(pp, struct hc_parser, parent));
   }
   
   free(p);
 }
 
-struct hc_parser *_hc_parse_any(struct hc_parser *alts[]) {
-  struct hc_parse_any *p = malloc(sizeof(struct hc_parse_any));
+struct hc_parser *_hc_parse_or(struct hc_parser *parts[]) {
+  struct hc_parse_or *p = malloc(sizeof(struct hc_parse_or));
 
   p->parser = (struct hc_parser){
-    .parse = any_parse,
-    .free = any_free
+    .parse = or_parse,
+    .free = or_free
   };
 
-  hc_list_init(&p->alts);
+  hc_list_init(&p->parts);
 
-  for (struct hc_parser **a = alts; *a; a++) {
-    hc_list_push_back(&p->alts, &(*a)->parent);
+  for (struct hc_parser **pp = parts; *pp; pp++) {
+    hc_list_push_back(&p->parts, &(*pp)->parent);
   }
 
   return &p->parser;
