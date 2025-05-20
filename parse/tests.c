@@ -31,7 +31,7 @@ static void alpha_test() {
 
 static void all_test() {
   struct hc_parser *p = hc_parse_all(0,
-				     hc_parse_space(),
+				     hc_parse_space(0),
 				     hc_parse_alpha(42));
   const char *in = " a bc";
   struct hc_list out;

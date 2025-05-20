@@ -13,9 +13,9 @@ static bool parse_once(struct hc_parser *p,
 }
 
 static struct hc_parsed *push_result(struct hc_list *parent,
-				     int id,
-				     size_t start,
-				     size_t end) {
+				     const int id,
+				     const size_t start,
+				     const size_t end) {
   struct hc_parsed *r = malloc(sizeof(struct hc_parsed));
   hc_list_push_back(parent, &r->parent);
   hc_list_init(&r->children);
@@ -25,28 +25,44 @@ static struct hc_parsed *push_result(struct hc_list *parent,
   return r;
 }
 
-static bool space_parse(struct hc_parser *p,
+struct hc_parse_space {
+  struct hc_parser parser;
+  int id;
+};
+
+static bool space_parse(struct hc_parser *_p,
 			const char *in,
 			size_t *i,
 			struct hc_list *out) {
+  struct hc_parse_space *p = hc_baseof(_p, struct hc_parse_space, parser);
+  size_t start = *i;
+  
   while (isspace(*(in + *i))) {
     (*i)++;
   }
 
+  if (p->id && *i != start) {
+    push_result(out, p->id, start, *i);
+  }
+  
   return true;
 }
 
 static void space_free(struct hc_parser *p) {
-  //Do nothing
+  free(p);
 }
 
-struct hc_parser *hc_parse_space() {
-  static struct hc_parser p = (struct hc_parser){
+struct hc_parser *hc_parse_space(const int id) {
+  struct hc_parse_space *p = malloc(sizeof(struct hc_parse_space));
+
+  p->parser = (struct hc_parser) {
     .parse = space_parse,
     .free = space_free
   };
 
-  return &p;
+  p->id = id;
+  
+  return &p->parser;
 }
 
 struct hc_parse_char {
@@ -77,7 +93,7 @@ static void char_free(struct hc_parser *p) {
   free(p);
 }
 
-struct hc_parser *hc_parse_char(int id, const char ch) {
+struct hc_parser *hc_parse_char(const int id, const char ch) {
   struct hc_parse_char *p = malloc(sizeof(struct hc_parse_char));
 
   p->parser = (struct hc_parser){
@@ -119,7 +135,7 @@ static void if_free(struct hc_parser *p) {
   free(hc_baseof(p, struct hc_parse_if, parser));
 }
 
-struct hc_parser *hc_parse_if(int id, bool (*predicate)(char)) {
+struct hc_parser *hc_parse_if(const int id, bool (*predicate)(char)) {
   struct hc_parse_if *p = malloc(sizeof(struct hc_parse_if));
 
   p->parser = (struct hc_parser){
@@ -136,7 +152,7 @@ static bool alpha_p(char c) {
   return isalpha(c);
 }
 
-struct hc_parser *hc_parse_alpha(int id) {
+struct hc_parser *hc_parse_alpha(const int id) {
   return hc_parse_if(id, alpha_p);
 }
 
@@ -144,7 +160,7 @@ static bool digit_p(char c) {
   return isdigit(c);
 }
 
-struct hc_parser *hc_parse_digit(int id) {
+struct hc_parser *hc_parse_digit(const int id) {
   return hc_parse_if(id, digit_p);
 }
 
@@ -240,7 +256,7 @@ static void all_free(struct hc_parser *_p) {
   free(p);
 }
 
-struct hc_parser *_hc_parse_all(int id, struct hc_parser *parts[]) {
+struct hc_parser *_hc_parse_all(const int id, struct hc_parser *parts[]) {
   struct hc_parse_all *p = malloc(sizeof(struct hc_parse_all));
 
   p->parser = (struct hc_parser){
