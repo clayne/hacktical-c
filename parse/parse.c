@@ -283,13 +283,8 @@ static bool many_parse(struct hc_parser *_p,
 		       size_t *i,
 		       struct hc_list *out) {
   struct hc_parse_many *p = hc_baseof(_p, struct hc_parse_many, parser);
-  bool result = false;
-  
-  while (parse_once(p->part, in, i, out)) {
-    result = true;
-  }
-
-  return result;
+  while (parse_once(p->part, in, i, out));
+  return true;
 }
 
 static void many_free(struct hc_parser *_p) {
