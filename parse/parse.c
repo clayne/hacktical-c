@@ -26,9 +26,9 @@ static struct hc_parsed *push_result(struct hc_list *parent,
 }
 
 static bool space_parse(struct hc_parser *p,
-		     const char *in,
-		     size_t *i,
-		     struct hc_list *out) {
+			const char *in,
+			size_t *i,
+			struct hc_list *out) {
   while (isspace(*(in + *i))) {
     (*i)++;
   }
@@ -45,8 +45,49 @@ struct hc_parser *hc_parse_space() {
     .parse = space_parse,
     .free = space_free
   };
-  
+
   return &p;
+}
+
+struct hc_parse_char {
+  struct hc_parser parser;
+  int id;
+  char ch;
+};
+
+static bool char_parse(struct hc_parser *_p,
+		       const char *in,
+		       size_t *i,
+		       struct hc_list *out) {
+  struct hc_parse_char *p = hc_baseof(_p, struct hc_parse_char, parser);
+
+  if (*(in + *i) == p->ch) {
+    if (p->id) {
+      push_result(out, p->id, *i, *i+1);
+    }
+
+    (*i)++;
+    return true;
+  }
+
+  return false;
+}
+
+static void char_free(struct hc_parser *p) {
+  free(p);
+}
+
+struct hc_parser *hc_parse_char(int id, const char ch) {
+  struct hc_parse_char *p = malloc(sizeof(struct hc_parse_char));
+
+  p->parser = (struct hc_parser){
+    .parse = char_parse,
+    .free = char_free
+  };
+
+  p->id = id;
+  p->ch = ch;
+  return &p->parser;
 }
 
 struct hc_parse_if {
