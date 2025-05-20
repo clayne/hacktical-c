@@ -57,16 +57,27 @@ static void and_test() {
   hc_parsed_free(&out);
 }
 
-static void id_test() {
-  /*  struct hc_parser *id =
-    hc_parse_and(42,
-                 hc_parse_alpha(0),
-		 hc_parse_many(hc_parse_or(hc_parse_alpha(0),
-		                           hc_parse_digit(0))));*/
+static void delim_test() {
+  struct hc_parser *p = hc_parse_and(0,
+				     hc_parse_char(0, '('),
+				     hc_parse_many(42, hc_parse_alpha(0)),
+				     hc_parse_char(0, ')'));
+  const char *in = "(bcd)";
+  struct hc_list out;
+  hc_list_init(&out);
+  assert(hc_parse(p, in, &out) == 5);
+
+  struct hc_parsed *pr = hc_baseof(out.next, struct hc_parsed, parent);
+  assert(pr->id == 42);
+  assert(pr->start == 1);
+  assert(pr->end == 4);
+
+  hc_parser_free(p);
+  hc_parsed_free(&out);
 }
 
 void parse_tests() {
   alpha_test();
   and_test();
-  id_test();
+  delim_test();
 }

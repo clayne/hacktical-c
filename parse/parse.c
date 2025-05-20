@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "parse.h"
@@ -214,6 +215,7 @@ struct hc_parser *_hc_parse_or(struct hc_parser *parts[]) {
 
 struct hc_parse_and {
   struct hc_parser parser;
+  int id;
   struct hc_list parts;
 };
 
@@ -230,15 +232,14 @@ static bool and_parse(struct hc_parser *_p,
   hc_list_do(&p->parts, pp) {
     if (!parse_once(hc_baseof(pp, struct hc_parser, parent), in, i, &ps)) {
       *i = start;
-
-      hc_list_do(&ps, pp) {
-	hc_parser_free(hc_baseof(pp, struct hc_parser, parent));
-      }
-      
       return false;
     }
   }
 
+  if (p->id) {
+    out = &push_result(out, p->id, start, *i)->children;
+  }
+  
   hc_list_do(&ps, pp) {
     hc_list_push_back(out, pp);
   }
@@ -264,6 +265,7 @@ struct hc_parser *_hc_parse_and(const int id, struct hc_parser *parts[]) {
     .free = and_free
   };
 
+  p->id = id;
   hc_list_init(&p->parts);
 
   for (struct hc_parser **pp = parts; *pp; pp++) {
@@ -275,6 +277,7 @@ struct hc_parser *_hc_parse_and(const int id, struct hc_parser *parts[]) {
 
 struct hc_parse_many {
   struct hc_parser parser;
+  int id;
   struct hc_parser *part;
 };
 
@@ -283,7 +286,21 @@ static bool many_parse(struct hc_parser *_p,
 		       size_t *i,
 		       struct hc_list *out) {
   struct hc_parse_many *p = hc_baseof(_p, struct hc_parse_many, parser);
-  while (parse_once(p->part, in, i, out));
+
+  struct hc_list ps;
+  hc_list_init(&ps);
+  size_t start = *i;
+  
+  while (parse_once(p->part, in, i, &ps));
+
+  if (p->id && *i != start) {
+    out = &push_result(out, p->id, start, *i)->children;
+  }
+
+  hc_list_do(&ps, pp) {
+    hc_list_push_back(out, pp);
+  }
+
   return true;
 }
 
@@ -293,7 +310,7 @@ static void many_free(struct hc_parser *_p) {
   free(p);
 }
 
-struct hc_parser *hc_parse_many(struct hc_parser *part) {
+struct hc_parser *hc_parse_many(int id, struct hc_parser *part) {
   struct hc_parse_many *p = malloc(sizeof (struct hc_parse_many));
 
   p->parser = (struct hc_parser){
@@ -301,6 +318,7 @@ struct hc_parser *hc_parse_many(struct hc_parser *part) {
     .free = many_free
   };
 
+  p->id = id;
   p->part = part;
   return &p->parser;
 }
