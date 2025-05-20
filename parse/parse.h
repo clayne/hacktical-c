@@ -26,8 +26,8 @@ struct hc_parsed {
 struct hc_parser *hc_parse_any();
 struct hc_parser *hc_parse_space();
 struct hc_parser *hc_parse_char(int id, char ch);
-struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));
 
+struct hc_parser *hc_parse_if(int id, bool (*predicate)(char));
 struct hc_parser *hc_parse_alpha(int id);
 struct hc_parser *hc_parse_digit(int id);
 
