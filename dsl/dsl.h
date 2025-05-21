@@ -7,6 +7,7 @@ enum hc_order hc_strcmp(const char *x, const char *y);
 char *hc_upcase(char *s);
 
 struct hc_dsl {
+  struct hc_parser *parser;
   struct hc_set env;
   struct hc_stream *out;
 
@@ -27,6 +28,10 @@ void hc_dsl_set_string(struct hc_dsl *dsl, const char *key, const char *val);
 void hc_dsl_eval(struct hc_dsl *dsl, const char *in);
 
 struct hc_form;
+
+enum hc_dsl_parsed {
+  HC_DSL_CALL = 1, HC_DSL_ID, HC_DSL_TEXT
+};
 
 struct hc_form_type {
   void (*emit)(struct hc_form *, struct hc_dsl *);

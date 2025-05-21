@@ -34,6 +34,12 @@ struct hc_parser *hc_parse_digit(int id);
 #define hc_parse_or(...)					\
   _hc_parse_or((struct hc_parser *[]){__VA_ARGS__, NULL})
 
+struct hc_parse_and {
+  struct hc_parser parser;
+  int id;
+  struct hc_list parts;
+};
+
 struct hc_parser *_hc_parse_or(struct hc_parser *alts[]);
 
 #define hc_parse_and(id, ...)					\

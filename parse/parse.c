@@ -249,12 +249,6 @@ struct hc_parser *_hc_parse_or(struct hc_parser *parts[]) {
   
 }								   
 
-struct hc_parse_and {
-  struct hc_parser parser;
-  int id;
-  struct hc_list parts;
-};
-
 static struct hc_parser *and_parse(struct hc_parser *_p,
 				   struct hc_parser *pn,
 				   const char *in,

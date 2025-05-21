@@ -6,6 +6,7 @@
 #include "dsl.h"
 #include "error/error.h"
 #include "list/list.h"
+#include "parse/parse.h"
 
 enum hc_order hc_strcmp(const char *x, const char *y) {
   const int result = strcmp(x, y);
@@ -53,7 +54,38 @@ static const void *env_key(const void *x) {
   return &((const struct env_item *)x)->key;
 }
 
+static struct hc_parser *default_parser() {
+  struct hc_parser *id_suffix = hc_parse_or(0, hc_parse_alpha(0),
+					       hc_parse_digit(0));
+
+  struct hc_parser *id = hc_parse_and(HC_DSL_ID,
+				      hc_parse_alpha(0),
+				      hc_parse_many(0, id_suffix));
+
+  struct hc_parser *expr = hc_parse_and(0, hc_parse_space());
+
+  struct hc_parser *call = hc_parse_and(HC_DSL_CALL,
+					hc_parse_char(0, '('),
+					hc_parse_space(),
+					hc_parse_many(0, expr),
+					hc_parse_space(),
+					hc_parse_char(0, ')'));
+
+  hc_list_push_back(&hc_baseof(expr, struct hc_parse_and, parser)->parts,
+  		    &hc_parse_or(0, id, call)->parent);
+    
+  struct hc_parser *text = hc_parse_many(HC_DSL_TEXT, hc_parse_char(0, -'$'));
+
+  return hc_parse_many(0, 
+		       hc_parse_or(0,
+				   text,
+				   hc_parse_and(0,
+						hc_parse_char(0, '$'),
+						call)));
+}
+
 void hc_dsl_init(struct hc_dsl *dsl, struct hc_malloc *malloc) {
+  dsl->parser = default_parser();
   hc_set_init(&dsl->env, malloc, sizeof(struct env_item), env_cmp);
   dsl->env.key = env_key;
   dsl->out = hc_stdout();
@@ -74,6 +106,7 @@ static void deinit_env(struct hc_set *env) {
 }
 
 void hc_dsl_deinit(struct hc_dsl *dsl) {
+  hc_parser_free(dsl->parser);
   deinit_env(&dsl->env);
   hc_vm_deinit(&dsl->vm);
 }
@@ -100,7 +133,7 @@ void hc_dsl_set_string(struct hc_dsl *dsl, const char *key, const char *val) {
   hc_dsl_setenv(dsl, key, &HC_STRING)->as_string = strdup(val);
 }
 
- void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
+void hc_dsl_eval(struct hc_dsl *dsl, const char *in) {
   struct hc_list forms;
   hc_list_init(&forms);
   hc_defer(hc_forms_free(&forms));
