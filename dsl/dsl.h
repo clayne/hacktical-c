@@ -51,7 +51,7 @@ void hc_form_print(struct hc_form *f, struct hc_stream *out);
 struct hc_value *hc_form_value(const struct hc_form *f, struct hc_dsl *dsl);
 void hc_form_free(struct hc_form *f);
 
-extern const struct hc_form_type hc_call;
+extern const struct hc_form_type HC_CALL_FORM;
 
 struct hc_call {
   struct hc_form form;
@@ -64,7 +64,7 @@ void hc_call_init(struct hc_call *f,
 		  struct hc_list *owner,
 		  struct hc_form *target);
 
-extern const struct hc_form_type hc_id;
+extern const struct hc_form_type HC_ID_FORM;
 
 struct hc_id {
   struct hc_form form;
@@ -76,7 +76,7 @@ void hc_id_init(struct hc_id *f,
 		struct hc_list *owner,
 		const char *name);
 
-extern const struct hc_form_type hc_literal;
+extern const struct hc_form_type HC_LITERAL;
 
 struct hc_literal {
   struct hc_form form;

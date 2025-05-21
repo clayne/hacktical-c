@@ -14,7 +14,7 @@ static void read_call_tests() {
   assert(hc_read_expr(&in, &out, &sloc));
   
   struct hc_form *f = hc_baseof(out.next, struct hc_form, owner);
-  assert(f->type == &hc_call);
+  assert(f->type == &HC_CALL_FORM);
 }
 
 static void read_id_tests() {
@@ -29,7 +29,7 @@ static void read_id_tests() {
   assert(hc_read_expr(&in, &out, &sloc));
   
   struct hc_form *f = hc_baseof(out.next, struct hc_form, owner);
-  assert(f->type == &hc_id);
+  assert(f->type == &HC_ID_FORM);
 }
 
 static void eval_tests() {

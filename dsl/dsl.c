@@ -196,7 +196,7 @@ static void call_free(struct hc_form *_f) {
   free(f);
 }
 
-const struct hc_form_type hc_call = {
+const struct hc_form_type HC_CALL_FORM = {
   .emit = call_emit,
   .print = call_print,
   .value = NULL,
@@ -207,7 +207,7 @@ void hc_call_init(struct hc_call *f,
 		  const struct hc_sloc sloc,
 		  struct hc_list *owner,
 		  struct hc_form *target) {  
-  hc_form_init(&f->form, &hc_call, sloc, owner);
+  hc_form_init(&f->form, &HC_CALL_FORM, sloc, owner);
   f->target = target;
   hc_list_init(&f->args);
 }
@@ -243,7 +243,7 @@ static void id_free(struct hc_form *_f) {
   free(f);
 }
 
-const struct hc_form_type hc_id = {
+const struct hc_form_type HC_ID_FORM = {
   .emit = id_emit,
   .print = id_print,
   .value = id_value,
@@ -254,7 +254,7 @@ void hc_id_init(struct hc_id *f,
 		const struct hc_sloc sloc,
 		struct hc_list *owner,
 		const char *name) {
-  hc_form_init(&f->form, &hc_id, sloc, owner);
+  hc_form_init(&f->form, &HC_ID_FORM, sloc, owner);
   f->name = strdup(name);
 }
 
@@ -282,7 +282,7 @@ static void literal_free(struct hc_form *_f) {
   free(f);
 }
 
-const struct hc_form_type hc_literal = {
+const struct hc_form_type HC_LITERAL = {
   .emit = literal_emit,
   .print = literal_print,
   .value = literal_value,
@@ -292,7 +292,7 @@ const struct hc_form_type hc_literal = {
 void hc_literal_init(struct hc_literal *f,
 		     const struct hc_sloc sloc,
 		     struct hc_list *owner) {  
-  hc_form_init(&f->form, &hc_literal, sloc, owner);
+  hc_form_init(&f->form, &HC_LITERAL, sloc, owner);
 }
 
 void hc_skip_ws(const char **in, struct hc_sloc *sloc) {
