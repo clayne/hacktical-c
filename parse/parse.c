@@ -108,8 +108,9 @@ static struct hc_parser *char_parse(struct hc_parser *_p,
 				    size_t *i,
 				    struct hc_list *out) {
   struct hc_parse_char *p = hc_baseof(_p, struct hc_parse_char, parser);
-
-  if (*(in + *i) == p->ch) {
+  const char c = *(in + *i);
+  
+  if ((p->ch >= 0 && c == p->ch) || (p->ch < 0 && c != -p->ch)) {
     if (p->id) {
       push_result(out, p->id, *i, *i+1);
     }
@@ -343,11 +344,11 @@ static struct hc_parser *many_parse(struct hc_parser *_p,
   size_t start = *i;
   size_t end = start;
   struct hc_parser *pr = _p;
-  
+
   while (parse_once(p->part, NULL, in, i, &ps)) {
     end = *i;
     struct hc_list *po = out->prev;
-    
+
     if (pn && parse_once(pn, NULL, in, i, out)) {
       pr = pn;
       out = po;
@@ -363,7 +364,7 @@ static struct hc_parser *many_parse(struct hc_parser *_p,
     hc_list_push_back(out, pp);
   }
 
-  return pr;
+  return (start == end) ? NULL : pr;
 }
 
 static void many_free(struct hc_parser *_p) {

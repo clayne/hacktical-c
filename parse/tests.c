@@ -76,8 +76,27 @@ static void delim_test() {
   hc_parsed_free(&out);
 }
 
+static void not_char_test() {
+  struct hc_parser *p =
+    hc_parse_and(0, hc_parse_many(42, hc_parse_char(0, -'!')));
+  
+  const char *in = "abc!";
+  struct hc_list out;
+  hc_list_init(&out);
+  assert(hc_parse(p, in, &out) == 3);
+
+  struct hc_parsed *pr = hc_baseof(out.next, struct hc_parsed, parent);
+  assert(pr->id == 42);
+  assert(pr->start == 0);
+  assert(pr->end == 3);
+
+  hc_parser_free(p);
+  hc_parsed_free(&out);
+}
+
 void parse_tests() {
   alpha_test();
   and_test();
   delim_test();
+  not_char_test();
 }
