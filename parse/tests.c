@@ -59,10 +59,10 @@ static void and_test() {
 
 static void delim_test() {
   struct hc_parser *p = hc_parse_and(0,
-				     hc_parse_char(0, 'a'),
+				     hc_parse_char(0, '('),
 				     hc_parse_many(42, hc_parse_any()),
-				     hc_parse_char(0, 'e'));
-  const char *in = "abcde";
+				     hc_parse_char(0, ')'));
+  const char *in = "(abc)";
   struct hc_list out;
   hc_list_init(&out);
   assert(hc_parse(p, in, &out) == 5);
