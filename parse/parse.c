@@ -182,7 +182,7 @@ struct hc_parser *hc_parse_if(const int id, bool (*predicate)(char)) {
   return &p->parser;
 }
 
-static bool alpha_p(char c) {
+static bool alpha_p(const char c) {
   return isalpha(c);
 }
 
@@ -190,7 +190,7 @@ struct hc_parser *hc_parse_alpha(const int id) {
   return hc_parse_if(id, alpha_p);
 }
 
-static bool digit_p(char c) {
+static bool digit_p(const char c) {
   return isdigit(c);
 }
 
