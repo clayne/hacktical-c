@@ -1,7 +1,7 @@
 #include "chrono/chrono.h"
 #include "dsl.h"
 
-void dsl_benchmarks() {
+void dsl_benchmarks() {/*
   hc_time_t t;
   const int n = 100000;
 
@@ -31,5 +31,5 @@ void dsl_benchmarks() {
     hc_vm_eval(&dsl.vm, 0, -1);
   }
 
-  hc_time_print(&t, "dsl: "); 
+  hc_time_print(&t, "dsl: ");*/
 }

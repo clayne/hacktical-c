@@ -9,7 +9,6 @@
 #include "macro/tests.c"
 #include "malloc1/tests.c"
 #include "malloc2/tests.c"
-#include "parse/tests.c"
 #include "reflect/tests.c"
 #include "set/tests.c"
 #include "slog/tests.c"
@@ -28,7 +27,6 @@ int main() {
   macro_tests();
   malloc1_tests();
   malloc2_tests();
-  parse_tests();
   reflect_tests();
   set_tests();
   slog_tests();

@@ -7,7 +7,6 @@ enum hc_order hc_strcmp(const char *x, const char *y);
 char *hc_upcase(char *s);
 
 struct hc_dsl {
-  struct hc_parser *parser;
   struct hc_set env;
   struct hc_stream *out;
 
