@@ -16,26 +16,24 @@ struct hc_vector *hc_vector_init(struct hc_vector *v,
   v->item_size = item_size;
   v->capacity = 0;
   v->length = 0;
-  v->items = v->start = v->end = NULL;
+  v->start = v->end = NULL;
   return v;
 }
 
 void hc_vector_deinit(struct hc_vector *v) {
-  if (v->items) { _hc_release(v->malloc, v->items); }
+  if (v->start) { _hc_release(v->malloc, v->start); }
 }
 
 void hc_vector_grow(struct hc_vector *v, const size_t capacity) {
   v->capacity = capacity; 
   size_t size = v->item_size * (v->capacity+1);
-  uint8_t *new_items = _hc_acquire(v->malloc, size);
-  uint8_t *new_start = hc_align(new_items, v->item_size);
+  uint8_t *new_start = _hc_acquire(v->malloc, size);
 
-  if (v->items) {
+  if (v->start) {
     memmove(new_start, v->start, v->length * v->item_size);
-    _hc_release(v->malloc, v->items); 
+    _hc_release(v->malloc, v->start); 
   }
   
-  v->items = new_items;
   v->start = new_start;
   v->end = v->start + v->item_size*v->length;
 }
@@ -46,11 +44,11 @@ void hc_vector_clear(struct hc_vector *v) {
 }
 
 void *hc_vector_get(struct hc_vector *v, const size_t i) {
-  return v->items ? v->start + v->item_size*i : NULL;
+  return v->start ? v->start + v->item_size*i : NULL;
 }
 
 const void *hc_vector_get_const(const struct hc_vector *v, const size_t i) {
-  return v->items ? v->start + v->item_size*i : NULL;
+  return v->start ? v->start + v->item_size*i : NULL;
 }
 
 void *hc_vector_push(struct hc_vector *v) {

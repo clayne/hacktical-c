@@ -19,7 +19,7 @@ struct hc_malloc;
 
 struct hc_vector {
   size_t item_size, capacity, length;
-  uint8_t *items, *start, *end;
+  uint8_t *start, *end;
   struct hc_malloc *malloc;
 };
 
