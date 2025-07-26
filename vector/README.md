@@ -6,7 +6,7 @@ Rather than storing pointers to values, we'll expose the memory directly to enab
 ```C
 struct hc_vector {
   size_t item_size, capacity, length;
-  uint8_t *items, *start, *end;
+  uint8_t *start, *end;
   struct hc_malloc *malloc;
 };
 ```
@@ -30,15 +30,13 @@ The `hc_vector_grow()` call in the preceding example is not strictly needed, but
 void hc_vector_grow(struct hc_vector *v, int capacity) {
   v->capacity = capacity; 
   size_t size = v->item_size * (v->capacity+1);
-  uint8_t *new_items = _hc_acquire(v->malloc, size);
-  uint8_t *new_start = hc_align(new_items, v->item_size);
+  uint8_t *new_start = _hc_acquire(v->malloc, size);
 
-  if (v->items) {
+  if (v->start) {
     memmove(new_start, v->start, v->length * v->item_size);
-    _hc_release(v->malloc, v->items); 
+    _hc_release(v->malloc, v->start); 
   }
   
-  v->items = new_items;
   v->start = new_start;
   v->end = v->start + v->item_size*v->length;
 }
