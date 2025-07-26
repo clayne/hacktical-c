@@ -36,7 +36,43 @@ size_t hc_write(struct hc_stream *s,
 }
 ```
 
-`putc` and `puts` are trivially implemented using `write`.
+`getc` is trivial to implement using `read`.
+
+```C
+char hc_getc(struct hc_stream *s) {
+  char c = 0;
+  return hc_read(s, (uint8_t *)&c, 1) ? c : 0;
+}
+```
+
+Which in turn allows us to easily implement `gets`, using a [vector](https://github.com/codr7/hacktical-c/tree/main/vector) as buffer.
+
+```C
+char *hc_gets(struct hc_stream *s, struct hc_malloc *malloc) {
+  struct hc_vector out;
+  hc_vector_init(&out, malloc, 1);
+
+  for (;;) {
+    char c = hc_getc(s);
+
+    if (c == EOF) {
+      break;
+    }
+
+    *(char *)hc_vector_push(&out) = c;
+
+    if (c == '\n') {
+      break;
+    }
+  }
+
+ 
+  *(char *)hc_vector_push(&out) = 0;
+  return (char *)out.start;
+}
+```
+
+`putc` and `puts` delegate to `write`.
 
 ```C
 size_t hc_putc(struct hc_stream *s, const char data) {

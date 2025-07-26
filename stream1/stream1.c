@@ -24,6 +24,29 @@ char hc_getc(struct hc_stream *s) {
   return hc_read(s, (uint8_t *)&c, 1) ? c : 0;
 }
 
+char *hc_gets(struct hc_stream *s, struct hc_malloc *malloc) {
+  struct hc_vector out;
+  hc_vector_init(&out, malloc, 1);
+
+  for (;;) {
+    char c = hc_getc(s);
+
+    if (c == EOF) {
+      break;
+    }
+
+    *(char *)hc_vector_push(&out) = c;
+
+    if (c == '\n') {
+      break;
+    }
+  }
+
+ 
+  *(char *)hc_vector_push(&out) = 0;
+  return (char *)out.start;
+}
+
 size_t hc_putc(struct hc_stream *s, const char data) {
   const uint8_t d[2] = {data, 0};
   return hc_write(s, d, 1);

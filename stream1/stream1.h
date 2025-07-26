@@ -17,6 +17,7 @@ struct hc_stream {
 size_t hc_read(struct hc_stream *s, uint8_t *data, size_t n);
 size_t hc_write(struct hc_stream *s, const uint8_t *data, size_t n);
 
+char *hc_gets(struct hc_stream *s, struct hc_malloc *malloc);
 char hc_getc(struct hc_stream *s);
 size_t hc_putc(struct hc_stream *s, char data);
 size_t hc_puts(struct hc_stream *s, const char *data);
