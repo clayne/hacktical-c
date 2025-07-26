@@ -17,10 +17,6 @@ struct hc_malloc hc_malloc_default = {.acquire = default_acquire,
 
 __thread struct hc_malloc *hc_mallocp = NULL;
 
-struct hc_malloc *hc_malloc() {
-  return hc_mallocp ? hc_mallocp : &hc_malloc_default;
-}
-
 /* Bump */
 
 static void *bump_acquire(struct hc_malloc *a, size_t size) {
@@ -52,9 +48,9 @@ void hc_bump_alloc_init(struct hc_bump_alloc *a,
   a->source = source;
   a->size = size;
   a->offset = 0;
-  a->memory = _hc_acquire(source, size);
+  a->memory = hc_acquire(source, size);
 }
 
 void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
-  _hc_release(a->source, a->memory);
+  hc_release(a->source, a->memory);
 }

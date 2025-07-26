@@ -25,50 +25,26 @@ void default_release(struct hc_malloc *m, void *p) {
 
 struct hc_malloc hc_malloc_default = {.acquire = default_acquire,
 				      .release = default_release};
-
-__thread struct hc_malloc *hc_mallocp = NULL;
-
-struct hc_malloc *hc_malloc() {
-  return hc_mallocp ? hc_mallocp : &hc_malloc_default;
-}
 ```
 
-A set of macros are provided to simplify use. `_x()`-variants are intended for use with bare `struct hc_malloc`-pointers, while the outer layer adds `->malloc` to avoid having to type it out at every use.
-
 ```C
-#define __hc_malloc_do(m, _pm, _done)		
-  bool _done = false;				
-  for (struct hc_malloc *_pm = hc_mallocp;	
-       !_done && (hc_mallocp = (m));		
-       hc_mallocp = _pm, _done = true)
-
-#define _hc_malloc_do(m)						
-  __hc_malloc_do(m, hc_unique(malloc_pm), hc_unique(malloc_done))
-
-#define hc_malloc_do(m)				
-  _hc_malloc_do(&(m)->malloc)
-
-#define __hc_acquire(m, _m, s) ({		
+#define _hc_acquire(m, _m, s) ({		
       struct hc_malloc *_m = m;			
+      assert(_m->acquire);			
       _m->acquire(_m, s);			
     })
 
-#define _hc_acquire(m, s)			
-  __hc_acquire(m, hc_unique(malloc_m), s)
+#define hc_acquire(m, s)			
+  _hc_acquire(m, hc_unique(malloc_m), s)
 
-#define hc_acquire(s)				
-  _hc_acquire(hc_malloc(), s)
-
-#define __hc_release(m, _m, p) do {		
+#define _hc_release(m, _m, p) do {		
   struct hc_malloc *_m = m;			
-  _m->release(_m, p);
+  assert(_m->release);				
+  _m->release(_m, p);				
 } while (0)
-
-#define _hc_release(m, p)			
-  __hc_release(m, hc_unique(malloc_m), p)
-
-#define hc_release(p)				
-  _hc_release(hc_malloc(), p)
+    
+#define hc_release(m, p)			
+  _hc_release(m, hc_unique(malloc_m), p)
 ```
 
 ### Alignment
@@ -93,7 +69,7 @@ size_t hc_alignof(size_t size) {
 
 ### Bump Allocation
 
-A bump allocator consists of a fixed block of memory, a size and an offset. Bump allocators lack support for memory recycling.
+A bump allocator consists of a fixed block of memory, a size and an offset.
 
 ```C
 struct hc_bump_alloc {
@@ -111,11 +87,11 @@ void hc_bump_alloc_init(struct hc_bump_alloc *a,
   a->source = source;
   a->size = size;
   a->offset = 0;
-  a->memory = _hc_acquire(source, size);
+  a->memory = hc_acquire(source, size);
 }
 
 void hc_bump_alloc_deinit(struct hc_bump_alloc *a) {
-  _hc_release(a->source, a->memory);
+  hc_release(a->source, a->memory);
 }
 ```
 

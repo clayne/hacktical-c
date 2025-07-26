@@ -24,13 +24,11 @@ static void run_malloc() {
 
 static void run_bump() {
   struct hc_bump_alloc a;
-  hc_bump_alloc_init(&a, hc_malloc(), N * MAX_SIZE);
+  hc_bump_alloc_init(&a, &hc_malloc_default, N * MAX_SIZE);
   hc_time_t t = hc_now();
 
-  hc_malloc_do(&a) {
-    for (int i = 0; i < N; i++) {
-      hc_acquire(GET_SIZE());
-    }
+  for (int i = 0; i < N; i++) {
+    hc_acquire(&a.malloc, GET_SIZE());
   }
 
   hc_bump_alloc_deinit(&a);
@@ -39,13 +37,11 @@ static void run_bump() {
 
 static void run_slab() {
   struct hc_slab_alloc a;
-  hc_slab_alloc_init(&a, hc_malloc(), N);
+  hc_slab_alloc_init(&a, &hc_malloc_default, N);
   hc_time_t t = hc_now();
 
-  hc_malloc_do(&a) {
-    for (int i = 0; i < N; i++) {
-      hc_acquire(GET_SIZE());
-    }
+  for (int i = 0; i < N; i++) {
+    hc_acquire(&a.malloc, GET_SIZE());
   }
 
   hc_slab_alloc_deinit(&a);

@@ -26,7 +26,7 @@ static void *memo_acquire(struct hc_malloc *a, size_t size) {
     }
   }
 
-  struct memo *m = _hc_acquire(ma->source, sizeof(struct memo) + size);
+  struct memo *m = hc_acquire(ma->source, sizeof(struct memo) + size);
   m->size = size;
   return m->data;
 }
@@ -59,7 +59,7 @@ struct hc_memo_alloc *hc_memo_alloc_init(struct hc_memo_alloc *a,
 void hc_memo_alloc_deinit(struct hc_memo_alloc *a) {
   hc_vector_do(&a->memo.items, _m) {
     struct memo *m = *(struct memo **)_m;
-    _hc_release(a->source, m);
+    hc_release(a->source, m);
   }
   
   hc_set_deinit(&a->memo);
@@ -74,7 +74,7 @@ struct slab {
 };
 
 static struct slab *add_slab(struct hc_slab_alloc *a, const size_t size) {
-  struct slab *s = _hc_acquire(a->source, sizeof(struct slab) + size);
+  struct slab *s = hc_acquire(a->source, sizeof(struct slab) + size);
   hc_list_push_front(&a->slabs, &s->slabs);
   s->next = s->memory;
   return s;
@@ -138,6 +138,6 @@ struct hc_slab_alloc *hc_slab_alloc_init(struct hc_slab_alloc *a,
 void hc_slab_alloc_deinit(struct hc_slab_alloc *a) {
   hc_list_do(&a->slabs, _s) {
     struct slab *s = hc_baseof(_s, struct slab, slabs);
-    _hc_release(a->source, s);
+    hc_release(a->source, s);
   }
 }

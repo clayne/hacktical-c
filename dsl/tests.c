@@ -37,7 +37,7 @@ static void eval_tests() {
   hc_dsl_init(&dsl, &hc_malloc_default);
   hc_defer(hc_dsl_deinit(&dsl));
   struct hc_memory_stream out;
-  hc_memory_stream_init(&out, hc_malloc());
+  hc_memory_stream_init(&out, &hc_malloc_default);
   hc_defer(hc_stream_deinit(&out.stream));
   dsl.out = &out.stream;
   hc_dsl_set_string(&dsl, "foo", "ghi");

@@ -21,17 +21,17 @@ struct hc_vector *hc_vector_init(struct hc_vector *v,
 }
 
 void hc_vector_deinit(struct hc_vector *v) {
-  if (v->start) { _hc_release(v->malloc, v->start); }
+  if (v->start) { hc_release(v->malloc, v->start); }
 }
 
 void hc_vector_grow(struct hc_vector *v, const size_t capacity) {
   v->capacity = capacity; 
   size_t size = v->item_size * (v->capacity+1);
-  uint8_t *new_start = _hc_acquire(v->malloc, size);
+  uint8_t *new_start = hc_acquire(v->malloc, size);
 
   if (v->start) {
     memmove(new_start, v->start, v->length * v->item_size);
-    _hc_release(v->malloc, v->start); 
+    hc_release(v->malloc, v->start); 
   }
   
   v->start = new_start;
