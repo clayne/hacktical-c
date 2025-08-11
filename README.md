@@ -18,7 +18,9 @@ I started out with Basic on the Commodore 64, went on to learn Assembler on an A
 
 For a long time, I didn't pay much attention to C; the language felt primitive, especially compared to C++. But gradually over time, I realized that the worst enemy in software is complexity, and started taking C more seriously.
 
-Since then I've written a ton of C; and along the way I've picked up many interesting techniques that helped me make the most out of the language and appreciate it for its strengths.
+Since then I've written a ton of C; and along the way I've picked up a number of techniques that helped me make the most out of the language and appreciate it for its strengths.
+
+This book is an attempt to synthesize that experience.
 
 ## License
 The content of this book is openly licensed via [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
