@@ -54,11 +54,11 @@ Before we dive into the first real implementation, alignment deserves a brief di
 
 ```C
 #define hc_align(base, size) ({						
-      __auto_type _base = base;						
-      __auto_type _size = hc_alignof(size);				
-      __auto_type _rest = (ptrdiff_t)_base % _size;			
-      (_rest) ? _base + _size - _rest : _base;				
-    })
+  __auto_type _base = base;						
+  __auto_type _size = hc_alignof(size);				
+  __auto_type _rest = (ptrdiff_t)_base % _size;			
+  (_rest) ? _base + _size - _rest : _base;				
+})
 
 size_t hc_alignof(size_t size) {
   const size_t max = _Alignof(max_align_t);
