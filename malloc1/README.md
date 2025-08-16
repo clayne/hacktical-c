@@ -23,16 +23,18 @@ void default_release(struct hc_malloc *m, void *p) {
   free(p);
 }
 
-struct hc_malloc hc_malloc_default = {.acquire = default_acquire,
-				      .release = default_release};
+struct hc_malloc hc_malloc_default = {
+  .acquire = default_acquire,
+  .release = default_release
+};
 ```
 
 ```C
 #define _hc_acquire(m, _m, s) ({		
-      struct hc_malloc *_m = m;			
-      assert(_m->acquire);			
-      _m->acquire(_m, s);			
-    })
+  struct hc_malloc *_m = m;			
+  assert(_m->acquire);			
+  _m->acquire(_m, s);			
+})
 
 #define hc_acquire(m, s)			
   _hc_acquire(m, hc_unique(malloc_m), s)
