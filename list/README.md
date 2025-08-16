@@ -77,7 +77,7 @@ We use the following macro to reach out from `struct hc_list` to its `struct my_
   _hc_baseof(p, t, m, hc_unique(pointer))
 ```
 
-To remove an item from a list; we don't even need access to the list root, just the item is enough.
+To remove an item from a list; we don't even need access to the list root, the item is enough.
 
 ```C
 struct hc_list *hc_list_delete(struct hc_list *l) {

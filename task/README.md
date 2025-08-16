@@ -1,7 +1,7 @@
 ## Lightweight Concurrent Tasks
 Concurrent tasks allows keeping the flow of control intact where it would otherwise get lost in the noise of a solution based on discrete events. Note that concurrent means interleaved, not parallel; system threads would add a lot of complexity and overhead in comparison. C lacks built in support for coroutines, but the same effect can be achieved without breaking any rules.
 
-We start by defining an abstraction to represent a task.
+This is what a task looks like.
 
 ```C
 struct hc_task {
@@ -12,13 +12,13 @@ struct hc_task {
 };
 ```
 
-The task body is simply a regular pointer to a function taking a `struct hc_task *`-argument.
+The body is simply a regular pointer to a function taking a `struct hc_task *`-argument.
 
 ```C
 typedef void (*hc_task_body)(struct hc_task *);
 ```
 
-We also need a way to track of a list of tasks, a scheduler.
+We'll also need a strategy to track of a list of tasks, a kind of scheduler.
 
 ```C
 struct hc_task_list {
@@ -119,7 +119,7 @@ static void consumer(struct hc_task *task) {
   } while (0)				      
 ```
 
-The reason this works as well as it does is because C allows `case` to appear at any nesting level within a `switch`. The discovery of this feature is often credited to a guy named [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
+The reason this works as well as it does is because C allows `case` to appear at any nesting level within a `switch`; the discovery of this feature is often credited to [Tom Duff](https://en.wikipedia.org/wiki/Duff%27s_device).
 
 ### Limitations
 Since we're skipping around inside the task's function body, any local variables that span calls to `hc_task_yield()` need to be placed inside `struct my_task`.
