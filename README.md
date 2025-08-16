@@ -10,15 +10,15 @@ This book assumes basic programming knowledge. We're not going to spend a lot of
 Keep in mind it's very much a work in progress, mind the gaps, and please report any issues you come across or suggestions for improvements in the repo.
 
 ## About the author
-You could say that there are three kinds of programmers, with very different motivations; academics, hackers and gold diggers. I've always identified as a hacker. I like solving tricky problems, and I prefer using powerful tools that don't get in my way. To me; software is all about practical application, about making a positive change in the real world.
+Programmers tend to fall in to categories, with very different motivations. I've always identified as a hacker. I like solving tricky problems, tend to interpret rules as challenges, and prefer using powerful tools that don't get in my way. To me, software is all about making a positive change in the real world.
 
 I've been writing code for fun on a mostly daily basis since I got a Commodore 64 for Christmas in 1985, professionally in different roles/companies since 1998.
 
-I started out with Basic on the Commodore 64, went on to learn Assembler on an Amiga 500, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Erlang, Forth, Haskell, SmallTalk, Go, C#, Swift.
+I started out with Basic on the Commodore, went on to learn Assembler on an Amiga, Pascal on PC; C++, Modula-3, Prolog, Ruby, Python, Perl, JavaScript, Common Lisp, Java, Erlang, Forth, Haskell, SmallTalk, Clojure, Go, C#, Swift, Kotlin.
 
 For a long time, I didn't pay much attention to C; the language felt primitive, especially compared to C++. But gradually over time, I realized that the worst enemy in software is complexity, and started taking C more seriously.
 
-Since then I've written a ton of C; and along the way I've picked up a number of techniques that helped me make the most out of the language and appreciate it for its strengths.
+Since then I've written plenty of C; and along the way I've picked up a number of techniques that helped me make the most out of the language and appreciate it for its strengths.
 
 This book is an attempt to synthesize that experience.
 
@@ -28,7 +28,7 @@ The content of this book is openly licensed via [CC BY-NC-ND 4.0](https://creati
 ## Support
 I've decided to release the book using an open license to benefit as many as possible, because I believe knowledge should be shared freely.
 
-But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project. Please take a moment to consider chipping in if you like the idea. Nothing is free in this world, your contribution could make a big difference.
+But I also believe in compensation for creators; and the less economic pressure I have to deal with, the more time and energy I can put into the project.
 
 The repository is set up for sponsoring via Stripe and Liberapay, alternatively you may use BTC (bitcoin:18k7kMcvPSSSzQtJ6hY5xxCt5U5p45rbuh) or ETH (0x776001F33F6Fc07ce9FF70187D5c034DCb429811). 
 
@@ -56,22 +56,20 @@ make
 ```
 
 ## Platforms
-Since Unix is all about C, and Linux is currently the best supported Unix out there; that's the platform I would recommend for C.
-
-There's also Free/Open/NetBSD, which have less support but are equally enjoyable from my experience.
+Since Unix is all about C, and Linux is currently the best supported Unix out there; that's the platform I would recommend. There's also Free/Open/NetBSD, which have less support but are equally enjoyable from my experience.
 
 All of the above support [valgrind](https://valgrind.org/), which makes coding C a lot safer and more productive.
 
 Microsoft has unfortunately chosen to neglect C for a long time, its compilers dragging far behind the rest of the pack. Windows does however offer a way of running Linux in the form of WSL2, which works very well from my experience.
 
-macOS keeps diverging from its Unix roots, which makes coding C in that environment more and more frustrating.
+macOS keeps diverging from its Unix roots, which makes coding C in that environment increasingly frustrating.
 
 ## Portability
-The code in this book uses several GNU extensions that are not yet in the C standard. Cleanup attributes, multi-line expressions and nested functions specifically.
+The code in this book uses several GNU extensions that are not yet in the C standard; cleanup attributes, multi-line expressions and nested functions specifically.
 
 Except for nested functions, extensions used in the code should work just as well in `clang`.
 
-I can think of one feature, `hc_defer()`, which would currently be absolutely impossible to do without extensions. In other cases, alternative solutions are simply less convenient.
+I can think of one feature, `hc_defer()`, which would currently be absolutely impossible without extensions.
 
 ## Chapters
 The content is arranged to form a natural progression, where later chapters build on concepts that have already been introduced. That being said; feel free to skip around, just be prepared to backtrack to fill in blanks.
