@@ -3,20 +3,18 @@ To implement dynamic compilation, we'll have to cast a few non-trivial Unix spel
 
 Example:
 ```C
-  const char *out = "/var/tmp/libtest.so";
+const char *out = "/var/tmp/libtest.so";
   
-  hc_compile("#include <stdio.h>\n"
-	     "int test() { return 42; }",
-	     out,
-	     .cflags = (const char *[]){"-Wall",
-					"-fsanitize=undefined",
-					NULL});
+hc_compile("#include <stdio.h>\n"
+	   "int test() { return 42; }",
+	   out,
+	   .cflags = (const char *[]){"-Wall", "-fsanitize=undefined", NULL});
 
-  struct hc_dlib lib;
-  hc_dlib_init(&lib, out);
-  hc_defer(hc_dlib_deinit(&lib));
-  int (*fn)() = hc_dlib_find(&lib, "test");
-  assert(fn() == 42);
+struct hc_dlib lib;
+hc_dlib_init(&lib, out);
+hc_defer(hc_dlib_deinit(&lib));
+int (*fn)() = hc_dlib_find(&lib, "test");
+assert(fn() == 42);
 ```
 
 The star of the show is `hc_compile()` which allows dynamically creating shared libraries from source code.
