@@ -6,7 +6,7 @@ We now have enough features in place to implement more elaborate allocators.
 It might make sense to give [Part 1](https://github.com/codr7/hacktical-c/tree/main/malloc1) a quick scan before diving in.
 
 ### Recycling Memory
-Memory recycling is a common requirement, we'll design the feature as a separate allocator that can be plugged in at any point.
+Memory recycling is a common requirement, we'll design the feature as a separate allocator that can be plugged in at any point. Since we have no idea what kind of memory we'll be recycling, we'll tag each allocation with its size.
 
 Example:
 ```C
@@ -17,7 +17,7 @@ hc_release(&a.malloc, p);
 assert(hc_acquire(&a.malloc, sizeof(int)) == p);
 ```
 
-A multi-`struct hc_set` keyed on size is used to track allocations.
+A [set](https://github.com/codr7/hacktical-c/tree/main/set) keyed on size is used to track allocations.
 
 ```C
 struct hc_memo_alloc {
