@@ -1,5 +1,7 @@
 ## Exceptions
-How to deal with errors is something we're still very much figuring out in software. But it is very clear to me that there will be no one true error handling strategy to rule them all. Sometimes returning error codes is the right thing to do, other times exceptions make a better solution.
+How to best deal with errors is something we're still very much figuring out in software. But it is clear to me that there will always be a place for different strategies depending on needs.
+
+The main issue with exceptions is that they transfer control in difficult to predict ways, and the main advantage is that they allow dealing with errors at the correct level without manually propagating them.
 
 C lacks native exception support, so we're going to roll our own using `setjmp` and `longjmp`. `setjmp` saves the current execution context into a variable of type `jmp_buf` and returns `0` the first time, and `longjmp` restores it which causes a second return from `setjmp` with the specified value.
 
@@ -67,11 +69,10 @@ void hc_errors_deinit() {
 
 ```C
 #define hc_throw(m, ...) {						
-      struct hc_error *e =					
-	hc_error_new("Failure in '%s', line %d:\n" m "\n",
-		     __FILE__, __LINE__, ##__VA_ARGS__);	
-      _hc_throw(e);						
-  } do while(0)
+  struct hc_error *e = hc_error_new("Failure in '%s', line %d:\n" m "\n",
+                                    __FILE__, __LINE__, ##__VA_ARGS__);
+  _hc_throw(e);						
+} do while(0)
 
 void _hc_throw(struct hc_error *e) {
   struct hc_vector *hs = handlers();
@@ -88,7 +89,7 @@ void _hc_throw(struct hc_error *e) {
 }
 ```
 
-Errors are defined as dynamically sized structs, which are allocated/freed automagically. 
+Errors are defined as follows.
 
 ```C
 struct hc_error {
@@ -97,11 +98,11 @@ struct hc_error {
 ```
 
 ### Vararg Functions
-From this point on we're going to be defining a fair amount of vararg functions. Like many other features, they require a tiny bit more discipline in C compared to other mainstream languages.
+From this point on we're going to be defining a fair amount of vararg functions. Like many other features, they require a tiny bit more discipline in C compared to most other languages.
 
-`va_start` initializes a vararg, it expects the final argument in second position. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this it's not possible to retrieve an argument more than once. In the next example we use `va_copy` to get around the problem by duplicating the list.
+`va_start` initializes a vararg, it expects the final argument in second position. A `va_list` can only be consumed once, since each call to `va_arg()` modifies the list so that the next call returns the next argument. Due to this it's not possible to retrieve an argument more than once. In the following example we use `va_copy` to get around the problem by duplicating the list.
 
-Back to errors. Calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
+Back in error land; calling `vsnprintf` with a `NULL` argument returns the message length, which we need to allocate memory for the error.
 
 ```C
 struct hc_error *hc_error_new(const char *message, ...) {

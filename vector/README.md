@@ -1,7 +1,7 @@
 ## Vectors
-A vector is a dynamically allocated array that automagically changes its size when needed. Items are stored in a single block of memory, just like a regular array; on top of that it takes care of the book keeping when adding/removing items. It's by far the most common collection type in mainstream programming languages.
+A vector is a dynamically allocated array that automagically changes its size as needed. Items are stored in a single block of memory, just like a regular array; on top of that it takes care of the book keeping when adding/removing items. It's by far the most common collection type in today's mainstream programming languages.
 
-Rather than storing pointers to values, we'll expose the memory directly to enable value based access; this means that the vector needs to know the size of its items.
+Rather than storing pointers to values, we'll expose the memory directly to enable value based access; this means that the vector needs to know the size of its items. We also cache the start and end of the currently used, aligned memory block.
 
 ```C
 struct hc_vector {
