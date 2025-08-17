@@ -1,13 +1,13 @@
 ## Extensible Streams - Part 1
-C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs in general are a bad idea. The problem we're trying to solve is providing an interface where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for; there are extensions for custom `FILE *`-streams, but so far with spotty support.
+C++'s stream implementation may have missed the target in many ways, that doesn't mean extensible stream APIs in general are a bad idea. The problem we're trying to solve is providing an interface where one end doesn't need to know what's on the other end of a stream. C's standard library leaves a lot to wish for; there are extensions for custom `FILE *`-streams, but with spotty support.
 
 Example:
 ```C
-  struct hc_memory_stream s;
-  hc_memory_stream_init(&s);
-  hc_defer(hc_stream_deinit(&s.stream));
-  hc_printf(&s.stream, "%s%d", "foo", 42);
-  assert(strcmp("foo42", hc_memory_stream_string(&s)) == 0);
+struct hc_memory_stream s;
+hc_memory_stream_init(&s);
+hc_defer(hc_stream_deinit(&s.stream));
+hc_printf(&s.stream, "%s%d", "foo", 42);
+assert(strcmp("foo42", hc_memory_stream_string(&s)) == 0);
 ```
 
 We'll start with defining the interface for a stream.
@@ -111,7 +111,7 @@ void hc_stream_deinit(struct hc_stream *s) {
 }
 ```
 
-The first implementation is file streams.
+We begin with file streams.
 
 ```C
 struct hc_file_stream_opts {
@@ -177,7 +177,7 @@ void file_deinit(struct hc_stream *s) {
 }
 ```
 
-Next up is implementing memory streams. We'll use a `struct hc_vector` to manage the stream data and track the current read position in `rpos`.
+Next up is memory streams. We'll use a [vector](https://github.com/codr7/hacktical-c/tree/main/vector) to manage the stream data and add a separate variable to track the current read position.
 
 ```C
 struct hc_memory_stream {
