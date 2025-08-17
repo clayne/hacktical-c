@@ -1,13 +1,11 @@
 ## Ordered Sets and Maps
 Besides [lists](https://github.com/codr7/hacktical-c/tree/main/list) and [vectors](https://github.com/codr7/hacktical-c/tree/main/vector), some kind of mapping/lookup functionality is often needed. The design described here is based on binary searched vectors.
 
-Most people would likely instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs. Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run unpredictable issues with values clustering on a minority of buckets in the general case.
+Most people would instinctively reach for hash tables, and typically spend the next few months researching optimal hash algorithms and table designs. Most hash tables need to be resized at some point, leading to GC-like dips in performance. And no matter what hash algorithms you use, you will eventually run into issues with values clustering on a minority of buckets.
 
-A binary searched vector is as simple as it gets and performs pretty well while being more predictable, and since they don't need any infrastructure, they're comparably cheap to create. The one worst case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work it has to perform.
+A binary searched vector is as simple as it gets and performs pretty well while being more predictable, and since they don't need any infrastructure, they're comparably cheap to create. The case you want to avoid with a binary searched set is inserting items in reverse order, since that maximises the amount of work performed.
 
-Besides, the natural dual to a lookup table is a list of pairs, and having an order strengthens that connection.
-
-What we're actually going to build is an ordered set; but since it's value based, maps are easily implemented on top with low overhead.
+What we're actually going to build is an ordered (multi-)set; but since it's value based, maps are easily implemented on top with low overhead.
 
 Example:
 ```C
@@ -45,18 +43,18 @@ hc_set_deinit(&s);
 A custom enum and convenience macro for comparisons is provided.
 
 ```C
-#define hc_cmp(x, y) ({					\
-      __auto_type _x = x;				\
-      __auto_type _y = y;				\
-      (_x < _y) ? HC_LT : ((_x > _y) ? HC_GT : HC_EQ);	\
-    })
+#define hc_cmp(x, y) ({
+  __auto_type _x = x;				
+  __auto_type _y = y;				
+  (_x < _y) ? HC_LT : ((_x > _y) ? HC_GT : HC_EQ);	
+})
 
 enum hc_order {HC_LT = -1, HC_EQ = 0, HC_GT = 1};
 
 typedef enum hc_order (*hc_cmp_t)(const void *, const void *);
 ```
 
-Besides a comparator for items, sets also feature an optional accessor for item keys.
+Besides a comparator for items, sets also support an optional key accessor.
 
 ```C
 struct hc_set {
@@ -80,7 +78,7 @@ void hc_set_deinit(struct hc_set *s) {
 }
 ```
 
-Most of the weight is pulled by `hc_set_index()`; which returns an index for a key, and optionally sets a flag if the key is in the set.
+Most of the weight is pulled by `hc_set_index()`; which returns the index for a key, and optionally sets a flag if the key is in the set.
 
 ```C
 size_t hc_set_index(struct hc_set *s, void *key, bool *ok) {
@@ -127,7 +125,7 @@ void *hc_set_add(struct hc_set *s, void *key, bool force) {
 }
 ```
 
-`hc_set_find()` returns the item with the specified key if it's in the set, otherwise `NULL`.
+`hc_set_find()` returns the item with the specified key if found, otherwise `NULL`.
 
 ```C
 void *hc_set_find(struct hc_set *s, void *key) {
