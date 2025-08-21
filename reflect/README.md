@@ -1,5 +1,5 @@
 ## Reflection
-Reflection is the ability of a program to examine and introspect its own structure and behavior. Since `C` lacks built-in support, we're going to add a layer of types and values on top. By itself, the functionality described here doesn't look very useful, but it enables generalizing over types when implementing other features.
+Reflection is the ability of a program to examine and introspect its own structure and behavior. Since C lacks built-in support, we're going to add a thin layer of types and values on top. By itself, the functionality described here doesn't look very useful, but it enables implementing [other](https://github.com/codr7/hacktical-c/tree/main/slog) [ideas](https://github.com/codr7/hacktical-c/tree/main/dsl).
 
 Example:
 ```C
@@ -69,7 +69,7 @@ struct hc_value *hc_value_copy(struct hc_value *dst, struct hc_value *src) {
 }
 ```
 
-`print` defaults to `write` if not defined.
+We'll add both raw (`write`) and formatted (`print`) output, formatted defaults to raw.
 
 ```C
 void hc_value_print(struct hc_value *v, struct hc_stream *out) {
@@ -83,9 +83,10 @@ void hc_value_print(struct hc_value *v, struct hc_stream *out) {
 
 The standard types are defined as constants.
 
+Booleans:
 ```C
 static void bool_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_puts(out, v->as_bool ? "true" : "false");
+  hc_puts(out, v->as_bool ? "true" : "false");
 }
 
 const struct hc_type HC_BOOL = {
@@ -94,6 +95,8 @@ const struct hc_type HC_BOOL = {
   .write = bool_write
 };
 ```
+
+[Fixed-points](https://github.com/codr7/hacktical-c/tree/main/fix):
 
 ```C
 static void fix_write(const struct hc_value *v, struct hc_stream *out) {
@@ -107,9 +110,11 @@ const struct hc_type HC_FIX = {
 };
 ```
 
+Integers:
+
 ```C
 static void int_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_printf(out, "%d", v->as_int);
+  hc_printf(out, "%d", v->as_int);
 }
 
 const struct hc_type HC_INT = {
@@ -131,13 +136,13 @@ static void string_deinit(struct hc_value *v) {
 }
 
 static void string_print(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_puts(out, v->as_string);
+  hc_puts(out, v->as_string);
 }
 
 static void string_write(const struct hc_value *v, struct hc_stream *out) {
-  _hc_stream_putc(out, '"');
+  hc_putc(out, '"');
   string_print(v, out);
-  _hc_stream_putc(out, '"');
+  hc_putc(out, '"');
 }
 
 const struct hc_type HC_STRING = {
