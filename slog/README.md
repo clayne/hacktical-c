@@ -1,5 +1,5 @@
 ## Structured Logs
-Logging is one aspect of software development that I feel deserves more focus than it usually gets. A well implemented log goes a long way to quickly resolving unforseen issues that pop up in production. I prefer my logs structured by name/value pairs since this increases their usefulness by making them convenient to work with programatically.
+Logging is one of those things that deserve more focus than it usually gets. A well designed log helps alot with resolving unforseen issues that pop up in production. I prefer my logs structured by name/value pairs since this increases their usefulness by making them convenient to work with programatically.
 
 Example:
 ```C
@@ -34,7 +34,7 @@ struct hc_slog_field {
 };
 ```
 
-Each thread tracks its own default log, which defaults to `stdout`.
+Each thread has a default log, which defaults to `stdout`.
 
 ```C
 __thread struct hc_slog *_hc_slog = NULL;
@@ -56,7 +56,7 @@ struct hc_slog *hc_slog() {
 }
 ```
 
-A few macros to simplify typical use are provided:
+A few macros to simplify typical use:
 
 ```C
 #define __hc_slog_do(s, _ps)			
@@ -74,7 +74,7 @@ A few macros to simplify typical use are provided:
   _hc_slog_deinit(&(s)->slog)
 ```
 
-Since specifying fields needs to be as convenient as possible, we'll add a thin layer on top.
+We'll add a layer of convenience functions for defining fields:
 
 ```C
 static struct hc_value *field_init(struct hc_slog_field *f,
@@ -122,7 +122,7 @@ struct hc_slog_field *hc_slog_time(const char *name, const hc_time_t value) {
   _hc_slog_write(hc_slog(), ##__VA_ARGS__)
 ```
 
-The primary kind of log writes fields to a `struct hc_stream`.
+The primary kind of log writes fields to a [stream](https://github.com/codr7/hacktical-c/tree/main/stream1).
 
 ```C
 struct hc_slog_stream_opts {

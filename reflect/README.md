@@ -153,6 +153,7 @@ const struct hc_type HC_STRING = {
   .write = string_write
 };
 ```
+[Time](https://github.com/codr7/hacktical-c/tree/main/chrono):
 
 ```C
 static void time_write(const struct hc_value *v, struct hc_stream *out) {
